@@ -1,0 +1,141 @@
+<project name="proxy" default="usage" basedir=".">
+
+  <property file="./build.properties"/>
+  <property name="test.dir" location="${test}"/>
+
+  <target name="usage">
+    <echo>
+    Main targets:
+
+    build --> compiles library, servlets, and tests
+    clean --> cleans all built files
+    api   --> creates javadocs
+    test  --> runs unit tests
+    all   --> clean, compile, build, api
+
+    </echo>
+  </target>
+
+  <target name="all" depends="clean, compile, build, api"/>
+
+  <target name="init">
+    <mkdir dir="${classes}"/>
+    <mkdir dir="${lib}"/>
+    <mkdir dir="${reports}"/>
+    <mkdir dir="${built}"/>
+    <mkdir dir="${api}"/>
+  </target>
+
+  <target name="clean">
+    <delete dir="${classes}"/>
+    <delete dir="${lib}"/>
+    <delete dir="${reports}"/>
+    <delete dir="${built}"/>
+    <delete dir="${api}"/>
+  </target>
+
+  <target name="api" depends="compile">
+    <javadoc destdir="${api}" Overview="${src}/overview.html">
+      <link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+
+      <packageset dir="${src}" defaultexcludes="yes">
+        <exclude name="org/apache/joid/SimpleRegistration"/>
+      </packageset>
+
+      <classpath refid="compile.classpath"/>
+      <classpath location="${classes}"/>
+    </javadoc>
+  </target>
+
+  <target name="compile" depends="init">
+    <javac srcdir="${src}" destdir="${classes}" 
+           debug="on" includeAntRuntime="no" source="1.4">
+      <compilerarg value="-Xlint"/>
+      <classpath refid="compile.classpath"/>
+    </javac>
+    <javac srcdir="${test}" destdir="${classes}" 
+           debug="on" includeAntRuntime="no" source="1.4">
+      <compilerarg value="-Xlint"/>
+      <classpath refid="compile.test.classpath"/>
+    </javac>
+  </target>
+
+  <target name="build" depends="compile, copy">
+    <jar jarfile="${joid_jar}">
+      <fileset dir="${classes}"/>
+    </jar>
+    <jar jarfile="${joid_db_config_jar}">
+      <fileset file="${src}/org.verisign.joid.db.hibernate.cfg.xml"/>
+    </jar>
+    <war webxml="${src}/web.xml" destfile="${joid_war}">
+      <lib file="${joid_jar}"/>
+      <lib file="${tsik_jar}"/>
+      <lib file="${mysql_jar}"/>
+      <lib file="${log4j_jar}"/>
+
+      <lib file="${dom4j_jar}"/>
+      <lib file="${hibernate_jar}"/>
+      <lib file="${commons_collections_jar}"/>
+      <lib file="${cglib_jar}"/>
+      <lib file="${asm_jar}"/>
+      <lib file="${jta_jar}"/>
+      <lib file="${antlr_jar}"/>
+    </war>
+  </target>
+
+  <target name="copy" depends="init">
+    <copy todir="${classes}">
+      <fileset dir="${src}">
+        <exclude name="**/*.java"/>
+        <exclude name="**/create.sql"/>
+        <exclude name="**/web.xml"/>
+        <exclude name="**/org.verisign.joid.db.hibernate.cfg.xml"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <fileset dir="/." id="hibernate.fileset">
+    <include name="${dom4j_jar}"/> 
+    <include name="${hibernate_jar}"/> 
+    <include name="${commons_collections_jar}"/> 
+  </fileset>  
+
+  <path id="compile.classpath">
+    <pathelement location="${tsik_jar}"/>
+    <pathelement location="${servlet_jar}"/>
+    <pathelement location="${log4j_jar}"/> 
+    <pathelement location="${hibernate_jar}"/> 
+  </path>  
+
+  <path id="compile.test.classpath">
+    <pathelement location="${tsik_jar}"/>
+    <pathelement location="${servlet_jar}"/>
+    <pathelement location="${classes}"/>
+    <pathelement location="${cactus_jar}"/>
+    <pathelement location="${junit_jar}"/>
+  </path>  
+
+  <target name="test" depends="build">
+    <junit fork="yes" dir="${test}/data" 
+           printsummary="on" showoutput="on">
+      <classpath>
+        <pathelement location="${joid_db_config_jar}"/>
+        <pathelement location="${joid_jar}"/>
+        <pathelement location="${log4j_jar}"/>
+        <pathelement location="${tsik_jar}"/>
+        <pathelement location="${dom4j_jar}"/>
+        <pathelement location="${hibernate_jar}"/>
+        <pathelement location="${commons_collections_jar}"/>
+        <pathelement location="${cglib_jar}"/>
+        <pathelement location="${asm_jar}"/>
+        <pathelement location="${jta_jar}"/>
+        <pathelement location="${antlr_jar}"/>
+        <pathelement location="${commons_logging_jar}"/>
+        <pathelement location="${mysql_jar}"/>
+      </classpath>
+      <formatter type="plain"/>
+      <test name="org.verisign.joid.test.AllTests" todir="${reports}"/>
+    </junit>
+  </target>
+
+</project>

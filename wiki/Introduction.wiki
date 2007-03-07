@@ -5,5 +5,13 @@ providers as well as relying parties.
 
 JOID compiles under JDK 1.4 or later.
 
+There are two mailing lists. Feel free to join either:
+
+|| *Type* || *URL* ||
+|| General || http://groups.google.com/group/joid-general ||
+|| Developer || http://groups.google.com/group/joid-dev ||
+
+
+
 
 

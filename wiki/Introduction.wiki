@@ -1,0 +1,9 @@
+#summary Introduction to JOID.
+
+JOID is an OpenID 2.0 Java library that lets you implement
+providers as well as relying parties.
+
+JOID compiles under JDK 1.4 or later.
+
+
+

@@ -72,7 +72,7 @@ public class RequestFactory
      * @throws UnsupportedEncodingException if the string is not properly 
      *  UTF-8 encoded.
      */
-    static Map parseQuery(String query) 
+    public static Map parseQuery(String query) 
 	throws UnsupportedEncodingException
     {
 	Map map = new HashMap();

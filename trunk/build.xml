@@ -50,12 +50,12 @@
 
   <target name="compile" depends="init">
     <javac srcdir="${src}" destdir="${classes}" 
-           debug="on" includeAntRuntime="no" source="1.4">
+           debug="on" includeAntRuntime="no" target="1.4" source="1.4">
       <compilerarg value="-Xlint"/>
       <classpath refid="compile.classpath"/>
     </javac>
     <javac srcdir="${test}" destdir="${classes}" 
-           debug="on" includeAntRuntime="no" source="1.4">
+           debug="on" includeAntRuntime="no" target="1.4" source="1.4">
       <compilerarg value="-Xlint"/>
       <classpath refid="compile.test.classpath"/>
     </javac>

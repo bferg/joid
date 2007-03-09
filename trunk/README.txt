@@ -24,3 +24,8 @@ For unit tests:
   mysql> flush privileges;
   mysql> exit;
 
+
+
+See LICENSE.txt for licensing agreement.
+
+

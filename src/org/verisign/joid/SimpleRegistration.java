@@ -26,8 +26,10 @@ import org.apache.log4j.Logger;
  * Simple registration extensions, as defined by
  * http://openid.net/specs/openid-simple-registration-extension-1_0.html
  * 
- * This class should only be used by internal request/response processing. TODO
- * to make this clearer.
+ * <strong>This class should only be used by internal request/response 
+ * processing</strong>. 
+ * 
+ * TODO to make this clearer.
  */
 public class SimpleRegistration
 {

@@ -16,8 +16,7 @@ package org.verisign.joid;
 import org.verisign.joid.db.DbStore;
 
 /**
- * Creates stores. Currently the {@link org.verisign.joid.db.DbStore} is
- * supported.
+ * Creates stores. JOID comes with the {@link org.verisign.joid.db.DbStore}.
  */
 public class StoreFactory
 {
@@ -34,20 +33,38 @@ public class StoreFactory
 	return "db".equals(storeType);
     }
 
+
     /**
-     * Gets a store implementation. Use store type "db" to retrieve a
+     * Gets a store implementation. 
+     *
+     * @param className the class name of the store to instantiate.
+     * @return the store.
+     * @throws IllegalArgumentException if the class doesn't exist or is
+     *  not a store type.
+     */
+    public static Store getInstance(String className)
+    {
+	try {
+	    return (Store) Class.forName(className).newInstance();
+	} catch (ClassNotFoundException e){
+	    throw new IllegalArgumentException("Not found "+className);
+	} catch (IllegalAccessException e){
+	    throw new IllegalArgumentException("No access to "+className);
+	} catch (InstantiationException e){
+	    throw new IllegalArgumentException("Cannot instantiate "
+					       +className);
+	}
+    }
+
+
+    /**
+     * Gets a database store implementation of type 
      * {@link org.verisign.joid.db.DbStore}.
      *
-     * @param storeType the type to cget.
-     * @return the store.
-     * @throws IllegalArgumentException if the store type is not supported.
+     * @return the database store.
      */
-    public static Store getInstance(String storeType)
+    public static Store getDbInstance()
     {
-	if ("db".equals(storeType)){
-	    return DbStore.getInstance();
-	} else {
-	    throw new IllegalArgumentException("No such type: "+storeType);
-	}
+	return DbStore.getInstance();
     }
 }

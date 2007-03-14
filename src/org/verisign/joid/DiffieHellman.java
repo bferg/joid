@@ -32,6 +32,8 @@ public class DiffieHellman
 
     private final static Logger log = Logger.getLogger(DiffieHellman.class);
 
+    private DiffieHellman() {}
+
     /**
      * The default modulus defined in the specification.
      */
@@ -54,7 +56,7 @@ public class DiffieHellman
 	try {
 	    random = SecureRandom.getInstance("SHA1PRNG");
 	} catch (NoSuchAlgorithmException e){
-	    throw new RuntimeException("No secure random available. Goodnight");
+	    throw new RuntimeException("No secure random available!");
 	}
     }
 
@@ -77,10 +79,11 @@ public class DiffieHellman
     }
 
     /**
-     * Creates a DiffieHellmanInstance.
+     * Creates a DiffieHellman instance.
      *
-     * @param mod the modulus to use. If null, use {@link #DEFAULT_MODULUS} 
-     * @param gen the generator to use. If null, use {@link #DEFAULT_GENERATOR} 
+     * @param mod the modulus to use. If null, use {@link #DEFAULT_MODULUS}.
+     * @param gen the generator to use. If null, use 
+     * {@link #DEFAULT_GENERATOR}.
      */
     public DiffieHellman(BigInteger mod, BigInteger gen)
     {
@@ -103,6 +106,34 @@ public class DiffieHellman
 	}
     }
 
+    /**
+     * Recreates a DiffieHellman instance.
+     *
+     * @param privateKey the private key. Cannot be null.
+     * @param modulus the modulus to use. Cannot be be null.
+     */
+    public static DiffieHellman recreate(BigInteger privateKey, 
+					 BigInteger modulus)
+    {
+        if (privateKey == null || modulus == null) {
+	    throw new IllegalArgumentException("Null parameter");
+	}
+	DiffieHellman dh = new DiffieHellman();
+	dh.setPrivateKey(privateKey);
+	dh.setModulus(modulus);
+	return dh;
+    }
+
+    private void setPrivateKey(BigInteger privateKey)
+    {
+	this.privateKey = privateKey;
+    }
+
+    private void setModulus(BigInteger modulus)
+    {
+	this.modulus = modulus;
+    }
+
     /** 
      * Returns the shared secret.
      *
@@ -122,8 +153,8 @@ public class DiffieHellman
      * @param secret the key to XOR encrypt with.
      * @return the encrypted secret.
      * @throws IllegalArgumentException if <code>otherPublic</code> is null.
-     * @throws RuntimeException if length of <code>secret</code> is incorrect. Yes,
-     *  big TODO here to make this error reporting better.
+     * @throws RuntimeException if length of <code>secret</code> is 
+     * incorrect. Big TODO here to make this error reporting better.
      */
     public byte[] xorSecret(BigInteger otherPublic, byte[] secret)
 	throws NoSuchAlgorithmException
@@ -131,8 +162,10 @@ public class DiffieHellman
 	if (otherPublic == null) {
 	    throw new IllegalArgumentException("otherPublic cannot be null");
 	}
+
         BigInteger shared = getSharedSecret(otherPublic);
         byte[] hashed = Crypto.sha1(shared.toByteArray());
+
         if (secret.length != hashed.length) {
             log.warn("invalid secret byte[] length: secret="+secret.length
 		     +", hashed="+hashed.length);
@@ -149,53 +182,3 @@ public class DiffieHellman
 
 
 
-
-
-
-
-
-
-    /*    public BigInteger createSecretKey()
-    {
-	return createSecretKey(null, null);
-    }
-
-    public String convertToString(BigInteger b)
-    {
-	return b.toString();
-    }
-
-    public BigInteger createSecretKey(BigInteger modulus, BigInteger generator)
-    {
-        this.modulus = (modulus != null ? modulus : Crypto.DEFAULT_MODULUS);
-        this.generator = (generator != null 
-			  ? generator : Crypto.DEFAULT_GENERATOR);
-
-        int bits = this.modulus.bitLength();
-        BigInteger max = this.modulus.subtract(BigInteger.ONE);
-	while (true) {
-	    BigInteger pkey = new BigInteger(bits, ran);
-            if (pkey.compareTo(max) >= 0) { //too large
-                continue;
-            }
-            else if (pkey.compareTo(BigInteger.ONE) <= 0) { //too small
-                continue;
-            }
-            setPrivateKey(pkey);
-	    return pkey;
-	}
-    }
-
-    private void setPrivateKey(BigInteger privateKey)
-    {
-        this.privateKey = privateKey;
-        publicKey = generator.modPow(privateKey, modulus);
-
-    }
-
-    public BigInteger getSharedSecret(BigInteger composite)
-    {
-        return composite.modPow(privateKey, modulus);
-    }
-}
-    */

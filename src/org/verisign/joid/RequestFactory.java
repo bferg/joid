@@ -41,15 +41,19 @@ public class RequestFactory
      *
      * @param query the query to parse.
      * @return the parsed request.
-     * @throws UnsupportedEncodingException if the string is not properly 
-     *  UTF-8 encoded.
      * @throws OpenIdException if the query cannot be parsed into a known
      *  request.
      */
     public static Request parse(String query) 
 	throws UnsupportedEncodingException, OpenIdException
     {
-	Map map = parseQuery(query);
+	Map map;
+	try {
+	    map = parseQuery(query);
+	} catch (UnsupportedEncodingException e) {
+ 	    throw new OpenIdException("Error parsing "+query+": "
+				      +e.toString());
+	}
 
 	String s = (String) map.get(OPENID_MODE);
 	if (ASSOCIATE_MODE.equals(s)){
@@ -60,7 +64,7 @@ public class RequestFactory
 	} else if (CHECK_AUTHENTICATION_MODE.equals(s)){
 	    return new CheckAuthenticationRequest(map, s);
 	} else {
-	    throw new OpenIdException("Unknown "+OPENID_MODE+": "+s);
+ 	    throw new OpenIdException("Cannot parse request from "+query);
 	}
     }
 
@@ -73,39 +77,9 @@ public class RequestFactory
      *  UTF-8 encoded.
      */
     public static Map parseQuery(String query) 
-	throws UnsupportedEncodingException
+    	throws UnsupportedEncodingException
     {
-	Map map = new HashMap();
-	if (query == null) {
-	    return map;
-	}
-	StringTokenizer st = new StringTokenizer(query, "?&=", true);
-	String previous = null;
-	while (st.hasMoreTokens()) {
-	    String current = st.nextToken();
-	    if ("?".equals(current) || "&".equals(current)) {
-		//ignore
-	    } else if ("=".equals(current)) {
-		String name = URLDecoder.decode(previous, "UTF-8");
-		if (st.hasMoreTokens()){
-		    String value = URLDecoder.decode(st.nextToken(), "UTF-8");
-		    if (checkValue(value)){
-			map.put(name, value);
-		    }
-		}
-	    } else {
-		previous = current;
-	    }
-	}
-	return map;
+	return MessageParser.urlEncodedToMap(query);
     }
 
-    private static boolean checkValue(String value)
-    {
-	if ("&".equals(value)){
-	    return false;
-	}
-	// more tests here perchance
-	return true;
-    }
 }

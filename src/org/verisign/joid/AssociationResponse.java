@@ -68,7 +68,8 @@ public class AssociationResponse extends Response
     public BigInteger getDhServerPublic(){return dhServerPublic;}
 
     /** 
-     * Returns the MAC key in this response. See also {@link #getEncryptedMacKey()}
+     * Returns the MAC key in this response. See also 
+     * {@link #getEncryptedMacKey()}
      * @return the MAC key in this response; null if none.
      */
     public byte[] getMacKey(){return macKey;}
@@ -154,21 +155,31 @@ public class AssociationResponse extends Response
 	    Map.Entry mapEntry = (Map.Entry) iter.next();
 	    String key = (String) mapEntry.getKey();
 	    String value = (String) mapEntry.getValue();
+
 	    if (AssociationResponse.OPENID_SESSION_TYPE.equals(key)){
 		sessionType = AssociationRequest.parseSessionType(value);
-	    } else if (AssociationResponse
+	    } 
+	    else if (AssociationResponse
 		       .OPENID_ASSOCIATION_TYPE.equals(key)){
 		associationType
 		    = AssociationRequest.parseAssociationType(value);
-	    } else if (OPENID_DH_SERVER_PUBLIC.equals(key)){
+	    } 
+	    else if (OPENID_DH_SERVER_PUBLIC.equals(key)){
 		dhServerPublic = Crypto.convertToBigIntegerFromString(value);
-	    } else if (OPENID_EXPIRES_IN.equals(key)){
+	    } 
+	    else if (OPENID_ASSOCIATION_HANDLE.equals(key)){
+		associationHandle = value;
+	    } 
+	    else if (OPENID_EXPIRES_IN.equals(key)){
 		expiresIn = Integer.parseInt(value);
-	    } else if (OPENID_MAC_KEY.equals(key)){
+	    } 
+	    else if (OPENID_MAC_KEY.equals(key)){
 		macKey = Crypto.convertToBytes(value);	
-	    } else if (OPENID_ENC_MAC_KEY.equals(key)){
+	    } 
+	    else if (OPENID_ENC_MAC_KEY.equals(key)){
 		encryptedMacKey = Crypto.convertToBytes(value);	
-	    } else if (OPENID_ERROR_CODE.equals(key)){
+	    } 
+	    else if (OPENID_ERROR_CODE.equals(key)){
 		errorCode = value;	
 	    }
 	}
@@ -176,12 +187,27 @@ public class AssociationResponse extends Response
 
     public String toString()
     {
-        return "[AssociationResponse "
+	String s = "[AssociationResponse "
             + super.toString()
+            +", session type="+sessionType
             +", association type="+associationType
-            +", expires in="+expiresIn
-            +", error code="+errorCode
-	    +"]";
+            +", association handle="+associationHandle
+	    +", expires in="+expiresIn;
+	if (dhServerPublic != null) {
+            s += ", server public key="+Crypto.convertToString(dhServerPublic);
+	}
+	if (macKey != null) {
+            s += ", MAC key="+Crypto.convertToString(macKey);
+	}
+	if (encryptedMacKey != null) {
+            s += ", encrypted MAC key="
+		+Crypto.convertToString(encryptedMacKey);
+	}
+	if (errorCode != null) {
+            s += ", error code="+errorCode;
+	}
+	s+="]";
+	return s;
     }
 
 }

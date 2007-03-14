@@ -7,11 +7,11 @@
     <echo>
     Main targets:
 
-    build --> compiles library, servlets, and tests
-    clean --> cleans all built files
-    api   --> creates javadocs
-    test  --> runs unit tests
-    all   --> clean, compile, build, api
+    build    --> compiles library, servlets, and tests
+    clean    --> cleans all built files
+    api      --> creates javadocs
+    test     --> runs unit tests
+    all      --> clean, compile, build, examples, api
 
     </echo>
   </target>
@@ -41,6 +41,7 @@
       <packageset dir="${src}" defaultexcludes="yes">
         <exclude name="org/apache/joid/SimpleRegistration"/>
         <exclude name="**/package.html"/>
+        <exclude name="examples/*"/>
       </packageset>
 
       <classpath refid="compile.classpath"/>
@@ -61,6 +62,7 @@
     </javac>
   </target>
 
+
   <target name="build" depends="compile, copy">
     <jar jarfile="${joid_jar}">
       <fileset dir="${classes}"/>
@@ -68,7 +70,13 @@
     <jar jarfile="${joid_db_config_jar}">
       <fileset file="${src}/org.verisign.joid.db.hibernate.cfg.xml"/>
     </jar>
-    <war webxml="${src}/web.xml" destfile="${joid_war}">
+    <jar jarfile="${joid_examples_jar}">
+      <fileset dir="${classes}"> 
+	<include name="examples/**/*.class"/>
+      </fileset>
+    </jar>
+    <war webxml="${examples}/server/web.xml" destfile="${joid_examples_war}">
+      <lib file="${joid_examples_jar}"/>
       <lib file="${joid_jar}"/>
       <lib file="${tsik_jar}"/>
       <lib file="${mysql_jar}"/>

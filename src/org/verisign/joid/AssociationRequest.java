@@ -16,7 +16,10 @@ package org.verisign.joid;
 import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
+import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
 import org.apache.log4j.Logger;
 
 /**
@@ -69,9 +72,24 @@ public class AssociationRequest extends Request
 	} else if (DH_SHA256.equals(s)){
 	    return DH_SHA256;
 	} else {
-	    throw new IllegalArgumentException("Cannot parse session type: "+s);
+	    throw new IllegalArgumentException("Cannot parse session type: "
+					       +s);
 	}
     }
+
+    Map toMap()
+    {
+	Map map = super.toMap();
+       
+	map.put(AssociationRequest.OPENID_SESSION_TYPE, sessionType);
+	map.put(AssociationRequest.OPENID_ASSOCIATION_TYPE, 
+		associationType);
+	map.put(AssociationRequest.OPENID_DH_CONSUMER_PUBLIC, 
+		Crypto.convertToString(dhConsumerPublic));
+
+	return map;
+    }
+
     
     /**
      * Returns a ref to the static strings for subsequent
@@ -105,6 +123,29 @@ public class AssociationRequest extends Request
 	return Crypto.convertToBigIntegerFromString(s);
     }
 
+    /**
+     * Creates a standard association request. Default values are
+     * <code>HMAC-SHA1</code> for association type, and <code>DH-SHA1</code>
+     * for session type.
+     *
+     * @param pubKey the Diffie-Hellman public key to use.
+     * @return an AssociationRequest.
+     * @throws OpenIdException 
+     */
+    public static AssociationRequest create(BigInteger pubKey) 
+    {
+	try {
+	    Map map = new HashMap();
+	    map.put("openid.mode","associate");
+	    map.put(OPENID_ASSOCIATION_TYPE, HMAC_SHA1);
+	    map.put(OPENID_SESSION_TYPE, DH_SHA1);
+	    map.put(OPENID_DH_CONSUMER_PUBLIC, Crypto.convertToString(pubKey));
+	    return new AssociationRequest(map, "associate");
+	} catch (OpenIdException e) {
+	    throw new IllegalArgumentException(e.toString());
+	}
+    }
+
     AssociationRequest(Map map, String mode) throws OpenIdException
     {
 	super(map, mode);
@@ -119,17 +160,21 @@ public class AssociationRequest extends Request
 	    Map.Entry mapEntry = (Map.Entry) iter.next();
 	    String key = (String) mapEntry.getKey();
 	    String value = (String) mapEntry.getValue();
-	    //log.debug("key="+key+", value="+value);
+
 	    if (OPENID_SESSION_TYPE.equals(key)){
 		this.sessionType = AssociationRequest.parseSessionType(value);
-	    } else if (OPENID_ASSOCIATION_TYPE.equals(key)){
+	    } 
+	    else if (OPENID_ASSOCIATION_TYPE.equals(key)){
 		this.associationType 
 		    = AssociationRequest.parseAssociationType(value);
-	    } else if (OPENID_DH_MODULUS.equals(key)){
+	    } 
+	    else if (OPENID_DH_MODULUS.equals(key)){
 		this.dhModulus = AssociationRequest.parseDhModulus(value);
-	    } else if (OPENID_DH_GENERATOR.equals(key)){
+	    } 
+	    else if (OPENID_DH_GENERATOR.equals(key)){
 		this.dhGenerator = AssociationRequest.parseDhGenerator(value);
-	    } else if (OPENID_DH_CONSUMER_PUBLIC.equals(key)){
+	    } 
+	    else if (OPENID_DH_CONSUMER_PUBLIC.equals(key)){
 		this.dhConsumerPublic 
 		    = AssociationRequest.parseDhConsumerPublic(value);
 	    }
@@ -171,7 +216,8 @@ public class AssociationRequest extends Request
 	if ((sessionType.equals(AssociationRequest.DH_SHA1))
 	    || (sessionType.equals(AssociationRequest.DH_SHA256))){
 	    if (dhConsumerPublic == null){
-		throw new OpenIdException("Missing "+OPENID_DH_CONSUMER_PUBLIC);
+		throw new OpenIdException("Missing "
+					  +OPENID_DH_CONSUMER_PUBLIC);
 	    }
 	}
     }

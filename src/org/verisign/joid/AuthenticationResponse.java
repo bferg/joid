@@ -37,7 +37,6 @@ public class AuthenticationResponse extends Response
     private static String OPENID_IDENTITY = "openid.identity";
     private static String OPENID_ERROR = "openid.error";
     private static String OPENID_NONCE = "openid.nonce";
-    private static String OPENID_MODE = "openid.mode";
     private static String 
 	OPENID_INVALIDATE_HANDLE = "openid.invalidate_handle";
     private static String 
@@ -46,7 +45,6 @@ public class AuthenticationResponse extends Response
     // package scope so that ResponseFactory can trigger on this key
     static String OPENID_SIG = "openid.sig";
 
-    String mode;
     String identity;
     String returnTo;
     String nonce;
@@ -76,7 +74,8 @@ public class AuthenticationResponse extends Response
 
     /**
      * Returns the internal elements mapped to a map. The keys used
-     * are those defined by the specification, for example <code>openid.mode</code>.
+     * are those defined by the specification, for example 
+     * <code>openid.mode</code>.
      *
      * TODO: Made public only for unit tests. Needs to package-scope
      * limit this method.
@@ -143,10 +142,11 @@ public class AuthenticationResponse extends Response
 	    }
 	    map.put(AuthenticationResponse.OPENID_ERROR, e.getMessage());
 	} else {
-	    map.put(AuthenticationResponse.OPENID_ERROR, "OpenID request error");
+	    map.put(AuthenticationResponse.OPENID_ERROR, 
+		    "OpenID request error");
 	}
 	try {
-	    return new AuthenticationResponse(map).toUrlStringResponse();
+	    return new AuthenticationResponse(map).toUrlString();
 	} catch (OpenIdException ex){
 	    // this should never happen
 	    log.error(ex);
@@ -162,8 +162,8 @@ public class AuthenticationResponse extends Response
      * @param signed the comma-separated list of elements to sign. The elements
      * must be mapped internally.
      * @return the Base 64 encoded result.
-     * @throws OpenIdException at signature errors, or if the signed list points
-     * to elements that are not mapped.
+     * @throws OpenIdException at signature errors, or if the signed list 
+     * points to elements that are not mapped.
      */ 
     public String sign(byte[] key, String signed)
 	throws OpenIdException
@@ -266,10 +266,12 @@ public class AuthenticationResponse extends Response
 
     public String toString()
     {
-        return "[AuthenticationResponse "
-            + super.toString()
-	    +", sreg="+sreg
-            +", mode="+mode
+        String s = "[AuthenticationResponse "
+            + super.toString();
+	if (sreg != null) {
+	    s+=", sreg="+sreg;
+	}
+	s+=", mode="+mode
             +", nonce="+nonce
             +", association handle="+associationHandle
             +", invalidation handle="+invalidateHandle
@@ -278,6 +280,7 @@ public class AuthenticationResponse extends Response
             +", identity="+identity
 	    +", return to="+returnTo
 	    +"]";
+	return s;
     }
 
 }

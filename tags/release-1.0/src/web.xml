@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+    <servlet>
+        <servlet-name>openid</servlet-name>
+        <servlet-class>org.verisign.joid.IdpServlet</servlet-class>
+        <init-param>
+            <param-name>store_type</param-name>
+            <param-value>db</param-value>
+	</init-param>
+        <init-param>
+            <param-name>db_user</param-name>
+            <param-value>root</param-value>
+	</init-param>
+        <init-param>
+            <param-name>db_password</param-name>
+            <param-value>password</param-value>
+	</init-param>
+        <init-param>
+            <param-name>db_url</param-name>
+            <param-value>jdbc:mysql://localhost/openid?autoReconnect=true</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>openid</servlet-name>
+        <url-pattern>/openid</url-pattern>
+    </servlet-mapping>
+
+</web-app>

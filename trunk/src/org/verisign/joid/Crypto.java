@@ -74,7 +74,7 @@ public class Crypto
 	try {
 	    random = SecureRandom.getInstance("SHA1PRNG");
 	} catch (NoSuchAlgorithmException e){
-	    throw new RuntimeException("No secure random available. Goodnight");
+	    throw new RuntimeException("No secure random available.");
 	}
     }
 
@@ -138,6 +138,16 @@ public class Crypto
     }
 
     /**
+     * Sets the Diffie-Hellman key values.
+     *
+     * @param dh the Diffie-Hellman value.
+     */
+    public void setDiffieHellman(DiffieHellman dh)
+    {
+	this.dh = dh;
+    }
+
+    /**
      * Returns the Diffie-Hellman public key set 
      * by {@link #setDiffieHellman(BigInteger, BigInteger)}.
      *
@@ -164,6 +174,19 @@ public class Crypto
     public byte[] generateSecret(String sessionType)
     {
 	return generateRandom(sessionType);
+    }
+
+    /**
+     * Decrypts a secret using Diffie-Hellman.
+     *
+     * @param consumerPublic the public key used to decrypt.
+     * @param secret the value to decrypt.
+     * @return the decrypted value.
+     */
+    public byte[] decryptSecret(BigInteger consumerPublic, byte[] secret)
+	throws OpenIdException
+    {
+	return encryptSecret(consumerPublic, secret);
     }
 
     /**

@@ -3,7 +3,7 @@ Java OpenID = JOID
 This library lets you create OpenID providers as well as relying parties. Both
 OpenID 1.1 and 2.0 is covered. 
 
-See more at http://code.google.com/p/joid/
+See more at <http://code.google.com/p/joid/>
 
 To build:
   $ ant build
@@ -25,6 +25,7 @@ For unit tests:
   mysql> exit;
 
 
+See src/examples for example usage.
 
 See LICENSE.txt for licensing agreement.
 

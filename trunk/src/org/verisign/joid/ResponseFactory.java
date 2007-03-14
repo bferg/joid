@@ -14,6 +14,7 @@
 package org.verisign.joid;
 
 import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,50 +39,31 @@ public class ResponseFactory
      *
      * @param query the query to parse.
      * @return the parsed response.
-     * @throws UnsupportedEncodingException if the string is not properly 
-     *  UTF-8 encoded.
      * @throws OpenIdException if the query cannot be parsed into a known
      *  response.
      */
-    public static Response parse(String query) 
-	throws UnsupportedEncodingException, OpenIdException
+    public static Response parse(String query) throws OpenIdException
     {
-	Map map = parseQuery(query);
+	Map map;
+	try {
+	    if (MessageParser.numberOfNewlines(query) == 1) {
+		map = MessageParser.urlEncodedToMap(query);
+	    } else {
+		map = MessageParser.postedToMap(query);
+	    }
+	} catch (IOException e) {
+	    throw new OpenIdException("Error parsing "+query+": "
+				      +e.toString());
+	}
+
 	Set set = map.keySet();
 	if (set.contains(AssociationResponse.OPENID_ENC_MAC_KEY)){
 	    return new AssociationResponse(map);
 	} else if (set.contains(AuthenticationResponse.OPENID_SIG)){
 	    return new AuthenticationResponse(map);
  	} else {
- 	    throw new OpenIdException("Cannot parse type of response from "+
-				      query);
+ 	    throw new OpenIdException("Cannot parse response from "+query);
  	}
-    }
-
-    private static Map parseQuery(String query) 
-	throws UnsupportedEncodingException
-    {
-	//log.debug("About to parse '"+query+"'");
-	StringTokenizer st = new StringTokenizer(query, "?&=", true);
-	Map map = new HashMap();
-	String previous = null;
-	while (st.hasMoreTokens()) {
-	    String current = st.nextToken();
-	    if ("?".equals(current) || "&".equals(current)) {
-		//ignore
-	    } else if ("=".equals(current)) {
-		String name = URLDecoder.decode(previous, "UTF-8");
-		String value = URLDecoder.decode(st.nextToken(), "UTF-8");
-		// TODO, get rid of Cactus test inserted values
-		if (!name.startsWith("Cactus")){
-		    map.put(name, value);
-		}
-	    } else {
-		previous = current;
-	    }
-	}
-	//log.debug("Parsed into map: "+map);
-	return map;
     }
 
 }

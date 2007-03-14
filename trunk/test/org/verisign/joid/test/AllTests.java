@@ -54,7 +54,7 @@ public class AllTests extends TestCase
     protected void tearDown() throws Exception {super.tearDown();}
 
     private static Crypto crypto = new Crypto();
-    private static Store store = StoreFactory.getInstance("db");
+    private static Store store = StoreFactory.getDbInstance();
 
     public static Test suite() 
     {
@@ -88,7 +88,7 @@ public class AllTests extends TestCase
 	assertTrue(req instanceof AssociationRequest);
 	Response resp = req.processUsing(store, crypto);
 	assertTrue(resp instanceof AssociationResponse);
-	s = resp.toUrlStringResponse();
+	s = resp.toUrlString();
 
 	Response resp2 = ResponseFactory.parse(s);
 	assertTrue(resp2 instanceof AssociationResponse);
@@ -129,7 +129,7 @@ public class AllTests extends TestCase
 	Response resp = req.processUsing(store, crypto);
 	assertTrue(resp instanceof AssociationResponse);
 
-	s = resp.toUrlStringResponse();
+	s = resp.toUrlString();
 
 	Response resp2 = ResponseFactory.parse(s);
 	assertTrue(resp2 instanceof AssociationResponse);
@@ -245,8 +245,6 @@ public class AllTests extends TestCase
 	BigInteger privateKey = dh.getPrivateKey();
 	BigInteger publicKey = dh.getPublicKey();
 
-	byte[] serverGeneratedKey = ar.getMacKey();
-
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
 	assertTrue(60 * 10 == ar.getExpiresIn());
@@ -261,7 +259,6 @@ public class AllTests extends TestCase
 
 	byte[] clearKey = dh.xorSecret(serverPublic, encKey);
 
-
 	// authenticate
 	String s = Utils.readFileAsString("3bv1.txt");
 	s += "?openid.assoc_handle="
@@ -274,7 +271,7 @@ public class AllTests extends TestCase
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertFalse(resp.isVersion2());
 
-	s = resp.toUrlStringResponse();
+	s = resp.toUrlString();
 
 	Response resp2 = ResponseFactory.parse(s);
 	assertTrue(resp2 instanceof AuthenticationResponse);
@@ -293,7 +290,6 @@ public class AllTests extends TestCase
 	// check that we can authenticate the signaure
 	//
 	Map map = authr.toMap();
-	//System.out.println("map="+map);
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 	assertFalse(carq.isVersion2());
@@ -325,8 +321,6 @@ public class AllTests extends TestCase
 	AssociationResponse ar = associate(dh);
 	BigInteger privateKey = dh.getPrivateKey();
 	BigInteger publicKey = dh.getPublicKey();
-
-	byte[] serverGeneratedKey = ar.getMacKey();
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
@@ -366,8 +360,8 @@ public class AllTests extends TestCase
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
 
-	s = resp.toUrlStringResponse();
-	//System.out.println("resp="+s);
+	s = resp.toUrlString();
+
 	Response resp2 = ResponseFactory.parse(s);
 	assertTrue(resp2 instanceof AuthenticationResponse);
 	AuthenticationResponse authr = (AuthenticationResponse) resp;
@@ -409,7 +403,7 @@ public class AllTests extends TestCase
 	assertTrue(resp instanceof AssociationResponse);
 	assertTrue(resp.isVersion2());
 
-	s = resp.toUrlStringResponse();
+	s = resp.toUrlString();
 	Response resp2 = ResponseFactory.parse(s);
 	assertTrue(resp2.isVersion2());
 	assertTrue(resp2 instanceof AssociationResponse);
@@ -433,8 +427,6 @@ public class AllTests extends TestCase
 	AssociationResponse ar = associate(dh);
 	BigInteger privateKey = dh.getPrivateKey();
 	BigInteger publicKey = dh.getPublicKey();
-
-	byte[] serverGeneratedKey = ar.getMacKey();
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
@@ -466,7 +458,7 @@ public class AllTests extends TestCase
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
 
-	s = resp.toUrlStringResponse();
+	s = resp.toUrlString();
 
 	Response resp2 = ResponseFactory.parse(s);
 	assertTrue(resp2 instanceof AuthenticationResponse);
@@ -544,7 +536,7 @@ public class AllTests extends TestCase
 	}
     }
     
-    public void testMissingDhPublice() throws Exception
+    public void testMissingDhPublic() throws Exception
     {
 	
 	String s = "openid.mode=associate"

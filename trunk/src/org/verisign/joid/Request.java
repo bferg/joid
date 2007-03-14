@@ -19,36 +19,24 @@ import org.apache.log4j.Logger;
 /**
  * Represents an OpenID request. Valid for OpenID 1.1 and 2.0 namespace.
  */
-public abstract class Request
+public abstract class Request extends Message
 {
-    String mode;
-    String ns;
-
-    private static String OPENID_20_NAMESPACE = "http://openid.net/signon/2.0";
-    private static String OPENID_NS = "openid.ns";
-
     private final static Logger log = Logger.getLogger(Request.class);
 
-    /**
-     * Returns whether this request is an OpenID 2.0 request.
-     *
-     * @return true if this request is an OpenID 2.0 request.
-     */
-    public boolean isVersion2()
-    {
-	return Request.OPENID_20_NAMESPACE.equals(this.ns);
-    }
 
     Request(Map map, String mode)
     {
 	this.mode = mode;
 
 	if (map != null) {
-	    this.ns = (String) map.get(Request.OPENID_NS);
+	    this.ns = (String) map.get(Message.OPENID_NS);
 	}
     }
 
-    String getNamespace(){return ns;}
+    Map toMap()
+    {
+	return super.toMap();
+    }
 
     /**
      * Processes this request using the given store and crypto implementations.
@@ -66,14 +54,4 @@ public abstract class Request
     public abstract Response processUsing(Store store, Crypto crypto)
 	throws OpenIdException;
 
-    /** 
-     * Returns a string representation of this request.
-     *
-     * @return a string representation of this request.
-     */
-    public String toString()
-    {
-        return "is version 2="+isVersion2()
-            +", namespace="+ns;
-    }
 }

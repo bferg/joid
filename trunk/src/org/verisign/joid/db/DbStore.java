@@ -67,7 +67,6 @@ public class DbStore extends Store
 	    a.setEncryptedMacKey(encryptedSecret);
 	    a.setPublicDhKey(crypto.getPublicKey());
 	}
-
 	a.setMacKey(secret);
 	a.setIssuedDate(new Date());
 	// lifetime in seconds

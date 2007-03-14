@@ -36,12 +36,8 @@ public class AuthenticationRequest extends Request
     private String trustRoot;
     private SimpleRegistration sreg;
 
-    private final static String OPENID_MODE = "openid.mode";
-    private final static String OPENID_NS = "openid.ns";
     private final static String OPENID_IDENTITY = "openid.identity";
     private final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
-    private final static String 
-	OPENID_20_NAMESPACE = "http://openid.net/signon/2.0";
     private final static String 
 	PICK_ONE = "http://openid.net/identifier_select/2.0";
     private final static String CHECKID_IMMEDIATE = "checkid_immediate";
@@ -76,6 +72,31 @@ public class AuthenticationRequest extends Request
 	}
     }
 
+    /**
+     * Creates a standard authentication request.
+     *
+     * @param identity the openid identity.
+     * @param returnTo the return_to value.
+     * @param trustRoot the openid trust_root.
+     * @param assocHandle the openid association handle.
+     * @return an AuthenticationRequest.
+     * @throws OpenIdException if the request cannot be created.
+     */
+    public static 
+	AuthenticationRequest create(String identity, String returnTo, 
+				     String trustRoot, String assocHandle) 
+	throws OpenIdException
+    {
+	Map map = new HashMap();
+	map.put("openid.mode",CHECKID_SETUP);
+	map.put(OPENID_IDENTITY, identity);
+	map.put(OPENID_RETURN_TO, returnTo);
+	map.put(OPENID_TRUST_ROOT, trustRoot);
+	map.put(OPENID_ASSOC_HANDLE, assocHandle);
+	return new AuthenticationRequest(map, CHECKID_SETUP);
+    }
+
+
     AuthenticationRequest(Map map, String mode) throws OpenIdException
     {
 	super(map, mode);
@@ -87,18 +108,34 @@ public class AuthenticationRequest extends Request
 
 	    if (OPENID_NS.equals(key)){
 		this.ns = value;
-	    } else if (OPENID_IDENTITY.equals(key)){
+	    } 
+	    else if (OPENID_IDENTITY.equals(key)){
 		this.identity = value;
-	    } else if (OPENID_ASSOC_HANDLE.equals(key)){
+	    } 
+	    else if (OPENID_ASSOC_HANDLE.equals(key)){
 		this.handle = value;
-	    } else if (OPENID_RETURN_TO.equals(key)){
+	    } 
+	    else if (OPENID_RETURN_TO.equals(key)){
 		this.returnTo = value; 
-	    } else if (OPENID_TRUST_ROOT.equals(key)){
+	    } 
+	    else if (OPENID_TRUST_ROOT.equals(key)){
 		this.trustRoot = value; 
 	    }
 	}
 	this.sreg = new SimpleRegistration(map);
 	checkInvariants();
+    }
+
+    Map toMap()
+    {
+	Map map = super.toMap();
+       
+	map.put(AuthenticationRequest.OPENID_IDENTITY, identity);
+	map.put(AuthenticationRequest.OPENID_ASSOC_HANDLE, handle);
+	map.put(AuthenticationRequest.OPENID_RETURN_TO, returnTo);
+	map.put(AuthenticationRequest.OPENID_TRUST_ROOT, trustRoot);
+
+	return map;
     }
 
     /**
@@ -168,25 +205,11 @@ public class AuthenticationRequest extends Request
 	String tHost = new StringBuffer(t.getHost()).reverse().toString();
 	String rHost = new StringBuffer(r.getHost()).reverse().toString();
 
-	log.debug("tHost: "+tHost);
-	log.debug("rHost: "+rHost);
-
 	String[] tNames = tHost.split("\\.");
 	String[] rNames = rHost.split("\\.");
 	int len = (tNames.length > rNames.length) 
 	    ? rNames.length : tNames.length;
 	
-	/*
-	log.info("tNames");
-	for (int i = 0; i < tNames.length; i += 1){
-	    log.info(tNames[i]);
-	}
-	log.info("rNames");
-	for (int i = 0; i < rNames.length; i += 1){
-	    log.info(rNames[i]);
-	}
-	*/
-
 	int i;
 	for (i = 0; i < len; i += 1){
 	    if (!(tNames[i].equals(rNames[i]))

@@ -130,8 +130,8 @@ public class OpenId
      * Returns whether the incoming request is a Check Authentication Request.
      *
      * @param query the request to check.
-     * @return true if the incoming request is a Check Authentication Request; false
-     * otherwise.
+     * @return true if the incoming request is a Check Authentication 
+     * Request; false otherwise.
      */
     public boolean isCheckAuthenticationRequest(String query) 
     {
@@ -148,12 +148,15 @@ public class OpenId
     }
 
     /**
-     * Call this method if the data is on the URL, i.e., GET
+     * Processes an OpenID request into an OpenID response.
+     * @param query the query
+     * @return the response. The format of the response is depending
+     * on the request: if the request is an authentication request, the
+     * response will be suitable for redirecting via URL; otherwise the
+     * response will be name/value pair encoded as per specification.
      */
     public String handleRequest(String query) throws OpenIdException
     {
-	log.info("handleRequest()="+query);
-
 	Request req = null;
 	try {
 	    req = RequestFactory.parse(query);
@@ -161,10 +164,12 @@ public class OpenId
 	    log.warn("exception="+e);
 	    throw new OpenIdException(e);
 	}
-	log.info("request="+req);
 	Response resp = req.processUsing(store, crypto);
-	log.info("response="+resp);
-	return resp.toPostStringResponse();
+	if (req instanceof AuthenticationRequest) {
+	    return resp.toUrlString();
+	} else {
+	    return resp.toPostString();
+	}
     }
 
     /**
@@ -180,8 +185,6 @@ public class OpenId
 	try {
 	    Response resp = ResponseFactory.parse(s);
 	    return (resp.getError() != null);
-	} catch (UnsupportedEncodingException e){
-	    return false;
 	} catch (OpenIdException e){
 	    return false;
 	}

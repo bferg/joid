@@ -128,13 +128,14 @@ public class AssociationRequest extends Request
      * <code>HMAC-SHA1</code> for association type, and <code>DH-SHA1</code>
      * for session type.
      *
-     * @param pubKey the Diffie-Hellman public key to use.
+     * @param crypto the Crypto implementation to use.
      * @return an AssociationRequest.
      * @throws OpenIdException 
      */
-    public static AssociationRequest create(BigInteger pubKey) 
+    public static AssociationRequest create(Crypto crypto) 
     {
 	try {
+	    BigInteger pubKey = crypto.getPublicKey();
 	    Map map = new HashMap();
 	    map.put("openid.mode","associate");
 	    map.put(OPENID_ASSOCIATION_TYPE, HMAC_SHA1);

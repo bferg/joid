@@ -51,6 +51,21 @@ public class DiffieHellman
      */
     public static final BigInteger DEFAULT_GENERATOR = BigInteger.valueOf(2);
 
+    /**
+     * Returns a Diffie-Hellman instance using default modulus and
+     * generator. Note that each call to this method will return an instance
+     * with random private key.
+     * @return a DiffieHellman instance using modulus 
+     * ${#DiffieHellman.DEFAULT_MODULUS}, and generator
+     * ${#DiffieHellman.DEFAULT_GENERATOR}.
+     */
+    public static DiffieHellman getDefault()
+    {
+	BigInteger p = DiffieHellman.DEFAULT_MODULUS;
+	BigInteger g = DiffieHellman.DEFAULT_GENERATOR;
+	return new DiffieHellman(p, g);
+    }
+
     private static SecureRandom random;
     static {
 	try {

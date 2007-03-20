@@ -28,11 +28,11 @@ public class Associate
     public Associate(String destination, String fileName) 
 	throws IOException, OpenIdException
     {
-	BigInteger p = DiffieHellman.DEFAULT_MODULUS;
-	BigInteger g = DiffieHellman.DEFAULT_GENERATOR;
-	DiffieHellman dh = new DiffieHellman(p, g);
+	DiffieHellman dh = DiffieHellman.getDefault();
+	Crypto crypto = new Crypto();
+	crypto.setDiffieHellman(dh);
 
-	AssociationRequest ar = AssociationRequest.create(dh.getPublicKey());
+	AssociationRequest ar = AssociationRequest.create(crypto);
 
 	Response response = Util.send(ar, destination);
  	AssociationResponse asr = (AssociationResponse) response;
@@ -46,7 +46,8 @@ public class Associate
 			  Crypto.convertToString(asr.getEncryptedMacKey()));
 
 	props.setProperty("privateKey", Crypto.convertToString(privateKey));
-	props.setProperty("modulus", Crypto.convertToString(p));
+	props.setProperty("modulus", 
+		   Crypto.convertToString(DiffieHellman.DEFAULT_MODULUS));
 
 	File f = new File(fileName);
 	props.store(new FileOutputStream(f), "Association result");

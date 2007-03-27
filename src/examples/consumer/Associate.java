@@ -49,6 +49,8 @@ public class Associate
 	props.setProperty("modulus", 
 		   Crypto.convertToString(DiffieHellman.DEFAULT_MODULUS));
 
+	props.setProperty("_dest", destination);
+
 	File f = new File(fileName);
 	props.store(new FileOutputStream(f), "Association result");
 	System.out.println("Results written into "+f.getCanonicalPath());

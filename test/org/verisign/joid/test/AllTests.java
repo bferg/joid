@@ -550,5 +550,42 @@ public class AllTests extends TestCase
 	}
     }
 
+    /** Tests that 'realm' is treated just like 'trust_root' */
+    public void testRealm() throws Exception
+    {
+	DiffieHellman dh = new DiffieHellman(p, g);
+	AssociationResponse ar = associate(dh);
+
+	String s = "openid.return_to=http%3A%2F%2Fexample.com&ope"
+	    +"nid.realm=http%3A%2F%2Fexample.com&openid.ns=http%"
+	    +"3A%2F%2Fopenid.net%2Fsignon%2F2.0&openid.claimed_id"
+	    +"=http%3A%2F%2Falice.example.com&openid.mode=checkid"
+	    +"_setup&openid.identity=http%3A%2F%2Fexample.com&ope"
+	    +"nid.assoc_handle="+ar.getAssociationHandle();
+
+	Request req = RequestFactory.parse(s);
+	Response resp = req.processUsing(store, crypto);
+    }
+
+    /** Tests that trailing slashes on URLs are *not* canonicalized.
+     * That is: http://example.com is not equals to http://example.com/
+     */
+    public void testTrailing() throws Exception
+    {
+	String s = "openid.return_to=http%3A%2F%2Fexample.com&ope"
+	    +"nid.realm=http%3A%2F%2Fexample.com/&openid.ns=http%"
+	    +"3A%2F%2Fopenid.net%2Fsignon%2F2.0&openid.claimed_id"
+	    +"=http%3A%2F%2Falice.example.com&openid.mode=checkid"
+	    +"_setup&openid.identity=http%3A%2F%2Fexample.com&ope"
+	    +"nid.assoc_handle=1b184cb";
+
+	try {
+	    Request req = RequestFactory.parse(s);
+	    Response resp = req.processUsing(store, crypto);
+	    assertTrue(false);
+	} catch (OpenIdException expected){
+	    // System.out.println(expected);
+	}
+    }
 
 }

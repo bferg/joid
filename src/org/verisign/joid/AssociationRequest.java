@@ -140,6 +140,7 @@ public class AssociationRequest extends Request
 	    map.put("openid.mode","associate");
 	    map.put(OPENID_ASSOCIATION_TYPE, HMAC_SHA1);
 	    map.put(OPENID_SESSION_TYPE, DH_SHA1);
+	    map.put(OPENID_NS, OPENID_20_NAMESPACE);
 	    map.put(OPENID_DH_CONSUMER_PUBLIC, Crypto.convertToString(pubKey));
 	    return new AssociationRequest(map, "associate");
 	} catch (OpenIdException e) {

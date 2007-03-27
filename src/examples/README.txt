@@ -9,6 +9,9 @@ Build these examples via normal 'ant build'
   OpenID provider code. Deploy the jode_examples.war file into your
   favorite servlet container.
 
+  If your server doesn't run on port 8080, please change the example
+  files (Associate and Authenticate.java) to the correct port.
+
 
 ./consumer
 
@@ -22,11 +25,13 @@ Build these examples via normal 'ant build'
 
 ./scripts 
 
-   contains scripts to run the associate and authenticate cunsumer clients:
+   contains scripts to run the associate and authenticate consumer clients:
 
    Example use:
-     $./scripts/associate.sh file.txt
+
+     $ cd scripts
+     $ ./associate.sh file.txt
      Results written into [path]/file.txt
 
-     $./scripts/authenticate.sh file.txt
+     $ ./authenticate.sh file.txt
 

@@ -19,7 +19,6 @@ import java.util.Properties;
  */ 
 public class Authenticate
 {
-    private String dest = "http://localhost:8080/joid_examples/server";
     private Map map;
     private Map responseMap;
     
@@ -50,6 +49,8 @@ public class Authenticate
 	    = Crypto.convertToBigIntegerFromString(p.getProperty("publicKey"));
  	byte[] encryptedKey 
 	    = Crypto.convertToBytes(p.getProperty("encryptedKey"));
+
+ 	String dest = p.getProperty("_dest");
 
 	AuthenticationRequest ar 
 	    = AuthenticationRequest.create(identity, returnTo, trustRoot,

@@ -45,6 +45,7 @@ public class AuthenticationRequest extends Request
 
     private final static String OPENID_RETURN_TO = "openid.return_to";
     private final static String OPENID_TRUST_ROOT = "openid.trust_root";
+    private final static String OPENID_REALM = "openid.realm";
 
     private static String OPENID_DH_CONSUMER_PUBLIC 
 	= "openid.dh_consumer_public";
@@ -92,6 +93,7 @@ public class AuthenticationRequest extends Request
 	map.put(OPENID_IDENTITY, identity);
 	map.put(OPENID_RETURN_TO, returnTo);
 	map.put(OPENID_TRUST_ROOT, trustRoot);
+	map.put(OPENID_NS, OPENID_20_NAMESPACE);
 	map.put(OPENID_ASSOC_HANDLE, assocHandle);
 	return new AuthenticationRequest(map, CHECKID_SETUP);
     }
@@ -118,7 +120,8 @@ public class AuthenticationRequest extends Request
 	    else if (OPENID_RETURN_TO.equals(key)){
 		this.returnTo = value; 
 	    } 
-	    else if (OPENID_TRUST_ROOT.equals(key)){
+	    else if (OPENID_TRUST_ROOT.equals(key)
+		     || OPENID_REALM.equals(key)){
 		this.trustRoot = value; 
 	    }
 	}

@@ -171,7 +171,8 @@ public class AllTests extends TestCase
 	String s = "openid.identity=http%3A%2F%2Fhans.beta.abtain.com%2F"
 	    +"&openid.mode=checkid_setup"
 	    +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
-	    +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26nonce%3D2006-12-"
+	    +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_no"
+	    +"nce%3D2006-12-"
 	    +"06T04%253A54%253A51ZQvGYW3"
 	    +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F";
 
@@ -509,7 +510,8 @@ public class AllTests extends TestCase
 	    +"2F%2Fmisja.pip.verisignlabs.com%2F&openid.mode=ch"
 	    +"eckid_setup"
 	    +"&openid.return_to=http%3A%2F%2Fradagast.biz%2Felg"
-	    +"g2%2Fmod%2Fopenid_client%2Freturn.php%3Fnonce%3DR"
+	    +"g2%2Fmod%2Fopenid_client%2Freturn.php%3Fresponse_"
+	    +"nonce%3DR"
 	    +"qyqPiwW&openid.sreg.optional=email%2Cfullname"
 	    +"&openid.trust_root=";
 

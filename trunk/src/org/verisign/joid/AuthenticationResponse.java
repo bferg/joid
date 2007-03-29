@@ -36,7 +36,7 @@ public class AuthenticationResponse extends Response
     private static String OPENID_RETURN_TO = "openid.return_to";
     private static String OPENID_IDENTITY = "openid.identity";
     private static String OPENID_ERROR = "openid.error";
-    private static String OPENID_NONCE = "openid.nonce";
+    private static String OPENID_NONCE = "openid.response_nonce";
     private static String 
 	OPENID_INVALIDATE_HANDLE = "openid.invalidate_handle";
     private static String 
@@ -215,7 +215,7 @@ public class AuthenticationResponse extends Response
 	nonce = generateNonce();
 	this.invalidateHandle = invalidateHandle; //may be null
 	associationHandle = a.getHandle();
-	signed = "identity,nonce,return_to";
+	signed = "identity,response_nonce,return_to";
 	sreg = ar.getSimpleRegistration();
 	log.debug("sreg="+sreg);
 	if (sreg != null){

@@ -1,6 +1,6 @@
 #summary Introduction to JOID.
 
-JOID is an OpenID 2.0 Java library that lets you implement
+JOID is an OpenID 1.x/2.0 Java library that lets you implement
 providers as well as relying parties. JOID compiles under JDK 1.4 or later.
 
 ==Usage==
@@ -49,7 +49,6 @@ JOID has two mailing lists, both public to join:
 || *Type* || *URL* ||
 || General || http://groups.google.com/group/joid-general ||
 || Developer || http://groups.google.com/group/joid-dev ||
-
 
 
 

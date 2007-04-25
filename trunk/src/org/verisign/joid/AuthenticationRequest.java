@@ -278,6 +278,13 @@ public class AuthenticationRequest extends Request
     public String getIdentity(){return identity;}
 
     /**
+     * Sets the identity used in this authentication request.
+     * 
+     * @param identity the identity.
+     */
+    public void setIdentity(String identity){this.identity = identity;}
+
+    /**
      * Returns the 'return to' address in this authentication request.
      * 
      * @return the address.

@@ -590,4 +590,25 @@ public class AllTests extends TestCase
 	}
     }
 
+    /** Tests that identity can change.
+     */
+    public void testChangeId() throws Exception
+    {
+	String s = "openid.identity=http%3A%2F%2Fhans.beta.abtain.com%2F"
+	    +"&openid.mode=checkid_setup"
+	    +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
+	    +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_no"
+	    +"nce%3D2006-12-"
+	    +"06T04%253A54%253A51ZQvGYW3"
+	    +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
+	    +"&openid.assoc_handle=ahandle";
+
+	Request req = RequestFactory.parse(s);
+	assertTrue(req instanceof AuthenticationRequest);
+	AuthenticationRequest ar = (AuthenticationRequest) req;
+	ar.setIdentity("http://newidentity.example.com");
+	String x = ar.toUrlString();
+	assertFalse(s.equals(x));
+    }
+
 }

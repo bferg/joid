@@ -61,7 +61,9 @@ public class Authenticate
 	AuthenticationResponse authr = (AuthenticationResponse) response;
 	
 	DiffieHellman dh = DiffieHellman.recreate(privKey, modulus);
-	byte[] clearKey = dh.xorSecret(serverPublic, encryptedKey);
+	Crypto crypto = new Crypto();
+	crypto.setDiffieHellman(dh);
+	byte[] clearKey = crypto.decryptSecret(serverPublic, encryptedKey);
 	
 	String signature = authr.getSignature();
 	System.out.println("Server's signature: "+signature);

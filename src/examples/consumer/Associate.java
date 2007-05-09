@@ -18,7 +18,6 @@ import java.util.Properties;
  */ 
 public class Associate
 {
-    
     public static void main(String[] argv) throws Exception
     {
 	String dest = "http://localhost:8080/joid_examples/server";
@@ -53,6 +52,7 @@ public class Associate
 
 	File f = new File(fileName);
 	props.store(new FileOutputStream(f), "Association result");
+	System.out.println("Association expires in "+asr.getExpiresIn()+"s");
 	System.out.println("Results written into "+f.getCanonicalPath());
 
 	/*
@@ -64,5 +64,4 @@ public class Associate
 	System.out.println("Clear key: "+Crypto.convertToString(clearKey));
 	*/
     }
-
 }

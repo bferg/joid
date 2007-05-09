@@ -82,12 +82,12 @@ public class OpenIdServlet extends HttpServlet
         
 	try {
 	    String s = openId.handleRequest(query);
+	    log("response="+s);
 	    if (openId.isAuthenticationRequest(query)) {
 		Map map = RequestFactory.parseQuery(query); 
 		String return_to = (String) map.get("openid.return_to");
 		String delim = (return_to.indexOf('?') >= 0) ? "&" : "?"; 
 		s = response.encodeRedirectURL(return_to + delim + s);
-		log("S="+s);
 		response.sendRedirect(s);
 	    } else {
 		int len = s.length();

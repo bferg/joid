@@ -34,8 +34,9 @@ public class Associate
 	AssociationRequest ar = AssociationRequest.create(crypto);
 
 	Response response = Util.send(ar, destination);
+	System.out.println("Response="+response+"\n");
+
  	AssociationResponse asr = (AssociationResponse) response;
-	BigInteger privateKey = dh.getPrivateKey();
 
 	Properties props = new Properties();
 	props.setProperty("handle", asr.getAssociationHandle());
@@ -44,6 +45,7 @@ public class Associate
 	props.setProperty("encryptedKey", 
 			  Crypto.convertToString(asr.getEncryptedMacKey()));
 
+	BigInteger privateKey = dh.getPrivateKey();
 	props.setProperty("privateKey", Crypto.convertToString(privateKey));
 	props.setProperty("modulus", 
 		   Crypto.convertToString(DiffieHellman.DEFAULT_MODULUS));
@@ -52,7 +54,6 @@ public class Associate
 
 	File f = new File(fileName);
 	props.store(new FileOutputStream(f), "Association result");
-	System.out.println("Association expires in "+asr.getExpiresIn()+"s");
 	System.out.println("Results written into "+f.getCanonicalPath());
 
 	/*

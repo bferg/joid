@@ -144,17 +144,13 @@ class MessageParser
 	int n = 0;
 	String s = br.readLine();
 	while (s != null) {
-	    StringTokenizer st = new StringTokenizer(s, ":");
-	    String name = null;
-	    String value = null;
-	    if (st.hasMoreTokens()){
-		name = st.nextToken();
-	    }
-	    if (st.hasMoreTokens()){
-		value = st.nextToken();
-	    }
-	    if (name != null && value != null){
-		map.put(name, value);
+	    int index = s.indexOf(":");
+	    if (index != -1) {
+		String name = s.substring(0, index);
+		String value = s.substring(index+1, s.length());
+		if (name != null && value != null){
+		    map.put(name, value);
+		}
 	    }
 	    s = br.readLine();
 	}

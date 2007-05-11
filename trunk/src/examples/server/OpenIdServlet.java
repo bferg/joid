@@ -19,6 +19,7 @@ import org.verisign.joid.Crypto;
 import org.verisign.joid.OpenId;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.RequestFactory;
+import org.verisign.joid.AuthenticationRequest;
 import org.verisign.joid.Store;
 import org.verisign.joid.StoreFactory;
 
@@ -75,19 +76,24 @@ public class OpenIdServlet extends HttpServlet
                         HttpServletResponse response)
         throws ServletException, IOException
     {
+	log("\nrequest\n-------\n"+query+"\n");
 	if (!(openId.canHandle(query))){
 	    returnError(query, response);
 	    return;
 	}
-        
 	try {
-	    String s = openId.handleRequest(query);
-	    log("response="+s);
-	    if (openId.isAuthenticationRequest(query)) {
-		Map map = RequestFactory.parseQuery(query); 
-		String return_to = (String) map.get("openid.return_to");
-		String delim = (return_to.indexOf('?') >= 0) ? "&" : "?"; 
-		s = response.encodeRedirectURL(return_to + delim + s);
+	    boolean isAuth = openId.isAuthenticationRequest(query);
+            if (isAuth) {
+	        // ask user here...
+            }
+            String s = openId.handleRequest(query);
+	    log("\nresponse\n--------\n"+s+"\n");
+	    if (isAuth) {
+		AuthenticationRequest authReq = (AuthenticationRequest)
+		    RequestFactory.parse(query);
+		String returnTo = authReq.getReturnTo();
+		String delim = (returnTo.indexOf('?') >= 0) ? "&" : "?"; 
+		s = response.encodeRedirectURL(returnTo + delim + s);
 		response.sendRedirect(s);
 	    } else {
 		int len = s.length();
@@ -99,7 +105,6 @@ public class OpenIdServlet extends HttpServlet
 		out.print(s);
 		out.flush();
 	    }
-	    return;             
 	} catch (OpenIdException e) {
 	    response.sendError(HttpServletResponse
 			       .SC_INTERNAL_SERVER_ERROR);

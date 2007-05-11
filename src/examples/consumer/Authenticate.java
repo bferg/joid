@@ -41,15 +41,6 @@ public class Authenticate
 	p.load(new FileInputStream(f));
 
  	String handle = p.getProperty("handle");
- 	BigInteger privKey 
-	   = Crypto.convertToBigIntegerFromString(p.getProperty("privateKey"));
- 	BigInteger modulus 
-	    = Crypto.convertToBigIntegerFromString(p.getProperty("modulus"));
- 	BigInteger serverPublic 
-	    = Crypto.convertToBigIntegerFromString(p.getProperty("publicKey"));
- 	byte[] encryptedKey 
-	    = Crypto.convertToBytes(p.getProperty("encryptedKey"));
-
  	String dest = p.getProperty("_dest");
 
 	AuthenticationRequest ar 
@@ -60,6 +51,15 @@ public class Authenticate
 	System.out.println("Response="+response+"\n");
 
 	AuthenticationResponse authr = (AuthenticationResponse) response;
+
+ 	BigInteger privKey 
+	   = Crypto.convertToBigIntegerFromString(p.getProperty("privateKey"));
+ 	BigInteger modulus 
+	    = Crypto.convertToBigIntegerFromString(p.getProperty("modulus"));
+ 	BigInteger serverPublic 
+	    = Crypto.convertToBigIntegerFromString(p.getProperty("publicKey"));
+ 	byte[] encryptedKey 
+	    = Crypto.convertToBytes(p.getProperty("encryptedKey"));
 
 	DiffieHellman dh = DiffieHellman.recreate(privKey, modulus);
 	Crypto crypto = new Crypto();

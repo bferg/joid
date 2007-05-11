@@ -57,9 +57,10 @@ public class Authenticate
 					   handle);
 
 	Response response = Util.send(ar, dest);
+	System.out.println("Response="+response+"\n");
 
 	AuthenticationResponse authr = (AuthenticationResponse) response;
-	
+
 	DiffieHellman dh = DiffieHellman.recreate(privKey, modulus);
 	Crypto crypto = new Crypto();
 	crypto.setDiffieHellman(dh);

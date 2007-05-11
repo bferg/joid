@@ -28,14 +28,21 @@ public class Util
 	    in = new BufferedReader(new InputStreamReader(connection
 							  .getInputStream()));
 	    String str;
+	    int lines = 0;
 	    while ((str = in.readLine()) != null) {
 		b.append(str);
 		b.append('\n');
-	    }  
+		lines += 1;
+	    } 
+	    if (lines == 1){
+		// query string
+		b.deleteCharAt(b.length() - 1);
+	    }
 	} finally {
 	    if (in != null) in.close();
 	}
 	return ResponseFactory.parse(b.toString());
     }
+
 }
 

@@ -32,5 +32,80 @@ with <code>ant api</code>).</li>
 <code>joid.jar</code> and <code>joid.war</code> files.</li> 
 </ul>
 
+<h2>Not (yet) implemented</h2>
+For completeness, this section describes portions of the 
+OpenID 2.0 specification (<a 
+href="http://openid.net/specs/openid-authentication-2_0-11.html">current 
+draft 11</a>) that are not implemented:
+
+<ul>
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#sign_algos">6.2. Signature Algorithms</a>
+<ul>
+<li><tt>HMAC-SHA256</tt> not implemented.</li>
+</ul>
+</li>
+
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#anchor12">7. Initiation and Discovery</a>
+<ul>
+<li>XRI URLs are not supported.</li>
+</ul>
+</li>
+
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#anchor20">8.2. Association Session Response</a>
+<ul>
+<li>Clear-text MAC keys are not supported; the key is always encrypted.</li>
+</ul>
+</li>
+
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#assoc_types">8.3. Association Types</a>
+<ul>
+<li><tt>HMAC-SHA256</tt> association type not supported.</li>
+</ul>
+</li>
+
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#assoc_sess_types">8.4. Association Session Types</a>
+<ul>
+<li>Only <tt>DH-SHA1</tt> is supported.</li>
+</ul>
+</li>
+
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#anchor27
+">9.1. Request Parameters</a>
+<ul>
+<li><tt>openid.claimed_id</tt> is not implemented.</li>
+</ul>
+</li>
+
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#responding_to_authentication">10. Responding to Authentication Requests</a>
+<ul>
+<li><tt>http://specs.openid.net/auth/2.0/identifier_select</tt> is not supported.</li>
+</ul>
+</li>
+
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#positive_assertions">10.1. Positive Assertions</a>
+<ul>
+<li><tt>openid.claimed_id</tt> is not implemented.</li>
+</ul>
+</li>
+
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#verify_nonce">11.3. Checking the Nonce</a></li>
+<ul>
+<li>Server-side check of nonce is not performed.</li>
+</ul>
+</li>
+
+<li><a href="http://openid.net/specs/openid-authentication-2_0-11.html#extensions">12. Extensions</a>
+<ul>
+<li>Extensions are not actively supported, however, they should work.</li>
+</ul>
+</li>
+</ul>
+
 </body>
 </html>
+
+
+
+
+
+

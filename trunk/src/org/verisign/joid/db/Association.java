@@ -103,9 +103,15 @@ public class Association implements org.verisign.joid.Association
      */
     public String toString() 
     {
-	return "[Association secret="+secret+", encrypted secret="
-	    +Crypto.convertToString(encryptedMacKey)+", public key="
-	    +Crypto.convertToString(publicKey)+", issuedDate="+issuedDate+"]";
+	String s = "[Association secret="+secret;
+	if (encryptedMacKey != null) {
+	    s += ", encrypted secret="+Crypto.convertToString(encryptedMacKey);
+	} 
+	if (publicKey != null) {
+	    s += ", public key="+Crypto.convertToString(publicKey);
+	}
+	s+=", type="+associationType+", issuedDate="+issuedDate+"]";
+	return s;
     }
 
     public String getError() {return error;}

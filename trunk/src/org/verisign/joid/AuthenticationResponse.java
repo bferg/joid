@@ -51,6 +51,7 @@ public class AuthenticationResponse extends Response
     String invalidateHandle;
     String associationHandle;
     String signed;
+    private String algo;
     private String signature;
     private SimpleRegistration sreg;
 
@@ -158,7 +159,7 @@ public class AuthenticationResponse extends Response
      * Signs the elements designated by the signed list with the given key and
      * returns the result encoded to a string.
      *
-     * @param key the key to sign with (HMAC-SHA1)
+     * @param key the key to sign with (HMAC-SHA1, HMAC-SHA256)
      * @param signed the comma-separated list of elements to sign. The elements
      * must be mapped internally.
      * @return the Base 64 encoded result.
@@ -166,6 +167,12 @@ public class AuthenticationResponse extends Response
      * points to elements that are not mapped.
      */ 
     public String sign(byte[] key, String signed)
+	throws OpenIdException
+    {
+	return sign(this.algo, key, signed);
+    }
+
+    String sign(String algorithm, byte[] key, String signed)
 	throws OpenIdException
     {
 	Map map = toMap();
@@ -187,7 +194,14 @@ public class AuthenticationResponse extends Response
 	    sb.append('\n');
 	}
 	try {
-	    byte[] b = Crypto.hmacSha1(key, sb.toString().getBytes("UTF-8"));
+	    byte[] b; 
+	    if (algorithm.equals(AssociationRequest.HMAC_SHA1)){
+		b = Crypto.hmacSha1(key, sb.toString().getBytes("UTF-8"));
+	    } else if (algorithm.equals(AssociationRequest.HMAC_SHA256)){
+		b = Crypto.hmacSha256(key, sb.toString().getBytes("UTF-8"));
+	    } else {
+		throw new OpenIdException("Unknown signature algorithm");
+	    }
  	    return Crypto.convertToString(b);
 	} catch (UnsupportedEncodingException e){
 	    throw new OpenIdException(e);
@@ -229,6 +243,7 @@ public class AuthenticationResponse extends Response
 	    }
 	}
 	byte[] key = a.getMacKey();
+	this.algo = a.getAssociationType();
 	signature = sign(key, signed);
     }
 
@@ -262,7 +277,7 @@ public class AuthenticationResponse extends Response
 	}
 	this.sreg = SimpleRegistration.parseFromResponse(map);
 	log.debug("authn resp constr sreg="+sreg);
-    }
+  }
 
     public String toString()
     {

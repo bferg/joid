@@ -45,6 +45,7 @@ public class AuthenticationResponse extends Response
     // package scope so that ResponseFactory can trigger on this key
     static String OPENID_SIG = "openid.sig";
 
+    String claimed_id;
     String identity;
     String returnTo;
     String nonce;
@@ -66,6 +67,7 @@ public class AuthenticationResponse extends Response
      * @return the comma-separated list of signed elements in this response.
      */
     public String getSignedList(){return signed;}
+
 
     /** 
      * Returns the association handle in this response.
@@ -92,6 +94,9 @@ public class AuthenticationResponse extends Response
 	map.put(AuthenticationResponse.OPENID_IDENTITY, identity);
 	map.put(AuthenticationResponse.OPENID_RETURN_TO, returnTo);
 	map.put(AuthenticationResponse.OPENID_NONCE, nonce);
+	if (claimed_id != null) {
+	    map.put(AuthenticationRequest.OPENID_CLAIMED_ID, claimed_id);
+	}
 	if (invalidateHandle != null){
 	    map.put(AuthenticationResponse.OPENID_INVALIDATE_HANDLE, 
 		    invalidateHandle);
@@ -223,6 +228,7 @@ public class AuthenticationResponse extends Response
     {
 	super(null);
 	mode = "id_res";
+	claimed_id = ar.getClaimedIdentity();
 	identity = ar.getIdentity();
 	returnTo = ar.getReturnTo();
 	ns = ar.getNamespace();
@@ -230,6 +236,9 @@ public class AuthenticationResponse extends Response
 	this.invalidateHandle = invalidateHandle; //may be null
 	associationHandle = a.getHandle();
 	signed = "identity,response_nonce,return_to";
+	if (claimed_id != null){
+	    signed += ",claimed_id";
+	}
 	sreg = ar.getSimpleRegistration();
 	log.debug("sreg="+sreg);
 	if (sreg != null){
@@ -261,6 +270,8 @@ public class AuthenticationResponse extends Response
 		mode = value;
 	    } else if (AuthenticationResponse.OPENID_IDENTITY.equals(key)) {
 		identity = value;
+	    } else if (AuthenticationRequest.OPENID_CLAIMED_ID.equals(key)) {
+		claimed_id = value;
 	    } else if (AuthenticationResponse.OPENID_RETURN_TO.equals(key)) {
 		returnTo = value;
 	    } else if (OPENID_NONCE.equals(key)) {

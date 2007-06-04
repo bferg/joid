@@ -746,4 +746,57 @@ public class AllTests extends TestCase
 	assertTrue(ar.isIdentifierSelect());
     }
 
+    /** Tests that extensions work.
+     */
+    public void testExtensions() throws Exception
+    {
+	String s = "openid.identity="
+	    +"http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+	    +"&openid.mode=checkid_setup"
+	    +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
+	    +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_no"
+	    +"nce%3D2006-12-"
+	    +"06T04%253A54%253A51ZQvGYW3"
+	    +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
+	    +"&openid.assoc_handle=ahandle"
+	    +"&openid.ns.sig=http%3A%2F%2Fcommented.org"
+	    +"&openid.foo=happiness%20is%20a%20warm%20bun"
+	    +"&openid.glass.bunion=rocky%20sassoon%20gluebird%20foolia";
+
+	try {
+	    Request req = RequestFactory.parse(s);
+	    assertTrue(false);
+	} catch (OpenIdException e) {
+	    // expected: ns.sig cannot be redefined
+	}
+    }
+
+    /** Tests that extensions work.
+     */
+    public void testExtensions2() throws Exception
+    {
+	String s = "openid.identity="
+	    +"http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+	    +"&openid.mode=checkid_setup"
+	    +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
+	    +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_no"
+	    +"nce%3D2006-12-"
+	    +"06T04%253A54%253A51ZQvGYW3"
+	    +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
+	    +"&openid.assoc_handle=ahandle"
+	    +"&openid.ns.foo=http%3A%2F%2Fcommented.org"
+	    +"&openid.foo=trycke%20e%20for%20mycke"
+	    +"&openid.foo.bar=jaha%20vadda%20nu%20da";
+
+	Request req = RequestFactory.parse(s);
+	assertTrue(req instanceof AuthenticationRequest);
+	AuthenticationRequest ar = (AuthenticationRequest) req;
+	assertTrue(ar.isIdentifierSelect());
+
+	Map map = ar.getExtensions();
+	assertTrue(map.containsKey("ns.foo"));
+	assertTrue(map.containsKey("foo"));
+	assertTrue(map.containsKey("foo.bar"));
+    }
+
 }

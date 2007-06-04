@@ -108,8 +108,13 @@ public class AllTests extends TestCase
 
 	Request req = RequestFactory.parse(s);
 	assertTrue(req instanceof AssociationRequest);
+
 	Response resp = req.processUsing(store, crypto);
 	assertTrue(resp instanceof AssociationResponse);
+	AssociationResponse foo = (AssociationResponse) resp;
+	assertTrue(foo.getSessionType(),
+		   "DH-SHA256".equals(foo.getSessionType()));
+	assertTrue("HMAC-SHA256".equals(foo.getAssociationType()));
 	s = resp.toUrlString();
 
 	Response resp2 = ResponseFactory.parse(s);
@@ -476,6 +481,7 @@ public class AllTests extends TestCase
 
 	assertTrue(req instanceof AuthenticationRequest);
 	assertTrue(req.isVersion2());
+	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() == null);
 	Response resp = req.processUsing(store, crypto);
 
 	assertTrue(resp instanceof AuthenticationResponse);
@@ -490,6 +496,92 @@ public class AllTests extends TestCase
 
 	String sigList = authr.getSignedList();
 	assertTrue(sigList != null);
+	assertTrue(sigList.indexOf("claimed_id") == -1);
+	String signature = authr.getSignature();
+	assertTrue(signature != null);
+	String namespace = authr.getNamespace();
+	assertTrue(v2.equals(namespace));
+
+	String reSigned = authr.sign(clearKey, sigList);
+	assertEquals(reSigned, signature);
+
+
+	// check that we can authenticate the signaure
+	//
+	Map map = authr.toMap();
+	CheckAuthenticationRequest carq 
+	    = new CheckAuthenticationRequest(map, "check_authentication");
+
+	resp = carq.processUsing(store, crypto);
+	assertTrue(resp.isVersion2());
+	assertTrue(resp instanceof CheckAuthenticationResponse);
+	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
+	assertTrue(carp.isValid());
+
+
+	// and check that the wrong signature doesn't authenticate
+	//
+	map = authr.toMap();
+	map.put("openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=");
+	carq = new CheckAuthenticationRequest(map, "check_authentication");
+	assertTrue(carq.isVersion2());
+
+	resp = carq.processUsing(store, crypto);
+	assertTrue(resp instanceof CheckAuthenticationResponse);
+	carp = (CheckAuthenticationResponse) resp;
+	assertFalse(carp.isValid());
+    }
+
+
+
+    public void test3_claimedid() throws Exception
+    {
+	DiffieHellman dh = new DiffieHellman(p, g);
+	AssociationResponse ar = associate(dh);
+	BigInteger privateKey = dh.getPrivateKey();
+	BigInteger publicKey = dh.getPublicKey();
+
+	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
+	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
+	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(null == ar.getErrorCode());
+	assertTrue(null == ar.getMacKey());
+
+	byte[] encKey = ar.getEncryptedMacKey();
+	assertTrue(null != encKey);
+
+	BigInteger serverPublic = ar.getDhServerPublic();
+	assertTrue(null != serverPublic);
+
+	byte[] clearKey = dh.xorSecret(serverPublic, encKey);
+
+
+	// authenticate
+	String s = Utils.readFileAsString("3c.txt");
+	s += "?openid.ns="+v2
+	    + "?openid.assoc_handle="
+	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
+
+	Request req = RequestFactory.parse(s);
+
+	assertTrue(req instanceof AuthenticationRequest);
+	assertTrue(req.isVersion2());
+	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() !=null);
+	Response resp = req.processUsing(store, crypto);
+
+	assertTrue(resp instanceof AuthenticationResponse);
+	assertTrue(resp.isVersion2());
+
+	s = resp.toUrlString();
+
+	Response resp2 = ResponseFactory.parse(s);
+	assertTrue(resp2 instanceof AuthenticationResponse);
+	assertTrue(resp2.isVersion2());
+	AuthenticationResponse authr = (AuthenticationResponse) resp;
+
+	String sigList = authr.getSignedList();
+	assertTrue(sigList != null);
+	assertTrue(sigList.indexOf("claimed_id") != -1);
 	String signature = authr.getSignature();
 	assertTrue(signature != null);
 	String namespace = authr.getNamespace();

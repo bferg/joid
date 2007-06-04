@@ -30,12 +30,14 @@ public class AuthenticationRequest extends Request
     private final static Logger log 
 	= Logger.getLogger(AuthenticationRequest.class);
 
+    private String claimed_id;
     private String identity;
     private String handle;
     private String returnTo;
     private String trustRoot;
     private SimpleRegistration sreg;
 
+    final static String OPENID_CLAIMED_ID = "openid.claimed_id";
     private final static String OPENID_IDENTITY = "openid.identity";
     private final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
     private final static String 
@@ -114,6 +116,9 @@ public class AuthenticationRequest extends Request
 	    else if (OPENID_IDENTITY.equals(key)){
 		this.identity = value;
 	    } 
+	    else if (OPENID_CLAIMED_ID.equals(key)){
+		this.claimed_id = value;
+	    } 
 	    else if (OPENID_ASSOC_HANDLE.equals(key)){
 		this.handle = value;
 	    } 
@@ -133,6 +138,9 @@ public class AuthenticationRequest extends Request
     {
 	Map map = super.toMap();
        
+	if (claimed_id != null) {
+	    map.put(AuthenticationRequest.OPENID_CLAIMED_ID, claimed_id);
+	}
 	map.put(AuthenticationRequest.OPENID_IDENTITY, identity);
 	map.put(AuthenticationRequest.OPENID_ASSOC_HANDLE, handle);
 	map.put(AuthenticationRequest.OPENID_RETURN_TO, returnTo);
@@ -160,6 +168,9 @@ public class AuthenticationRequest extends Request
 	}
 	if (identity == null){
 	    throw new OpenIdException("Missing identity");
+	}
+	if (claimed_id != null && !this.isVersion2()){
+	    throw new OpenIdException("claimed_id not valid in version 1.x");
 	}
 	if (trustRoot == null){
 	    throw new OpenIdException("Missing trust root");
@@ -278,6 +289,13 @@ public class AuthenticationRequest extends Request
     public String getIdentity(){return identity;}
 
     /**
+     * Returns the claimed identity used in this authentication request.
+     * 
+     * @return the claimed identity.
+     */
+    public String getClaimedIdentity(){return claimed_id;}
+
+    /**
      * Sets the identity used in this authentication request.
      * 
      * @param identity the identity.
@@ -327,6 +345,7 @@ public class AuthenticationRequest extends Request
         return "[AuthenticationRequest "
 	    + super.toString()
 	    +", sreg="+sreg
+            +", claimed identity="+claimed_id
             +", identity="+identity
             +", handle="+handle+", return to="+returnTo
             +", trust root="+trustRoot+"]";

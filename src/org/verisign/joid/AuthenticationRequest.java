@@ -40,8 +40,9 @@ public class AuthenticationRequest extends Request
     final static String OPENID_CLAIMED_ID = "openid.claimed_id";
     private final static String OPENID_IDENTITY = "openid.identity";
     private final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
-    private final static String 
-	PICK_ONE = "http://openid.net/identifier_select/2.0";
+
+    final static String 
+	ID_SELECT = "http://specs.openid.net/auth/2.0/identifier_select";
     private final static String CHECKID_IMMEDIATE = "checkid_immediate";
     private final static String CHECKID_SETUP = "checkid_setup";
 
@@ -287,6 +288,16 @@ public class AuthenticationRequest extends Request
      * @return the identity.
      */
     public String getIdentity(){return identity;}
+
+    /**
+     * Returns whether the given identity equals {@link ID_SELECT}.
+     * 
+     * @return true if the identity equals {@link ID_SELECT}.
+     */
+    public boolean isIdentifierSelect()
+    {
+	return AuthenticationRequest.ID_SELECT.equals(identity);
+    }
 
     /**
      * Returns the claimed identity used in this authentication request.

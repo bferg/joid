@@ -125,7 +125,7 @@ public class OpenIdServlet extends HttpServlet
         }
 
         if (goodReturnTo) {
-            String s = "?openid.ns:http://openid.net/signon/2.0"
+            String s = "?openid.ns:http://specs.openid.net/auth/2.0"
                 +"&openid.mode=error&openid.error=BAD_REQUEST";
             s = response.encodeRedirectURL(returnTo+s);
             response.sendRedirect(s);
@@ -133,7 +133,7 @@ public class OpenIdServlet extends HttpServlet
             PrintWriter out = response.getWriter();
             // response.setContentLength() seems to be broken, 
             // so set the header manually 
-            String s = "ns:http://openid.net/signon/2.0\n"
+            String s = "ns:http://specs.openid.net/auth/2.0\n"
                 +"&mode:error"
                 +"&error:BAD_REQUEST\n";
             int len = s.length();

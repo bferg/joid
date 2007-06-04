@@ -96,6 +96,28 @@ public class AllTests extends TestCase
 	return ar;
     }
 
+    private AssociationResponse associate256(DiffieHellman dh)
+	throws Exception
+    {
+	BigInteger publicKey = dh.getPublicKey();
+
+	String s = "openid.mode=associate&openid.assoc_type=HMAC-SHA256"
+	    +"&openid.session_type=DH-SHA1&openid.dh_consumer_public=";
+
+	s += URLEncoder.encode(Crypto.convertToString(publicKey), "UTF-8");
+
+	Request req = RequestFactory.parse(s);
+	assertTrue(req instanceof AssociationRequest);
+	Response resp = req.processUsing(store, crypto);
+	assertTrue(resp instanceof AssociationResponse);
+	s = resp.toUrlString();
+
+	Response resp2 = ResponseFactory.parse(s);
+	assertTrue(resp2 instanceof AssociationResponse);
+	AssociationResponse ar = (AssociationResponse) resp;
+	return ar;
+    }
+
 
     public void testAssociationLifeLength() throws Exception
     {
@@ -391,7 +413,7 @@ public class AllTests extends TestCase
 	assertTrue(carp.isValid());
     }
 
-    String v2 = "http://openid.net/signon/2.0";
+    String v2 = "http://specs.openid.net/auth/2.0";
 
     public void testVersion2() throws Exception
     {
@@ -560,7 +582,7 @@ public class AllTests extends TestCase
 
 	String s = "openid.return_to=http%3A%2F%2Fexample.com&ope"
 	    +"nid.realm=http%3A%2F%2Fexample.com&openid.ns=http%"
-	    +"3A%2F%2Fopenid.net%2Fsignon%2F2.0&openid.claimed_id"
+	    +"3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.claimed_id"
 	    +"=http%3A%2F%2Falice.example.com&openid.mode=checkid"
 	    +"_setup&openid.identity=http%3A%2F%2Fexample.com&ope"
 	    +"nid.assoc_handle="+ar.getAssociationHandle();
@@ -576,7 +598,7 @@ public class AllTests extends TestCase
     {
 	String s = "openid.return_to=http%3A%2F%2Fexample.com&ope"
 	    +"nid.realm=http%3A%2F%2Fexample.com/&openid.ns=http%"
-	    +"3A%2F%2Fopenid.net%2Fsignon%2F2.0&openid.claimed_id"
+	    +"3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.claimed_id"
 	    +"=http%3A%2F%2Falice.example.com&openid.mode=checkid"
 	    +"_setup&openid.identity=http%3A%2F%2Fexample.com&ope"
 	    +"nid.assoc_handle=1b184cb";

@@ -78,7 +78,8 @@ public class CheckAuthenticationResponse extends Response
 	this.ns = ar.getNamespace();
 
 	if (a != null) {
-	    String sig = ar.sign(a.getMacKey(), ar.getSignedList());
+	    String sig = ar.sign(a.getAssociationType(),
+				 a.getMacKey(), ar.getSignedList());
 	    isValid = sig.equals(ar.getSignature());
 	} else {
 	    isValid = false;

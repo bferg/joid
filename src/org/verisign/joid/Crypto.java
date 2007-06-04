@@ -53,7 +53,8 @@ public class Crypto
     }
 
     /**
-     * Signs a message using HMACSHA1.
+     * Signs a message using HMAC SHA1.
+     *
      * @param key the key to sign with.
      * @param text the bytes to sign.
      * @return the signed bytes.
@@ -63,7 +64,28 @@ public class Crypto
     public static byte[] hmacSha1(byte[] key, byte[] text)
 	throws InvalidKeyException, NoSuchAlgorithmException
     {
-	SecretKey sk = new SecretKeySpec(key, "HMACSHA1");
+	return hmacShaX("HMACSHA1", key, text);
+    }
+
+    /**
+     * Signs a message using HMAC SHA256.
+     *
+     * @param key the key to sign with.
+     * @param text the bytes to sign.
+     * @return the signed bytes.
+     * @throws InvalidKeyException if <code>key</code> is not a good HMAC key.
+     * @throws NoSuchAlgorithmException if HMACSHA1 is not available.
+     */
+    public static byte[] hmacSha256(byte[] key, byte[] text)
+	throws InvalidKeyException, NoSuchAlgorithmException
+    {
+	return hmacShaX("HMACSHA256", key, text);
+    }
+
+    private static byte[] hmacShaX(String keySpec, byte[] key, byte[] text)
+	throws InvalidKeyException, NoSuchAlgorithmException
+    {
+	SecretKey sk = new SecretKeySpec(key, keySpec);
 	Mac m = Mac.getInstance(sk.getAlgorithm());
 	m.init(sk);
 	return m.doFinal(text);

@@ -29,7 +29,7 @@ public abstract class Message
     String mode;
     String ns;
 
-    static String OPENID_20_NAMESPACE = "http://openid.net/signon/2.0";
+    static String OPENID_20_NAMESPACE = "http://specs.openid.net/auth/2.0";
     static String OPENID_NS = "openid.ns";
     static String OPENID_MODE = "openid.mode";
 
@@ -47,7 +47,7 @@ public abstract class Message
 
     /**
      * Returns the namespace of this message. For OpenID 2.0 messages,
-     * this namespace will be <code>http://openid.net/signon/2.0</code>.
+     * this namespace will be <code>http://specs.openid.net/auth/2.0</code>.
      *
      * @return the namespace, or null if none (OpenID 1.x).
      */

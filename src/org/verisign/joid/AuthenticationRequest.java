@@ -17,9 +17,11 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.Arrays;
 import org.apache.log4j.Logger;
 
 /**
@@ -30,6 +32,8 @@ public class AuthenticationRequest extends Request
     private final static Logger log 
 	= Logger.getLogger(AuthenticationRequest.class);
 
+    private Map extendedMap;
+
     private String claimed_id;
     private String identity;
     private String handle;
@@ -37,6 +41,7 @@ public class AuthenticationRequest extends Request
     private String trustRoot;
     private SimpleRegistration sreg;
 
+    private static Set reservedWords; 
     final static String OPENID_CLAIMED_ID = "openid.claimed_id";
     private final static String OPENID_IDENTITY = "openid.identity";
     private final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
@@ -74,6 +79,14 @@ public class AuthenticationRequest extends Request
 	    //
 	    throw new RuntimeException(e);
 	}
+
+	// from section 12 in spec
+	reservedWords = new HashSet(Arrays.asList(new String[] 
+	    { "assoc_handle","assoc_type","claimed_id","contact","delegate",
+	      "dh_consumer_public","dh_gen","dh_modulus","error","identity",
+	      "invalidate_handle","mode","ns","op_endpoint","openid","realm",
+	      "reference","response_nonce","return_to","server","session_type",
+	      "sig","signed","trust_root"}));
     }
 
     /**
@@ -106,6 +119,7 @@ public class AuthenticationRequest extends Request
     {
 	super(map, mode);
 	Set set = map.entrySet();
+	extendedMap = new HashMap();
 	for (Iterator iter=set.iterator(); iter.hasNext();){
 	    Map.Entry mapEntry = (Map.Entry) iter.next();
 	    String key = (String) mapEntry.getKey();
@@ -129,7 +143,14 @@ public class AuthenticationRequest extends Request
 	    else if (OPENID_TRUST_ROOT.equals(key)
 		     || OPENID_REALM.equals(key)){
 		this.trustRoot = value; 
-	    }
+	    } 
+	    else if (key != null && key.startsWith("openid.")) {
+		String foo = key.substring(7);  // remove "openid."
+		if ((!(AuthenticationRequest.reservedWords.contains(foo)))
+		    && (!foo.startsWith("sreg."))){
+		    extendedMap.put(foo, value);
+		}
+	    } 
 	}
 	this.sreg = new SimpleRegistration(map);
 	checkInvariants();
@@ -176,11 +197,46 @@ public class AuthenticationRequest extends Request
 	if (trustRoot == null){
 	    throw new OpenIdException("Missing trust root");
 	}
-	// actually optional per spec!
-	/* if (returnTo == null){
-	    throw new OpenIdException("Missing return to");
-	    }*/
+
 	checkTrustRoot();
+
+	Set namespaces = new HashSet();
+	Set entries = new HashSet();
+	Set set = extendedMap.entrySet();
+	for (Iterator iter=set.iterator(); iter.hasNext();){
+	    Map.Entry mapEntry = (Map.Entry) iter.next();
+	    String key = (String) mapEntry.getKey();
+	    String value = (String) mapEntry.getValue();
+	    // all keys start "openid." in the set
+
+	    if (key.startsWith("ns.")){
+		key = key.substring(3);
+		if (AuthenticationRequest.reservedWords.contains(key)){
+		    throw new OpenIdException("Cannot redefine: "+key);
+		}
+		if (namespaces.contains(key)){
+		    throw new OpenIdException("Multiple definitions: "+key);
+		}
+		namespaces.add(key);
+	    } 
+	    else {
+		if (entries.contains(key)){
+		    throw new OpenIdException("Multiple definitions: "+key);
+		}
+		entries.add(key);
+	    } 
+	}
+	for (Iterator iter = entries.iterator(); iter.hasNext();){
+	    String key = (String) iter.next();
+	    int period = key.indexOf('.');
+	    if (period != -1){
+		key = key.substring(0, period);
+	    }
+	    if (!namespaces.contains(key)){
+		throw new OpenIdException("No such namespace: "+key);
+	    }
+	}
+
     }
 
     private void checkTrustRoot() throws OpenIdException
@@ -288,6 +344,13 @@ public class AuthenticationRequest extends Request
      * @return the identity.
      */
     public String getIdentity(){return identity;}
+
+    /**
+     * Returns the extensions in this authentication request.
+     * 
+     * @return the extensions; empty if none.
+     */
+    public Map getExtensions(){return extendedMap;}
 
     /**
      * Returns whether the given identity equals {@link ID_SELECT}.

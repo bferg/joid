@@ -21,6 +21,7 @@ import org.verisign.joid.OpenIdException;
 import org.verisign.joid.RequestFactory;
 import org.verisign.joid.AuthenticationRequest;
 import org.verisign.joid.Store;
+import org.verisign.joid.ServerInfo;
 import org.verisign.joid.StoreFactory;
 
 public class OpenIdServlet extends HttpServlet
@@ -35,7 +36,7 @@ public class OpenIdServlet extends HttpServlet
 	super.init(config);
         store = StoreFactory.getInstance(MemoryStore.class.getName());
         crypto = new Crypto();
-        openId = new OpenId(store);
+        openId = new OpenId(new ServerInfo("http://endpoint", store, crypto));
     }
 
     

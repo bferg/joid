@@ -49,7 +49,7 @@ public class AuthenticationRequest extends Request
     final static String 
 	ID_SELECT = "http://specs.openid.net/auth/2.0/identifier_select";
     private final static String CHECKID_IMMEDIATE = "checkid_immediate";
-    private final static String CHECKID_SETUP = "checkid_setup";
+    private final static String CHECKID_SETUP = "checkid_setp";
 
     private final static String OPENID_RETURN_TO = "openid.return_to";
     private final static String OPENID_TRUST_ROOT = "openid.trust_root";
@@ -317,9 +317,10 @@ public class AuthenticationRequest extends Request
     }
 
 
-    public Response processUsing(Store store, Crypto crypto)
-	throws OpenIdException
+    public Response processUsing(ServerInfo si)	throws OpenIdException
     {
+	Store store = si.getStore();
+	Crypto crypto = si.getCrypto();
 	Association assoc = null;
 	String invalidate = null;
 	if (handle != null){
@@ -335,7 +336,7 @@ public class AuthenticationRequest extends Request
 	    assoc = store.generateAssociation(statelessAr, crypto);
 	    store.saveAssociation(assoc);
 	}
-	return new AuthenticationResponse(this, assoc, crypto, invalidate);
+	return new AuthenticationResponse(si, this, assoc, crypto, invalidate);
     }
 
     /**

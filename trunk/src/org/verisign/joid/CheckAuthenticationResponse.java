@@ -69,8 +69,8 @@ public class CheckAuthenticationResponse extends Response
      * throws at errors in signature creation
      */
     CheckAuthenticationResponse(AuthenticationResponse ar,
-				       Association a, Crypto crypto,
-				       String invalidateHandle)
+				Association a, Crypto crypto,
+				String invalidateHandle)
 	throws OpenIdException
     {
 	super(Collections.EMPTY_MAP);

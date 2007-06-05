@@ -76,6 +76,24 @@ public class DbStore extends Store
 	return a;
     }
 
+    public org.verisign.joid.Nonce generateNonce(String nonce) 
+	throws OpenIdException
+    {
+	Nonce n = new Nonce();
+	n.setNonce(nonce);
+	n.setCheckedDate(new Date());
+	return n;
+    }
+
+    public void saveNonce(org.verisign.joid.Nonce n)
+    {
+        Session session = HibernateUtil.currentSession();
+	Transaction tx = session.beginTransaction();
+	session.save(n);
+	tx.commit();
+        HibernateUtil.closeSession();
+    }
+
     public void saveAssociation(org.verisign.joid.Association a)
     {
         Session session = HibernateUtil.currentSession();
@@ -108,10 +126,34 @@ public class DbStore extends Store
         HibernateUtil.closeSession();
 
 	if (l.size() == 0) {
-	    log.info("Found no such association: "+handle);
+	    log.debug("Found no such association: "+handle);
 	    return null;
 	} else {
 	    return (Association) l.get(0);
+	}
+    }
+
+    public org.verisign.joid.Nonce findNonce(String nonce)
+	throws OpenIdException
+    {
+        Session session = HibernateUtil.currentSession();
+	Transaction tx = session.beginTransaction();
+
+	String s = "from Nonce as n where n.nonce=:nonce";
+	Query q = session.createQuery(s);
+	q.setParameter("nonce",nonce);
+	List l = q.list();
+	if (l.size() > 1) {
+	    throw new OpenIdException("Non-unique nonce: "+nonce);
+	}
+	tx.commit();
+        HibernateUtil.closeSession();
+
+	if (l.size() == 0) {
+	    log.debug("Found no such nonce: "+nonce);
+	    return null;
+	} else {
+	    return (Nonce) l.get(0);
 	}
     }
     

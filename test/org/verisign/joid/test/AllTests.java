@@ -330,18 +330,69 @@ public class AllTests extends TestCase
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
 	assertTrue(carp.isValid());
+    }
+
+    public void test3_badsig() throws Exception
+    {
+	DiffieHellman dh = new DiffieHellman(p, g);
+	AssociationResponse ar = associate(dh);
+	assertFalse(ar.isVersion2());
+	BigInteger privateKey = dh.getPrivateKey();
+	BigInteger publicKey = dh.getPublicKey();
+
+	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
+	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
+	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(null == ar.getErrorCode());
+	assertTrue(null == ar.getMacKey());
+
+	byte[] encKey = ar.getEncryptedMacKey();
+	assertTrue(null != encKey);
+
+	BigInteger serverPublic = ar.getDhServerPublic();
+	assertTrue(null != serverPublic);
+
+	byte[] clearKey = dh.xorSecret(serverPublic, encKey);
+
+	// authenticate
+	String s = Utils.readFileAsString("3bv1.txt");
+	s += "?openid.assoc_handle="
+	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
+
+	Request req = RequestFactory.parse(s);
+	assertTrue(req instanceof AuthenticationRequest);
+	assertFalse(req.isVersion2());
+	Response resp = req.processUsing(serverInfo);
+	assertTrue(resp instanceof AuthenticationResponse);
+	assertFalse(resp.isVersion2());
+
+	s = resp.toUrlString();
+
+	Response resp2 = ResponseFactory.parse(s);
+	assertTrue(resp2 instanceof AuthenticationResponse);
+	AuthenticationResponse authr = (AuthenticationResponse) resp;
+	assertFalse(authr.isVersion2());
+
+	String sigList = authr.getSignedList();
+	assertTrue(sigList != null);
+	String signature = authr.getSignature();
+	assertTrue(signature != null);
+
+	String reSigned = authr.sign(clearKey, sigList);
+	assertEquals(reSigned, signature);
 
 
-	// and check that the wrong signature doesn't authenticate
+	// check that the wrong signature doesn't authenticate
 	//
-	map = authr.toMap();
+	Map map = authr.toMap();
 	map.put("openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=");
-	carq = new CheckAuthenticationRequest(map, "check_authentication");
+	CheckAuthenticationRequest carq 
+	    = new CheckAuthenticationRequest(map, "check_authentication");
 
 	resp = carq.processUsing(serverInfo);
 	assertFalse(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
-	carp = (CheckAuthenticationResponse) resp;
+	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
 	assertFalse(carp.isValid());
     }
 
@@ -519,24 +570,81 @@ public class AllTests extends TestCase
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
 	assertTrue(carp.isValid());
+    }
+
+    public void test3version2_badsig() throws Exception
+    {
+	DiffieHellman dh = new DiffieHellman(p, g);
+	AssociationResponse ar = associate(dh);
+	BigInteger privateKey = dh.getPrivateKey();
+	BigInteger publicKey = dh.getPublicKey();
+
+	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
+	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
+	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(null == ar.getErrorCode());
+	assertTrue(null == ar.getMacKey());
+
+	byte[] encKey = ar.getEncryptedMacKey();
+	assertTrue(null != encKey);
+
+	BigInteger serverPublic = ar.getDhServerPublic();
+	assertTrue(null != serverPublic);
+
+	byte[] clearKey = dh.xorSecret(serverPublic, encKey);
 
 
-	// and check that the wrong signature doesn't authenticate
+	// authenticate
+	String s = Utils.readFileAsString("3b.txt");
+	s += "?openid.ns="+v2
+	    + "?openid.assoc_handle="
+	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
+
+	Request req = RequestFactory.parse(s);
+
+	assertTrue(req instanceof AuthenticationRequest);
+	assertTrue(req.isVersion2());
+	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() == null);
+	Response resp = req.processUsing(serverInfo);
+
+	assertTrue(resp instanceof AuthenticationResponse);
+	assertTrue(resp.isVersion2());
+
+	s = resp.toUrlString();
+
+	Response resp2 = ResponseFactory.parse(s);
+	assertTrue(resp2 instanceof AuthenticationResponse);
+	assertTrue(resp2.isVersion2());
+	AuthenticationResponse authr = (AuthenticationResponse) resp;
+
+	String sigList = authr.getSignedList();
+	assertTrue(sigList != null);
+	assertTrue(sigList.indexOf("claimed_id") == -1);
+	String signature = authr.getSignature();
+	assertTrue(signature != null);
+	String namespace = authr.getNamespace();
+	assertTrue(v2.equals(namespace));
+
+	String reSigned = authr.sign(clearKey, sigList);
+	assertEquals(reSigned, signature);
+
+
+	// Check that the wrong signature doesn't authenticate
 	//
-	map = authr.toMap();
+	Map map = authr.toMap();
 	map.put("openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=");
-	carq = new CheckAuthenticationRequest(map, "check_authentication");
+	CheckAuthenticationRequest carq 
+	    = new CheckAuthenticationRequest(map, "check_authentication");
 	assertTrue(carq.isVersion2());
 
 	resp = carq.processUsing(serverInfo);
 	assertTrue(resp instanceof CheckAuthenticationResponse);
-	carp = (CheckAuthenticationResponse) resp;
+	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
 	assertFalse(carp.isValid());
     }
 
 
-
-    public void test3_claimedid() throws Exception
+    public void test3_claimedid_noncecheck() throws Exception
     {
 	DiffieHellman dh = new DiffieHellman(p, g);
 	AssociationResponse ar = associate(dh);
@@ -606,17 +714,14 @@ public class AllTests extends TestCase
 	assertTrue(carp.isValid());
 
 
-	// and check that the wrong signature doesn't authenticate
+	// A 2nd check auth should fail (nonce check)
 	//
-	map = authr.toMap();
-	map.put("openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=");
-	carq = new CheckAuthenticationRequest(map, "check_authentication");
-	assertTrue(carq.isVersion2());
-
-	resp = carq.processUsing(serverInfo);
-	assertTrue(resp instanceof CheckAuthenticationResponse);
-	carp = (CheckAuthenticationResponse) resp;
-	assertFalse(carp.isValid());
+	try {
+	    resp = carq.processUsing(serverInfo);
+	    assertTrue(false); 
+	} catch (OpenIdException e) {
+	    // should throw
+	}
     }
 
     public void testEndsWithEquals() throws Exception

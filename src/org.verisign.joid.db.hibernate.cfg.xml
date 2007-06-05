@@ -21,6 +21,7 @@
     <property name="hibernate.hbm2ddl.auto">update</property>
 
     <mapping resource="org/verisign/joid/db/Association.hbm.xml"/>
+    <mapping resource="org/verisign/joid/db/Nonce.hbm.xml"/>
 
   </session-factory>
 </hibernate-configuration>

@@ -34,6 +34,7 @@ public class AuthenticationResponse extends Response
     private static Logger log = Logger.getLogger(AuthenticationResponse.class);
 
     private static String OPENID_RETURN_TO = "openid.return_to";
+    private static String OPENID_OP_ENDPOINT = "openid.op_endpoint";
     private static String OPENID_IDENTITY = "openid.identity";
     private static String OPENID_ERROR = "openid.error";
     private static String OPENID_NONCE = "openid.response_nonce";
@@ -55,6 +56,7 @@ public class AuthenticationResponse extends Response
     private String algo;
     private String signature;
     private SimpleRegistration sreg;
+    private String urlEndPoint;
 
     /** 
      * Returns the signature in this response.
@@ -90,6 +92,7 @@ public class AuthenticationResponse extends Response
     {
 	Map map = super.toMap();
 	
+	map.put(AuthenticationResponse.OPENID_OP_ENDPOINT, urlEndPoint);
 	map.put(AuthenticationResponse.OPENID_MODE, mode);
 	map.put(AuthenticationResponse.OPENID_IDENTITY, identity);
 	map.put(AuthenticationResponse.OPENID_RETURN_TO, returnTo);
@@ -221,7 +224,8 @@ public class AuthenticationResponse extends Response
     /**
      * throws at errors in signature creation
      */
-    AuthenticationResponse(AuthenticationRequest ar,
+    AuthenticationResponse(ServerInfo serverInfo,
+			   AuthenticationRequest ar,
 			   Association a, Crypto crypto,
 			   String invalidateHandle)
 	throws OpenIdException
@@ -233,11 +237,15 @@ public class AuthenticationResponse extends Response
 	returnTo = ar.getReturnTo();
 	ns = ar.getNamespace();
 	nonce = generateNonce();
+	this.urlEndPoint = serverInfo.getUrlEndPoint();
 	this.invalidateHandle = invalidateHandle; //may be null
 	associationHandle = a.getHandle();
-	signed = "identity,response_nonce,return_to";
+	signed = "assoc_handle,identity,response_nonce,return_to";
 	if (claimed_id != null){
 	    signed += ",claimed_id";
+	}
+	if (isVersion2()) {
+	    signed += ",op_endpoint";
 	}
 	sreg = ar.getSimpleRegistration();
 	log.debug("sreg="+sreg);
@@ -284,6 +292,8 @@ public class AuthenticationResponse extends Response
 		signed = value;
 	    } else if (OPENID_SIG.equals(key)) {
 		signature = value;
+	    } else if (OPENID_OP_ENDPOINT.equals(key)) {
+		urlEndPoint = value;
 	    }
 	}
 	this.sreg = SimpleRegistration.parseFromResponse(map);

@@ -44,14 +44,13 @@ public abstract class Request extends Message
      * sent back to the requestor. Associations may be read from, written to,
      * or deleted from the store by way of this processing step.
      *
-     * @param store the store implementation.
-     * @param crypto the crypto implementation to use.
+     * @param serverInfo information about this server's implementation.
      *
      * @return the response
      *
      * @throws OpenIdException unrecoverable errors happen.
      */
-    public abstract Response processUsing(Store store, Crypto crypto)
+    public abstract Response processUsing(ServerInfo serverInfo)
 	throws OpenIdException;
 
 }

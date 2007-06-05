@@ -224,9 +224,10 @@ public class AssociationRequest extends Request
 	}
     }
 
-    public Response processUsing(Store store, Crypto crypto)
-	throws OpenIdException
+    public Response processUsing(ServerInfo si)	throws OpenIdException
     {
+	Store store = si.getStore();
+	Crypto crypto = si.getCrypto();
 	Association a = store.generateAssociation(this, crypto);
 	store.saveAssociation(a);
 	return new AssociationResponse(this, a, crypto);

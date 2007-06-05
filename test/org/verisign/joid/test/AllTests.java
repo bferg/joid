@@ -43,6 +43,7 @@ import org.verisign.joid.Response;
 import org.verisign.joid.ResponseFactory;
 import org.verisign.joid.SimpleRegistration;
 import org.verisign.joid.Store;
+import org.verisign.joid.ServerInfo;
 import org.verisign.joid.StoreFactory;
 import org.verisign.joid.db.Association;
 
@@ -55,6 +56,8 @@ public class AllTests extends TestCase
 
     private static Crypto crypto = new Crypto();
     private static Store store = StoreFactory.getDbInstance();
+    private static ServerInfo serverInfo = new ServerInfo("http://example.com",
+							  store, crypto);
 
     public static Test suite() 
     {
@@ -86,7 +89,7 @@ public class AllTests extends TestCase
 
 	Request req = RequestFactory.parse(s);
 	assertTrue(req instanceof AssociationRequest);
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AssociationResponse);
 	s = resp.toUrlString();
 
@@ -109,7 +112,7 @@ public class AllTests extends TestCase
 	Request req = RequestFactory.parse(s);
 	assertTrue(req instanceof AssociationRequest);
 
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AssociationResponse);
 	AssociationResponse foo = (AssociationResponse) resp;
 	assertTrue(foo.getSessionType(),
@@ -153,7 +156,7 @@ public class AllTests extends TestCase
 
 	Request req = RequestFactory.parse(s);
 	assertTrue(req instanceof AssociationRequest);
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AssociationResponse);
 
 	s = resp.toUrlString();
@@ -175,7 +178,7 @@ public class AllTests extends TestCase
     {
 	String s = Utils.readFileAsString("2.txt");
 
-	OpenId openId = new OpenId(store);
+	OpenId openId = new OpenId(serverInfo);
 	assertTrue(openId.isAssociationRequest(s));
 	assertFalse(openId.isAuthenticationRequest(s));
     }
@@ -295,7 +298,7 @@ public class AllTests extends TestCase
 	Request req = RequestFactory.parse(s);
 	assertTrue(req instanceof AuthenticationRequest);
 	assertFalse(req.isVersion2());
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertFalse(resp.isVersion2());
 
@@ -322,7 +325,7 @@ public class AllTests extends TestCase
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 	assertFalse(carq.isVersion2());
 
-	resp = carq.processUsing(store, crypto);
+	resp = carq.processUsing(serverInfo);
 	assertFalse(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
@@ -335,7 +338,7 @@ public class AllTests extends TestCase
 	map.put("openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=");
 	carq = new CheckAuthenticationRequest(map, "check_authentication");
 
-	resp = carq.processUsing(store, crypto);
+	resp = carq.processUsing(serverInfo);
 	assertFalse(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	carp = (CheckAuthenticationResponse) resp;
@@ -384,7 +387,7 @@ public class AllTests extends TestCase
 	sreg = new SimpleRegistration(set, Collections.EMPTY_SET, supplied, "");
 	((AuthenticationRequest) req).setSimpleRegistration(sreg);
 
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
 
@@ -407,11 +410,10 @@ public class AllTests extends TestCase
 	// check that we can authenticate the signaure
 	//
 	Map map = authr.toMap();
-	//System.out.println("map="+map);
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 
-	resp = carq.processUsing(store, crypto);
+	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
@@ -427,7 +429,7 @@ public class AllTests extends TestCase
 
 	Request req = RequestFactory.parse(s);
 	assertTrue(req instanceof AssociationRequest);
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AssociationResponse);
 	assertTrue(resp.isVersion2());
 
@@ -482,7 +484,7 @@ public class AllTests extends TestCase
 	assertTrue(req instanceof AuthenticationRequest);
 	assertTrue(req.isVersion2());
 	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() == null);
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
 
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
@@ -512,7 +514,7 @@ public class AllTests extends TestCase
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 
-	resp = carq.processUsing(store, crypto);
+	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
@@ -526,7 +528,7 @@ public class AllTests extends TestCase
 	carq = new CheckAuthenticationRequest(map, "check_authentication");
 	assertTrue(carq.isVersion2());
 
-	resp = carq.processUsing(store, crypto);
+	resp = carq.processUsing(serverInfo);
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	carp = (CheckAuthenticationResponse) resp;
 	assertFalse(carp.isValid());
@@ -567,7 +569,7 @@ public class AllTests extends TestCase
 	assertTrue(req instanceof AuthenticationRequest);
 	assertTrue(req.isVersion2());
 	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() !=null);
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
 
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
@@ -597,7 +599,7 @@ public class AllTests extends TestCase
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 
-	resp = carq.processUsing(store, crypto);
+	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
@@ -611,7 +613,7 @@ public class AllTests extends TestCase
 	carq = new CheckAuthenticationRequest(map, "check_authentication");
 	assertTrue(carq.isVersion2());
 
-	resp = carq.processUsing(store, crypto);
+	resp = carq.processUsing(serverInfo);
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	carp = (CheckAuthenticationResponse) resp;
 	assertFalse(carp.isValid());
@@ -645,7 +647,7 @@ public class AllTests extends TestCase
 	    +".trust_root=http%3A%2F%2Ftest.vladlife.com&";
 	try {
 	    Request req = RequestFactory.parse(s);
-	    Response resp = req.processUsing(store, crypto);
+	    Response resp = req.processUsing(serverInfo);
 	    assertTrue(false);
 	} catch (OpenIdException expected){
 	    //System.out.println(expected);
@@ -680,7 +682,7 @@ public class AllTests extends TestCase
 	    +"nid.assoc_handle="+ar.getAssociationHandle();
 
 	Request req = RequestFactory.parse(s);
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
     }
 
     /** Tests that trailing slashes on URLs are *not* canonicalized.
@@ -697,7 +699,7 @@ public class AllTests extends TestCase
 
 	try {
 	    Request req = RequestFactory.parse(s);
-	    Response resp = req.processUsing(store, crypto);
+	    Response resp = req.processUsing(serverInfo);
 	    assertTrue(false);
 	} catch (OpenIdException expected){
 	    // System.out.println(expected);

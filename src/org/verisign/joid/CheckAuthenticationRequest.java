@@ -61,14 +61,15 @@ public class CheckAuthenticationRequest extends Request
 	}
     }
 
-    public Response processUsing(Store store, Crypto crypto)
-	throws OpenIdException
+    public Response processUsing(ServerInfo si)	throws OpenIdException
     {
 	String invalidate = null;
+	Store store = si.getStore();
 	Association assoc = store.findAssociation(handle);
 	if ((assoc == null) || (assoc.hasExpired())){
 	    invalidate = handle;
 	}
+	Crypto crypto = si.getCrypto();
 	return new CheckAuthenticationResponse(ar, assoc, 
 					       crypto, invalidate);
     }

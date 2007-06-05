@@ -42,19 +42,21 @@ import org.verisign.joid.Crypto;
 public class OpenId
 {
     private final static Logger log = Logger.getLogger(OpenId.class);
-    private Store store;
-    private Crypto crypto;
+    private ServerInfo serverInfo;
+//     private Store store;
+//     private Crypto crypto;
 
     /**
      * Creates an OpenId instance. This instance will use the default crypto
      * implementation {@link Crypto}.
      *
-     * @param store the datasource to use for associations.
+     * @param serverInfo information about this service.
      */
-    public OpenId(Store store)
+    public OpenId(ServerInfo si)
     {
-	this.store = store;
-	this.crypto = new Crypto();
+ 	this.serverInfo = serverInfo;
+// 	this.store = si.getStore();
+// 	this.crypto = new Crypto();
     }
 
     /**
@@ -164,7 +166,7 @@ public class OpenId
 	    log.warn("exception="+e);
 	    throw new OpenIdException(e);
 	}
-	Response resp = req.processUsing(store, crypto);
+	Response resp = req.processUsing(serverInfo);
 	if (req instanceof AuthenticationRequest) {
 	    return resp.toUrlString();
 	} else {

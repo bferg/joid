@@ -63,4 +63,32 @@ public abstract class Store
      */
     public abstract Association findAssociation(String handle)
 	throws OpenIdException;
+
+    /**
+     * Finds a nonce in the store.
+     *
+     * @param nonce the nonce to find.
+     * @return the nonce if found; null otherwise.
+     *
+     * @throws OpenIdException at unrecoverable errors.
+     */
+    public abstract Nonce findNonce(String nonce) throws OpenIdException;
+
+    /**
+     * Saves an nonce in the store.
+     *
+     * @param n the nonce to store.
+     */
+    public abstract void saveNonce(Nonce n);
+
+    /**
+     * Generates and returns a nonce. To store the nonce
+     * use {@link Store#saveNonce(Nonce) saveNonce()}
+     *
+     * @param nonce the nonce to use.
+     * @return the generated nonce.
+     *
+     * @throws OpenIdException at unrecoverable errors.
+     */
+    public abstract Nonce generateNonce(String nonce) throws OpenIdException;
 }

@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
 import org.verisign.joid.Association;
+import org.verisign.joid.Nonce;
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.Crypto;
 import org.verisign.joid.OpenIdException;
@@ -13,7 +14,8 @@ import org.verisign.joid.Store;
 
 public class MemoryStore extends Store
 {
-    private static List list = new ArrayList();
+    private static List associationList = new ArrayList();
+    private static List nonceList = new ArrayList();
 
     public Association generateAssociation(AssociationRequest req, 
 					   Crypto crypto) 
@@ -47,19 +49,24 @@ public class MemoryStore extends Store
 
     public void saveAssociation(Association a)
     {
-	list.add(a);
+	associationList.add(a);
+    }
+
+    public void saveNonce(Nonce n)
+    {
+	nonceList.add(n);
     }
 
     public void deleteAssociation(Association a)
     {
 	throw new RuntimeException("not yet implemented");
-	// "list.delete(a)"
+	// "associationList.delete(a)"
     }
 
     public Association findAssociation(String handle) throws OpenIdException
     {
 	if (handle == null) return null;
-	ListIterator li = list.listIterator();
+	ListIterator li = associationList.listIterator();
 	while (li.hasNext()){
 	    Association a = (Association) li.next();
 	    if (handle.equals(a.getHandle())){
@@ -67,5 +74,27 @@ public class MemoryStore extends Store
 	    }
 	}
 	return null;
+    }
+
+    public Nonce findNonce(String nonce) throws OpenIdException
+    {
+	if (nonce == null) return null;
+	ListIterator li = nonceList.listIterator();
+	while (li.hasNext()){
+	    Nonce n = (Nonce) li.next();
+	    if (nonce.equals(n.getNonce())){
+		return n;
+	    }
+	}
+	return null;
+    }
+
+    public Nonce generateNonce(String nonce) throws OpenIdException
+    {
+	org.verisign.joid.db.Nonce n 
+	    = new org.verisign.joid.db.Nonce();
+	n.setNonce(nonce);
+	n.setCheckedDate(new Date());
+	return n;
     }
 }

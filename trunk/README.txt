@@ -14,15 +14,10 @@ For javadocs API docs:
 For unit tests:
   $ ant tests
 
-  NOTE: To run the tests, you need to have a 'joid_test' database. Set it
-  up like this. Note user name 'test'.
+  NOTE: To run the tests, you need to have a 'joid_test' database. 
 
   $ mysqladmin -uroot -p<password> create joid_test
-  $ mysql -uroot -p<password> -Djoid_test
-  mysql> grant all privileges on joid_test.* to 'test'@'localhost' \
-         identified by 'password';
-  mysql> flush privileges;
-  mysql> exit;
+  $ mysql -uroot -p<password> -Djoid_test < ./src/create.sql
 
 
 See src/examples for example usage.

@@ -306,7 +306,7 @@ public class AllTests extends TestCase
 
 	Response resp2 = ResponseFactory.parse(s);
 	assertTrue(resp2 instanceof AuthenticationResponse);
-	AuthenticationResponse authr = (AuthenticationResponse) resp;
+	AuthenticationResponse authr = (AuthenticationResponse) resp2;
 	assertFalse(authr.isVersion2());
 
 	String sigList = authr.getSignedList();
@@ -314,7 +314,7 @@ public class AllTests extends TestCase
 	String signature = authr.getSignature();
 	assertTrue(signature != null);
 
-	String reSigned = authr.sign(clearKey, sigList);
+	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
 
 
@@ -370,7 +370,7 @@ public class AllTests extends TestCase
 
 	Response resp2 = ResponseFactory.parse(s);
 	assertTrue(resp2 instanceof AuthenticationResponse);
-	AuthenticationResponse authr = (AuthenticationResponse) resp;
+	AuthenticationResponse authr = (AuthenticationResponse) resp2;
 	assertFalse(authr.isVersion2());
 
 	String sigList = authr.getSignedList();
@@ -378,7 +378,7 @@ public class AllTests extends TestCase
 	String signature = authr.getSignature();
 	assertTrue(signature != null);
 
-	String reSigned = authr.sign(clearKey, sigList);
+	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
 
 
@@ -446,7 +446,7 @@ public class AllTests extends TestCase
 
 	Response resp2 = ResponseFactory.parse(s);
 	assertTrue(resp2 instanceof AuthenticationResponse);
-	AuthenticationResponse authr = (AuthenticationResponse) resp;
+	AuthenticationResponse authr = (AuthenticationResponse) resp2;
 	assertTrue(authr.isVersion2());
 
 	String sigList = authr.getSignedList();
@@ -454,7 +454,7 @@ public class AllTests extends TestCase
 	String signature = authr.getSignature();
 	assertTrue(signature != null);
 
-	String reSigned = authr.sign(clearKey, sigList);
+	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
 
 
@@ -555,7 +555,7 @@ public class AllTests extends TestCase
 	String namespace = authr.getNamespace();
 	assertTrue(v2.equals(namespace));
 
-	String reSigned = authr.sign(clearKey, sigList);
+	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
 
 
@@ -625,7 +625,7 @@ public class AllTests extends TestCase
 	String namespace = authr.getNamespace();
 	assertTrue(v2.equals(namespace));
 
-	String reSigned = authr.sign(clearKey, sigList);
+	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
 
 
@@ -697,7 +697,7 @@ public class AllTests extends TestCase
 	String namespace = authr.getNamespace();
 	assertTrue(v2.equals(namespace));
 
-	String reSigned = authr.sign(clearKey, sigList);
+	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
 
 
@@ -740,7 +740,6 @@ public class AllTests extends TestCase
 	    Request req = RequestFactory.parse(s);
 	    assertTrue(false);
 	} catch (OpenIdException expected){
-	    //System.out.println(expected);
 	}
     }
 
@@ -755,7 +754,6 @@ public class AllTests extends TestCase
 	    Response resp = req.processUsing(serverInfo);
 	    assertTrue(false);
 	} catch (OpenIdException expected){
-	    //System.out.println(expected);
 	}
     }
     
@@ -769,7 +767,7 @@ public class AllTests extends TestCase
 	    Request req = RequestFactory.parse(s);
 	    assertTrue(false);
 	} catch (OpenIdException expected){
-	    //System.out.println(expected);
+
 	}
     }
 
@@ -807,7 +805,6 @@ public class AllTests extends TestCase
 	    Response resp = req.processUsing(serverInfo);
 	    assertTrue(false);
 	} catch (OpenIdException expected){
-	    // System.out.println(expected);
 	}
     }
 
@@ -890,7 +887,6 @@ public class AllTests extends TestCase
 	    +"nce%3D2006-12-"
 	    +"06T04%253A54%253A51ZQvGYW3"
 	    +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
-	    +"&openid.assoc_handle=ahandle"
 	    +"&openid.ns.foo=http%3A%2F%2Fcommented.org"
 	    +"&openid.foo=trycke%20e%20for%20mycke"
 	    +"&openid.foo.bar=jaha%20vadda%20nu%20da";

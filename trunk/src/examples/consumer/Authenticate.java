@@ -70,7 +70,7 @@ public class Authenticate
 	System.out.println("Server's signature: "+signature);
 	
 	String sigList = authr.getSignedList();
-	String reSigned = authr.sign(clearKey, sigList);
+	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	System.out.println("Our signature:      "+reSigned);
 
     }

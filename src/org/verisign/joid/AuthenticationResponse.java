@@ -164,15 +164,7 @@ public class AuthenticationResponse extends Response
     }
 
     /**
-     * Signs the elements designated by the signed list with the given key and
-     * returns the result encoded to a string.
-     *
-     * @param key the key to sign with (HMAC-SHA1, HMAC-SHA256)
-     * @param signed the comma-separated list of elements to sign. The elements
-     * must be mapped internally.
-     * @return the Base 64 encoded result.
-     * @throws OpenIdException at signature errors, or if the signed list 
-     * points to elements that are not mapped.
+     * Only public for unit tests. Do not use.
      */ 
     public String sign(byte[] key, String signed)
 	throws OpenIdException
@@ -180,7 +172,19 @@ public class AuthenticationResponse extends Response
 	return sign(this.algo, key, signed);
     }
 
-    String sign(String algorithm, byte[] key, String signed)
+    /**
+     * Signs the elements designated by the signed list with the given key and
+     * returns the result encoded to a string.
+     *
+     * @param algorithm the algorithm to use (HMAC-SHA1, HMAC-SHA256)
+     * @param key the key to sign with (HMAC-SHA1, HMAC-SHA256)
+     * @param signed the comma-separated list of elements to sign. The elements
+     * must be mapped internally.
+     * @return the Base 64 encoded result.
+     * @throws OpenIdException at signature errors, or if the signed list 
+     * points to elements that are not mapped.
+     */ 
+    public String sign(String algorithm, byte[] key, String signed)
 	throws OpenIdException
     {
 	Map map = toMap();
@@ -308,6 +312,7 @@ public class AuthenticationResponse extends Response
 	    s+=", sreg="+sreg;
 	}
 	s+=", mode="+mode
+            +", algo="+algo
             +", nonce="+nonce
             +", association handle="+associationHandle
             +", invalidation handle="+invalidateHandle

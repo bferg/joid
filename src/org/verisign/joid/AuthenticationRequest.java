@@ -49,7 +49,7 @@ public class AuthenticationRequest extends Request
     final static String 
 	ID_SELECT = "http://specs.openid.net/auth/2.0/identifier_select";
     private final static String CHECKID_IMMEDIATE = "checkid_immediate";
-    private final static String CHECKID_SETUP = "checkid_setp";
+    private final static String CHECKID_SETUP = "checkid_setup";
 
     private final static String OPENID_RETURN_TO = "openid.return_to";
     private final static String OPENID_TRUST_ROOT = "openid.trust_root";

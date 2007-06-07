@@ -43,8 +43,6 @@ public class OpenId
 {
     private final static Logger log = Logger.getLogger(OpenId.class);
     private ServerInfo serverInfo;
-//     private Store store;
-//     private Crypto crypto;
 
     /**
      * Creates an OpenId instance. This instance will use the default crypto
@@ -52,11 +50,9 @@ public class OpenId
      *
      * @param serverInfo information about this service.
      */
-    public OpenId(ServerInfo si)
+    public OpenId(ServerInfo serverInfo)
     {
  	this.serverInfo = serverInfo;
-// 	this.store = si.getStore();
-// 	this.crypto = new Crypto();
     }
 
     /**

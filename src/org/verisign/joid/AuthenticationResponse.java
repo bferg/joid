@@ -46,13 +46,13 @@ public class AuthenticationResponse extends Response
     // package scope so that ResponseFactory can trigger on this key
     static String OPENID_SIG = "openid.sig";
 
-    String claimed_id;
-    String identity;
-    String returnTo;
-    String nonce;
-    String invalidateHandle;
-    String associationHandle;
-    String signed;
+	private String claimed_id;
+    private String identity;
+    private String returnTo;
+    private String nonce;
+    private String invalidateHandle;
+    private String associationHandle;
+    private String signed;
     private String algo;
     private String signature;
     private SimpleRegistration sreg;
@@ -206,7 +206,10 @@ public class AuthenticationResponse extends Response
 	    sb.append('\n');
 	}
 	try {
-	    byte[] b; 
+	    byte[] b;
+		if(algorithm == null){
+			algorithm = AssociationRequest.HMAC_SHA1;
+		}
 	    if (algorithm.equals(AssociationRequest.HMAC_SHA1)){
 		b = Crypto.hmacSha1(key, sb.toString().getBytes("UTF-8"));
 	    } else if (algorithm.equals(AssociationRequest.HMAC_SHA256)){
@@ -269,7 +272,7 @@ public class AuthenticationResponse extends Response
     }
 
 
-    AuthenticationResponse(Map map) throws OpenIdException
+    public AuthenticationResponse(Map map) throws OpenIdException
     {
 	super(map);
 	Set set = map.entrySet();
@@ -324,4 +327,39 @@ public class AuthenticationResponse extends Response
 	return s;
     }
 
+	public String getClaimedId() {
+		return claimed_id;
+	}
+
+	public String getIdentity() {
+		return identity;
+	}
+
+	public String getReturnTo() {
+		return returnTo;
+	}
+
+	public String getNonce() {
+		return nonce;
+	}
+
+	public String getInvalidateHandle() {
+		return invalidateHandle;
+	}
+
+	public String getSigned() {
+		return signed;
+	}
+
+	public String getAlgo() {
+		return algo;
+	}
+
+	public SimpleRegistration getSreg() {
+		return sreg;
+	}
+
+	public String getUrlEndPoint() {
+		return urlEndPoint;
+	}
 }

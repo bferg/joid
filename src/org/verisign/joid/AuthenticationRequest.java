@@ -104,14 +104,15 @@ public class AuthenticationRequest extends Request
 				     String trustRoot, String assocHandle) 
 	throws OpenIdException
     {
-	Map map = new HashMap();
-	map.put("openid.mode",CHECKID_SETUP);
-	map.put(OPENID_IDENTITY, identity);
-	map.put(OPENID_RETURN_TO, returnTo);
-	map.put(OPENID_TRUST_ROOT, trustRoot);
-	map.put(OPENID_NS, OPENID_20_NAMESPACE);
-	map.put(OPENID_ASSOC_HANDLE, assocHandle);
-	return new AuthenticationRequest(map, CHECKID_SETUP);
+		Map map = new HashMap();
+		map.put("openid.mode",CHECKID_SETUP);
+	    map.put(OPENID_IDENTITY, identity);
+	    map.put(OPENID_CLAIMED_ID, identity);
+	    map.put(OPENID_RETURN_TO, returnTo);
+		map.put(OPENID_TRUST_ROOT, trustRoot);
+		map.put(OPENID_NS, OPENID_20_NAMESPACE);
+		map.put(OPENID_ASSOC_HANDLE, assocHandle);
+		return new AuthenticationRequest(map, CHECKID_SETUP);
     }
 
 

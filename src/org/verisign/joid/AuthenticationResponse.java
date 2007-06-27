@@ -33,18 +33,16 @@ public class AuthenticationResponse extends Response
 {
     private static Logger log = Logger.getLogger(AuthenticationResponse.class);
 
-    private static String OPENID_RETURN_TO = "openid.return_to";
-    private static String OPENID_OP_ENDPOINT = "openid.op_endpoint";
-    private static String OPENID_IDENTITY = "openid.identity";
-    private static String OPENID_ERROR = "openid.error";
-    private static String OPENID_NONCE = "openid.response_nonce";
-    private static String 
-	OPENID_INVALIDATE_HANDLE = "openid.invalidate_handle";
-    private static String 
-	OPENID_ASSOCIATION_HANDLE = "openid.assoc_handle";
-    private static String OPENID_SIGNED = "openid.signed";
+    public static String OPENID_RETURN_TO = "openid.return_to";
+    public static String OPENID_OP_ENDPOINT = "openid.op_endpoint";
+    public static String OPENID_IDENTITY = "openid.identity";
+    public static String OPENID_ERROR = "openid.error";
+    public static String OPENID_NONCE = "openid.response_nonce";
+    public static String OPENID_INVALIDATE_HANDLE = "openid.invalidate_handle";
+    public static String OPENID_ASSOCIATION_HANDLE = "openid.assoc_handle";
+    public static String OPENID_SIGNED = "openid.signed";
     // package scope so that ResponseFactory can trigger on this key
-    static String OPENID_SIG = "openid.sig";
+    public static String OPENID_SIG = "openid.sig";
 
 	private String claimed_id;
     private String identity;

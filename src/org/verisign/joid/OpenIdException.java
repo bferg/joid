@@ -26,13 +26,15 @@ public class OpenIdException extends Exception
      */
     public OpenIdException(String s){super(s);}
 
-    /** 
+    /**
      * Creates an exception.
      * @param e a exception to encapsulate.
      */
     public OpenIdException(Exception e){super(e);}
 
-    /** 
+	 public OpenIdException(String s, Exception e){super(s, e);}
+
+    /**
      * Returns this exception's message.
      * @return a string message of this exception (either the encapsulated string,
      * or the encapsulated exception).

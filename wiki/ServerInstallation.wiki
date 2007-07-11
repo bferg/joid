@@ -1,0 +1,35 @@
+#labels Phase-Deploy
+This page will explain how to setup your own OpenID Server using JOID.
+
+= Introduction =
+
+There are two pieces required to run the server:
+
+  # A Store implementation - example: [http://joid.googlecode.com/svn/trunk/src/examples/server/MemoryStore.java MemoryStore]
+  # A Servlet - example: [http://joid.googlecode.com/svn/trunk/src/examples/server/OpenIdServlet.java OpenIdServlet]
+
+= Dependencies =
+
+You'll need the following in your classpath along with joid.jar.
+
+  * log4j-X.jar
+  * tsik.jar
+
+= web.xml =
+
+Add the servlet from above to your web.xml:
+
+{{{
+ <servlet>
+    <servlet-name>joid</servlet-name>
+    <servlet-class>examples.server.OpenIdServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>joid</servlet-name>
+    <url-pattern>/server</url-pattern>
+  </servlet-mapping>
+}}}
+
+
+

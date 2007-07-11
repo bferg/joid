@@ -46,6 +46,9 @@ Crypto crypto = ...
 Response resp = req.processUsing(store, crypto);
 }}}
 
+==Setting Up A JOID Server==
+
+ServerInstallation
 
 ==Mailing lists==
 JOID has two mailing lists, both public to join:
@@ -53,8 +56,6 @@ JOID has two mailing lists, both public to join:
 || *Type* || *URL* ||
 || General || http://groups.google.com/group/joid-general ||
 || Developer || http://groups.google.com/group/joid-dev ||
-
-
 
 
 

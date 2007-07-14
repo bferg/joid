@@ -13,17 +13,11 @@
 
 package org.verisign.joid;
 
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
-import org.apache.tsik.datatypes.DateTime;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Represents an OpenID check authentication request.

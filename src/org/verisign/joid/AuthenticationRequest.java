@@ -22,409 +22,410 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 
 /**
  * Represents an OpenID authentication request.
  */
-public class AuthenticationRequest extends Request
-{
-    private final static Logger log 
-	= Logger.getLogger(AuthenticationRequest.class);
+public class AuthenticationRequest extends Request {
+	private final static Logger log
+			= Logger.getLogger(AuthenticationRequest.class);
 
-    private Map extendedMap;
+	private Map extendedMap;
 
-    private String claimed_id;
-    private String identity;
-    private String handle;
-    private String returnTo;
-    private String trustRoot;
-    private SimpleRegistration sreg;
+	private String claimed_id;
+	private String identity;
+	private String handle;
+	private String returnTo;
+	private String trustRoot;
+	private SimpleRegistration sreg;
 
-    private static Set reservedWords; 
-    final static String OPENID_CLAIMED_ID = "openid.claimed_id";
-    private final static String OPENID_IDENTITY = "openid.identity";
-    private final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
+	private static Set reservedWords;
+	public final static String OPENID_CLAIMED_ID = "openid.claimed_id";
+	public final static String OPENID_IDENTITY = "openid.identity";
+	public final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
 
-    final static String 
-	ID_SELECT = "http://specs.openid.net/auth/2.0/identifier_select";
-    private final static String CHECKID_IMMEDIATE = "checkid_immediate";
-    private final static String CHECKID_SETUP = "checkid_setup";
+	public final static String ID_SELECT = "http://specs.openid.net/auth/2.0/identifier_select";
+	public final static String CHECKID_IMMEDIATE = "checkid_immediate";
+	public final static String CHECKID_SETUP = "checkid_setup";
 
-    private final static String OPENID_RETURN_TO = "openid.return_to";
-    private final static String OPENID_TRUST_ROOT = "openid.trust_root";
-    private final static String OPENID_REALM = "openid.realm";
+	public final static String OPENID_RETURN_TO = "openid.return_to";
+	/**
+	 * trust_root is the 1.x equivalent to trust_realm in 2.x
+	 */
+	public final static String OPENID_TRUST_ROOT = "openid.trust_root";
+	public final static String OPENID_REALM = "openid.realm";
 
-    private static String OPENID_DH_CONSUMER_PUBLIC 
-	= "openid.dh_consumer_public";
+	public static String OPENID_DH_CONSUMER_PUBLIC
+			= "openid.dh_consumer_public";
 
-    private static String OPENID_SESSION_TYPE = "openid.session_type";
-    private final static String DH_SHA1 = "DH-SHA1";
-    private static Map statelessMap = new HashMap();
-    private static AssociationRequest statelessAr;
-    static {
-	statelessMap.put(AuthenticationRequest.OPENID_SESSION_TYPE, 
-			 AuthenticationRequest.DH_SHA1);
-	// this value is not used for stateless, but it's not a valid
-	// association request unless it's there
-	//
-	statelessMap.put(AuthenticationRequest.OPENID_DH_CONSUMER_PUBLIC, 
-			 Crypto.convertToString(BigInteger.valueOf(1)));
-	try {
-	    // the request mode is irrelevant
-	    //
-	    statelessAr = new AssociationRequest(statelessMap, "");
-	} catch (OpenIdException e){
-	    // should not happen
-	    //
-	    throw new RuntimeException(e);
+	public static String OPENID_SESSION_TYPE = "openid.session_type";
+	public final static String DH_SHA1 = "DH-SHA1";
+	private static Map statelessMap = new HashMap();
+	private static AssociationRequest statelessAr;
+
+	static {
+		statelessMap.put(AuthenticationRequest.OPENID_SESSION_TYPE,
+				AuthenticationRequest.DH_SHA1);
+		// this value is not used for stateless, but it's not a valid
+		// association request unless it's there
+		//
+		statelessMap.put(AuthenticationRequest.OPENID_DH_CONSUMER_PUBLIC,
+				Crypto.convertToString(BigInteger.valueOf(1)));
+		try {
+			// the request mode is irrelevant
+			//
+			statelessAr = new AssociationRequest(statelessMap, "");
+		} catch (OpenIdException e) {
+			// should not happen
+			//
+			throw new RuntimeException(e);
+		}
+
+		// from section 12 in spec
+		reservedWords = new HashSet(Arrays.asList(new String[]
+				{"assoc_handle", "assoc_type", "claimed_id", "contact", "delegate",
+						"dh_consumer_public", "dh_gen", "dh_modulus", "error", "identity",
+						"invalidate_handle", "mode", "ns", "op_endpoint", "openid", "realm",
+						"reference", "response_nonce", "return_to", "server", "session_type",
+						"sig", "signed", "trust_root"}));
 	}
 
-	// from section 12 in spec
-	reservedWords = new HashSet(Arrays.asList(new String[] 
-	    { "assoc_handle","assoc_type","claimed_id","contact","delegate",
-	      "dh_consumer_public","dh_gen","dh_modulus","error","identity",
-	      "invalidate_handle","mode","ns","op_endpoint","openid","realm",
-	      "reference","response_nonce","return_to","server","session_type",
-	      "sig","signed","trust_root"}));
-    }
-
-    /**
-     * Creates a standard authentication request.
-     *
-     * @param identity the openid identity.
-     * @param returnTo the return_to value.
-     * @param trustRoot the openid trust_root.
-     * @param assocHandle the openid association handle.
-     * @return an AuthenticationRequest.
-     * @throws OpenIdException if the request cannot be created.
-     */
-    public static 
-	AuthenticationRequest create(String identity, String returnTo, 
-				     String trustRoot, String assocHandle) 
-	throws OpenIdException
-    {
+	/**
+	 * Creates a standard authentication request.
+	 *
+	 * @param identity    the openid identity.
+	 * @param returnTo    the return_to value.
+	 * @param trustRoot   the openid trust_root.
+	 * @param assocHandle the openid association handle.
+	 * @return an AuthenticationRequest.
+	 * @throws OpenIdException if the request cannot be created.
+	 */
+	public static AuthenticationRequest create(String identity, String returnTo,
+	                                           String trustRoot, String assocHandle)
+			throws OpenIdException {
 		Map map = new HashMap();
-		map.put("openid.mode",CHECKID_SETUP);
-	    map.put(OPENID_IDENTITY, identity);
-	    map.put(OPENID_CLAIMED_ID, identity);
-	    map.put(OPENID_RETURN_TO, returnTo);
+		map.put("openid.mode", CHECKID_SETUP);
+		map.put(OPENID_IDENTITY, identity);
+		map.put(OPENID_CLAIMED_ID, identity);
+		map.put(OPENID_RETURN_TO, returnTo);
 		map.put(OPENID_TRUST_ROOT, trustRoot);
+		map.put(OPENID_REALM, trustRoot);
 		map.put(OPENID_NS, OPENID_20_NAMESPACE);
 		map.put(OPENID_ASSOC_HANDLE, assocHandle);
 		return new AuthenticationRequest(map, CHECKID_SETUP);
-    }
+	}
 
 
-    AuthenticationRequest(Map map, String mode) throws OpenIdException
-    {
-	super(map, mode);
-	Set set = map.entrySet();
-	extendedMap = new HashMap();
-	for (Iterator iter=set.iterator(); iter.hasNext();){
-	    Map.Entry mapEntry = (Map.Entry) iter.next();
-	    String key = (String) mapEntry.getKey();
-	    String value = (String) mapEntry.getValue();
+	AuthenticationRequest(Map map, String mode) throws OpenIdException {
+		super(map, mode);
+		Set set = map.entrySet();
+		extendedMap = new HashMap();
+		for (Iterator iter = set.iterator(); iter.hasNext();) {
+			Map.Entry mapEntry = (Map.Entry) iter.next();
+			String key = (String) mapEntry.getKey();
+			String value = (String) mapEntry.getValue();
 
-	    if (OPENID_NS.equals(key)){
-		this.ns = value;
-	    } 
-	    else if (OPENID_IDENTITY.equals(key)){
-		this.identity = value;
-	    } 
-	    else if (OPENID_CLAIMED_ID.equals(key)){
-		this.claimed_id = value;
-	    } 
-	    else if (OPENID_ASSOC_HANDLE.equals(key)){
-		this.handle = value;
-	    } 
-	    else if (OPENID_RETURN_TO.equals(key)){
-		this.returnTo = value; 
-	    } 
-	    else if (OPENID_TRUST_ROOT.equals(key)
-		     || OPENID_REALM.equals(key)){
-		this.trustRoot = value; 
-	    } 
-	    else if (key != null && key.startsWith("openid.")) {
-		String foo = key.substring(7);  // remove "openid."
-		if ((!(AuthenticationRequest.reservedWords.contains(foo)))
-		    && (!foo.startsWith("sreg."))){
-		    extendedMap.put(foo, value);
+			if (OPENID_NS.equals(key)) {
+				this.ns = value;
+			} else if (OPENID_IDENTITY.equals(key)) {
+				this.identity = value;
+			} else if (OPENID_CLAIMED_ID.equals(key)) {
+				this.claimed_id = value;
+			} else if (OPENID_ASSOC_HANDLE.equals(key)) {
+				this.handle = value;
+			} else if (OPENID_RETURN_TO.equals(key)) {
+				this.returnTo = value;
+			} else if (OPENID_TRUST_ROOT.equals(key)
+					|| OPENID_REALM.equals(key)) {
+				this.trustRoot = value;
+			} else if (key != null && key.startsWith("openid.")) {
+				String foo = key.substring(7);  // remove "openid."
+				if ((!(AuthenticationRequest.reservedWords.contains(foo)))
+						&& (!foo.startsWith("sreg."))) {
+					extendedMap.put(foo, value);
+				}
+			}
 		}
-	    } 
-	}
-	this.sreg = new SimpleRegistration(map);
-	checkInvariants();
-    }
-
-    Map toMap()
-    {
-	Map map = super.toMap();
-       
-	if (claimed_id != null) {
-	    map.put(AuthenticationRequest.OPENID_CLAIMED_ID, claimed_id);
-	}
-	map.put(AuthenticationRequest.OPENID_IDENTITY, identity);
-	map.put(AuthenticationRequest.OPENID_ASSOC_HANDLE, handle);
-	map.put(AuthenticationRequest.OPENID_RETURN_TO, returnTo);
-	map.put(AuthenticationRequest.OPENID_TRUST_ROOT, trustRoot);
-
-	return map;
-    }
-
-    /**
-     * Returns whether this request is immediate, that is, whether the
-     * authentication mode is "CHECKID_IMMEDIATE".
-     *
-     * @return trut if this request is immediate; false otherwise.
-     */
-    public boolean isImmediate() 
-    {
-	return AuthenticationRequest.CHECKID_IMMEDIATE
-	    .equals(this.mode);
-    }
-
-    private void checkInvariants() throws OpenIdException
-    {
-	if (mode == null){
-	    throw new OpenIdException("Missing mode");
-	}
-	if (identity == null){
-	    throw new OpenIdException("Missing identity");
-	}
-	if (claimed_id != null && !this.isVersion2()){
-	    throw new OpenIdException("claimed_id not valid in version 1.x");
-	}
-	if (trustRoot == null){
-	    throw new OpenIdException("Missing trust root");
+		this.sreg = new SimpleRegistration(map);
+		checkInvariants();
 	}
 
-	checkTrustRoot();
+	Map toMap() {
+		Map map = super.toMap();
 
-	Set namespaces = new HashSet();
-	Set entries = new HashSet();
-	Set set = extendedMap.entrySet();
-	for (Iterator iter=set.iterator(); iter.hasNext();){
-	    Map.Entry mapEntry = (Map.Entry) iter.next();
-	    String key = (String) mapEntry.getKey();
-	    String value = (String) mapEntry.getValue();
-	    // all keys start "openid." in the set
-
-	    if (key.startsWith("ns.")){
-		key = key.substring(3);
-		if (AuthenticationRequest.reservedWords.contains(key)){
-		    throw new OpenIdException("Cannot redefine: "+key);
+		if (claimed_id != null) {
+			map.put(AuthenticationRequest.OPENID_CLAIMED_ID, claimed_id);
 		}
-		if (namespaces.contains(key)){
-		    throw new OpenIdException("Multiple definitions: "+key);
+		map.put(AuthenticationRequest.OPENID_IDENTITY, identity);
+		map.put(AuthenticationRequest.OPENID_ASSOC_HANDLE, handle);
+		map.put(AuthenticationRequest.OPENID_RETURN_TO, returnTo);
+		map.put(AuthenticationRequest.OPENID_TRUST_ROOT, trustRoot);
+		map.put(AuthenticationRequest.OPENID_REALM, trustRoot);
+
+		return map;
+	}
+
+	/**
+	 * Returns whether this request is immediate, that is, whether the
+	 * authentication mode is "CHECKID_IMMEDIATE".
+	 *
+	 * @return trut if this request is immediate; false otherwise.
+	 */
+	public boolean isImmediate() {
+		return AuthenticationRequest.CHECKID_IMMEDIATE
+				.equals(this.mode);
+	}
+
+	private void checkInvariants() throws OpenIdException {
+		if (mode == null) {
+			throw new OpenIdException("Missing mode");
 		}
-		namespaces.add(key);
-	    } 
-	    else {
-		if (entries.contains(key)){
-		    throw new OpenIdException("Multiple definitions: "+key);
+		if (identity == null) {
+			throw new OpenIdException("Missing identity");
 		}
-		entries.add(key);
-	    } 
-	}
-	for (Iterator iter = entries.iterator(); iter.hasNext();){
-	    String key = (String) iter.next();
-	    int period = key.indexOf('.');
-	    if (period != -1){
-		key = key.substring(0, period);
-	    }
-	    if (!namespaces.contains(key)){
-		throw new OpenIdException("No such namespace: "+key);
-	    }
-	}
+		if (claimed_id != null && !this.isVersion2()) {
+			throw new OpenIdException("claimed_id not valid in version 1.x");
+		}
+		if (trustRoot == null) {
+			throw new OpenIdException("Missing trust root");
+		}
 
-    }
+		checkTrustRoot();
 
-    private void checkTrustRoot() throws OpenIdException
-    {
-	if (trustRoot == null){
-	    throw new OpenIdException("No "+OPENID_TRUST_ROOT+" given");
-	}
+		Set namespaces = new HashSet();
+		Set entries = new HashSet();
+		Set set = extendedMap.entrySet();
+		for (Iterator iter = set.iterator(); iter.hasNext();) {
+			Map.Entry mapEntry = (Map.Entry) iter.next();
+			String key = (String) mapEntry.getKey();
+			String value = (String) mapEntry.getValue();
+			// all keys start "openid." in the set
 
-	// URI fragments are not allowed in trustroot
-	//
-	if (trustRoot.indexOf('#') > 0) {
-	    throw new OpenIdException("URI fragments are not allowed");
-	}
+			if (key.startsWith("ns.")) {
+				key = key.substring(3);
+				if (AuthenticationRequest.reservedWords.contains(key)) {
+					throw new OpenIdException("Cannot redefine: " + key);
+				}
+				if (namespaces.contains(key)) {
+					throw new OpenIdException("Multiple definitions: " + key);
+				}
+				namespaces.add(key);
+			} else {
+				if (entries.contains(key)) {
+					throw new OpenIdException("Multiple definitions: " + key);
+				}
+				entries.add(key);
+			}
+		}
+		for (Iterator iter = entries.iterator(); iter.hasNext();) {
+			String key = (String) iter.next();
+			int period = key.indexOf('.');
+			if (period != -1) {
+				key = key.substring(0, period);
+			}
+			if (!namespaces.contains(key)) {
+				throw new OpenIdException("No such namespace: " + key);
+			}
+		}
 
-
-	// Matched if:
-	// 1. trustroot and returnto are identical
-	// 2. trustroot contains wild-card characters "*.", and the 
-	// trailing part of the returnto's domain is identical to the 
-	// part of the trustroot following the "*." wildcard
-	//
-	// Trust root           Return to
-	// ----------           ---------
-	// example.com      =>  example.com      ==> ok
-	// *.example.com    =>  example.com      ==> ok
-	// *.example.com    =>  a.example.com    ==> ok
-	// www.example.com  =>  a.example.com    ==> not ok
-	//
-	URL r, t;
-	try {
-	    r = new URL(returnTo);
-	    t = new URL(trustRoot);
-	} catch (MalformedURLException e) {
-	    throw new OpenIdException("Malformed URL");
 	}
 
-	String tHost = new StringBuffer(t.getHost()).reverse().toString();
-	String rHost = new StringBuffer(r.getHost()).reverse().toString();
+	private void checkTrustRoot() throws OpenIdException {
+		if (trustRoot == null) {
+			throw new OpenIdException("No " + OPENID_TRUST_ROOT + " given");
+		}
 
-	String[] tNames = tHost.split("\\.");
-	String[] rNames = rHost.split("\\.");
-	int len = (tNames.length > rNames.length) 
-	    ? rNames.length : tNames.length;
-	
-	int i;
-	for (i = 0; i < len; i += 1){
-	    if (!(tNames[i].equals(rNames[i]))
-		&& (!tNames[i].equals("*"))){
-		throw new OpenIdException("returnTo not in trustroot set: "+
-					  tNames[i]+", "+rNames[i]);
-	    }
+		// URI fragments are not allowed in trustroot
+		//
+		if (trustRoot.indexOf('#') > 0) {
+			throw new OpenIdException("URI fragments are not allowed");
+		}
+
+		// Matched if:
+		// 1. trustroot and returnto are identical
+		// 2. trustroot contains wild-card characters "*.", and the
+		// trailing part of the returnto's domain is identical to the
+		// part of the trustroot following the "*." wildcard
+		//
+		// Trust root           Return to
+		// ----------           ---------
+		// example.com      =>  example.com      ==> ok
+		// *.example.com    =>  example.com      ==> ok
+		// *.example.com    =>  a.example.com    ==> ok
+		// www.example.com  =>  a.example.com    ==> not ok
+		//
+		URL r, t;
+		try {
+			r = new URL(returnTo);
+			t = new URL(trustRoot);
+		} catch (MalformedURLException e) {
+			throw new OpenIdException("Malformed URL");
+		}
+
+		String tHost = new StringBuffer(t.getHost()).reverse().toString();
+		String rHost = new StringBuffer(r.getHost()).reverse().toString();
+
+		String[] tNames = tHost.split("\\.");
+		String[] rNames = rHost.split("\\.");
+		int len = (tNames.length > rNames.length)
+				? rNames.length : tNames.length;
+
+		int i;
+		for (i = 0; i < len; i += 1) {
+			if (!(tNames[i].equals(rNames[i]))
+					&& (!tNames[i].equals("*"))) {
+				throw new OpenIdException("returnTo not in trustroot set: " +
+						tNames[i] + ", " + rNames[i]);
+			}
+		}
+		if ((i < tNames.length) && (!tNames[i].equals("*"))) {
+			throw new OpenIdException("returnTo not in trustroot set: " +
+					tNames[1]);
+		}
+
+		// The return to path is equal to or a sub-directory of the
+		// realm's (trustroot's) path.
+		//
+		// Trust root     Return to
+		// ----------     ---------
+		// /a/b/c     =>  /a/b/c/d    ==> ok
+		// /a/b/c     =>  /a/b        ==> not ok
+		// /a/b/c     =>  /a/b/b      ==> not ok
+		//
+
+		String tPath = t.getPath();
+		String rPath = r.getPath();
+
+		int n = rPath.indexOf(tPath);
+		if (n != 0) {
+			throw new OpenIdException("return to & trust root paths mismatch");
+		}
+
+		// if we're here, we're good to go!
 	}
-	if ((i < tNames.length) && (!tNames[i].equals("*"))){
-	    throw new OpenIdException("returnTo not in trustroot set: "+
-				      tNames[1]);
+
+
+	public Response processUsing(ServerInfo si) throws OpenIdException {
+		Store store = si.getStore();
+		Crypto crypto = si.getCrypto();
+		Association assoc = null;
+		String invalidate = null;
+		if (handle != null) {
+			assoc = store.findAssociation(handle);
+			if (assoc != null && assoc.hasExpired()) {
+				log.info("Association handle has expired: " + handle);
+				assoc = null;
+			}
+		}
+		if (handle == null || assoc == null) {
+			log.info("Invalidating association handle: " + handle);
+			invalidate = handle;
+			assoc = store.generateAssociation(statelessAr, crypto);
+			store.saveAssociation(assoc);
+		}
+		return new AuthenticationResponse(si, this, assoc, crypto, invalidate);
 	}
 
-
-	// The return to path is equal to or a sub-directory of the 
-	// realm's (trustroot's) path.
-	//
-	// Trust root     Return to
-	// ----------     ---------
-	// /a/b/c     =>  /a/b/c/d    ==> ok
-	// /a/b/c     =>  /a/b        ==> not ok
-	// /a/b/c     =>  /a/b/b      ==> not ok
-	//
-
-	String tPath = t.getPath();
-	String rPath = r.getPath();
-
-	int n = rPath.indexOf(tPath);
-	if (n != 0) {
-	    throw new OpenIdException("return to & trust root paths mismatch");
+	/**
+	 * Returns the identity used in this authentication request.
+	 *
+	 * @return the identity.
+	 */
+	public String getIdentity() {
+		return identity;
 	}
 
-	// if we're here, we're good to go!
-    }
-
-
-    public Response processUsing(ServerInfo si)	throws OpenIdException
-    {
-	Store store = si.getStore();
-	Crypto crypto = si.getCrypto();
-	Association assoc = null;
-	String invalidate = null;
-	if (handle != null){
-	    assoc = store.findAssociation(handle);
-	    if (assoc != null && assoc.hasExpired()){
-		log.info("Association handle has expired: "+handle);
-		assoc = null;
-	    }
+	/**
+	 * Returns the extensions in this authentication request.
+	 *
+	 * @return the extensions; empty if none.
+	 */
+	public Map getExtensions() {
+		return extendedMap;
 	}
-	if (handle == null || assoc == null){
-	    log.info("Invalidating association handle: "+handle);
-	    invalidate = handle;
-	    assoc = store.generateAssociation(statelessAr, crypto);
-	    store.saveAssociation(assoc);
+
+	/**
+	 * Returns whether the given identity equals {@link #ID_SELECT}.
+	 *
+	 * @return true if the identity equals {@link #ID_SELECT}.
+	 */
+	public boolean isIdentifierSelect() {
+		return AuthenticationRequest.ID_SELECT.equals(identity);
 	}
-	return new AuthenticationResponse(si, this, assoc, crypto, invalidate);
-    }
 
-    /**
-     * Returns the identity used in this authentication request.
-     * 
-     * @return the identity.
-     */
-    public String getIdentity(){return identity;}
+	/**
+	 * Returns the claimed identity used in this authentication request.
+	 *
+	 * @return the claimed identity.
+	 */
+	public String getClaimedIdentity() {
+		return claimed_id;
+	}
 
-    /**
-     * Returns the extensions in this authentication request.
-     * 
-     * @return the extensions; empty if none.
-     */
-    public Map getExtensions(){return extendedMap;}
+	/**
+	 * Sets the identity used in this authentication request.
+	 *
+	 * @param identity the identity.
+	 */
+	public void setIdentity(String identity) {
+		this.identity = identity;
+	}
 
-    /**
-     * Returns whether the given identity equals {@link ID_SELECT}.
-     * 
-     * @return true if the identity equals {@link ID_SELECT}.
-     */
-    public boolean isIdentifierSelect()
-    {
-	return AuthenticationRequest.ID_SELECT.equals(identity);
-    }
+	/**
+	 * Returns the 'return to' address in this authentication request.
+	 *
+	 * @return the address.
+	 */
+	public String getReturnTo() {
+		return returnTo;
+	}
 
-    /**
-     * Returns the claimed identity used in this authentication request.
-     * 
-     * @return the claimed identity.
-     */
-    public String getClaimedIdentity(){return claimed_id;}
+	/**
+	 * Returns the handle used in this authentication request.
+	 *
+	 * @return the handle
+	 */
+	public String getHandle() {
+		return handle;
+	}
 
-    /**
-     * Sets the identity used in this authentication request.
-     * 
-     * @param identity the identity.
-     */
-    public void setIdentity(String identity){this.identity = identity;}
+	/**
+	 * Returns the trust root address in this authentication request.
+	 *
+	 * @return the address.
+	 */
+	public String getTrustRoot() {
+		return trustRoot;
+	}
 
-    /**
-     * Returns the 'return to' address in this authentication request.
-     * 
-     * @return the address.
-     */
-    public String getReturnTo(){return returnTo;}
+	/**
+	 * Returns the simple registration fields in this authentication request.
+	 *
+	 * @return the sreg fields; or null if none present.
+	 */
+	public SimpleRegistration getSimpleRegistration() {
+		return sreg;
+	}
 
-    /**
-     * Returns the handle used in this authentication request.
-     * 
-     * @return the handle
-     */
-    public String getHandle(){return handle;}
+	/**
+	 * Sets the simple registration fields in this authentication request.
+	 *
+	 * @param sreg the registration fields.
+	 */
+	public void setSimpleRegistration(SimpleRegistration sreg) {
+		this.sreg = sreg;
+	}
 
-    /**
-     * Returns the trust root address in this authentication request.
-     * 
-     * @return the address.
-     */
-    public String getTrustRoot(){return trustRoot;}
-
-    /**
-     * Returns the simple registration fields in this authentication request.
-     * 
-     * @return the sreg fields; or null if none present.
-     */
-    public SimpleRegistration getSimpleRegistration(){return sreg;}
-
-    /**
-     * Sets the simple registration fields in this authentication request.
-     * 
-     * @param sreg the registration fields.
-     */
-    public void setSimpleRegistration(SimpleRegistration sreg)
-    {
-	this.sreg = sreg;
-    }
-
-    public String toString()
-    {
-        return "[AuthenticationRequest "
-	    + super.toString()
-	    +", sreg="+sreg
-            +", claimed identity="+claimed_id
-            +", identity="+identity
-            +", handle="+handle+", return to="+returnTo
-            +", trust root="+trustRoot+"]";
-    }
+	public String toString() {
+		return "[AuthenticationRequest "
+				+ super.toString()
+				+ ", sreg=" + sreg
+				+ ", claimed identity=" + claimed_id
+				+ ", identity=" + identity
+				+ ", handle=" + handle + ", return to=" + returnTo
+				+ ", trust root=" + trustRoot + "]";
+	}
 
 }

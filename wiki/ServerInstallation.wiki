@@ -1,21 +1,21 @@
 #labels Phase-Deploy
 This page will explain how to setup your own OpenID Server using JOID.
 
-= Introduction =
+== Introduction ==
 
 There are two pieces required to run the server:
 
   # A Store implementation - example: [http://joid.googlecode.com/svn/trunk/src/examples/server/MemoryStore.java MemoryStore]
   # A Servlet - example: [http://joid.googlecode.com/svn/trunk/src/examples/server/OpenIdServlet.java OpenIdServlet]
 
-= Dependencies =
+==Dependencies ==
 
 You'll need the following in your classpath along with joid.jar.
 
   * log4j-X.jar
   * tsik.jar
 
-= web.xml =
+==web.xml==
 
 Add the servlet from above to your web.xml:
 
@@ -46,10 +46,10 @@ Add the servlet from above to your web.xml:
 
 Be sure to modify the init-params in the web.xml to the appropriate values.
 
-= Login Page =
+== Login Page ==
 
 You'll need some way for a user to login/authenticate themselves. There is a sample in /examples/server/login.jsp that simply asks the user to login and accept the Realm that is asking to authenticate.
 
-= Running the Sample App =
+== Running the Sample App ==
 
 The sample app is both a consumer and a server. You can deploy it by dropping /out/joid.war into your TOMCAT_HOME/webapps directory. Then surf to http://localhost:8080/joid/ to try it out.

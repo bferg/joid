@@ -9,12 +9,11 @@ import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.Map;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
 import org.verisign.joid.Crypto;
 import org.verisign.joid.OpenId;
 import org.verisign.joid.OpenIdException;
@@ -23,6 +22,7 @@ import org.verisign.joid.AuthenticationRequest;
 import org.verisign.joid.Store;
 import org.verisign.joid.ServerInfo;
 import org.verisign.joid.StoreFactory;
+import org.verisign.joid.server.MemoryStore;
 
 public class OpenIdServlet extends HttpServlet
 {    

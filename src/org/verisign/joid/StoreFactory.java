@@ -13,7 +13,6 @@
 
 package org.verisign.joid;
 
-import org.verisign.joid.db.DbStore;
 
 /**
  * Creates stores. JOID comes with the {@link org.verisign.joid.db.DbStore}.
@@ -63,8 +62,8 @@ public class StoreFactory
      *
      * @return the database store.
      */
-    public static Store getDbInstance()
+    /*public static Store getDbInstance()
     {
 	return DbStore.getInstance();
-    }
+    }*/
 }

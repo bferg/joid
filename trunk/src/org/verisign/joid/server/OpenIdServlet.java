@@ -32,8 +32,8 @@ public class OpenIdServlet extends HttpServlet {
 	private static OpenId openId;
 	private Store store;
 	private Crypto crypto;
-	private MemoryUserManager userManager;
 	private String loginPage;
+	public static final String USER_ATTRIBUTE = "user";
 
 	public void init(ServletConfig config) throws ServletException {
 		super.init(config);
@@ -42,7 +42,7 @@ public class OpenIdServlet extends HttpServlet {
 		String endPointUrl = config.getInitParameter("endPointUrl");
 		loginPage = config.getInitParameter("loginPage");
 		openId = new OpenId(new ServerInfo(endPointUrl, store, crypto));
-		userManager = new MemoryUserManager();
+//		userManager = new MemoryUserManager();
 	}
 
 
@@ -55,13 +55,6 @@ public class OpenIdServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request,
 	                   HttpServletResponse response)
 			throws ServletException, IOException {
-		// check if user is logging in.
-		String username = request.getParameter("username");
-		if(username != null){
-			authenticate(request, username, request.getParameter("password"), request.getParameter("newuser"));
-			doQuery(URLDecoder.decode(request.getParameter("query")), request, response);
-			return;
-		}
 		StringBuffer sb = new StringBuffer();
 		Enumeration e = request.getParameterNames();
 		while (e.hasMoreElements()) {
@@ -84,21 +77,7 @@ public class OpenIdServlet extends HttpServlet {
 		doQuery(sb.toString(), request, response);
 	}
 
-	private void authenticate(HttpServletRequest request, String username, String password, String newuser) {
-		User user = userManager.getUser(username);
-		if(user == null){
-			if(newuser != null){
-				user = new User(username, password);
-				userManager.save(user);
-				System.out.println("created new user");
-			} else {
-				return;
-			}
-		}
-		if(user.getPassword().equals(password)){
-			request.getSession(true).setAttribute("user", user);
-		}
-	}
+
 
 	public void doQuery(String query,
 	                    HttpServletRequest request, HttpServletResponse response)
@@ -113,6 +92,7 @@ public class OpenIdServlet extends HttpServlet {
 			if (isAuth && !loggedIn(request)) {
 				// ask user to accept this realm
 				RequestDispatcher rd = request.getRequestDispatcher(loginPage);
+				// would it be better to store these in the session?
 				request.setAttribute("query", query);
 				request.setAttribute("openid.realm", request.getParameter("openid.realm"));
 				rd.forward(request, response);
@@ -145,7 +125,7 @@ public class OpenIdServlet extends HttpServlet {
 	}
 
 	private boolean loggedIn(HttpServletRequest request) {
-		return request.getSession(true).getAttribute("user") != null;
+		return request.getSession(true).getAttribute(USER_ATTRIBUTE) != null;
 	}
 
 	private void returnError(String query, HttpServletResponse response)

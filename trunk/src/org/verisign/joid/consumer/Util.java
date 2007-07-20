@@ -1,4 +1,4 @@
-package examples.consumer;
+package org.verisign.joid.consumer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,8 +22,7 @@ public class Util
 	try {
 	    URL url = new URL(dest+"?"+toSend);
 	    HttpURLConnection.setFollowRedirects(true);
-	    HttpURLConnection connection 
-		= (HttpURLConnection) url.openConnection();
+	    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 	    
 	    in = new BufferedReader(new InputStreamReader(connection
 							  .getInputStream()));

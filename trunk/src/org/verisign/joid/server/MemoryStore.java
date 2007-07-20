@@ -1,4 +1,4 @@
-package examples.server;
+package org.verisign.joid.server;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,8 +22,7 @@ public class MemoryStore extends Store
 	throws OpenIdException
     {
 	// boldly reusing the db implementation of Association
-	org.verisign.joid.db.Association a 
-	    = new org.verisign.joid.db.Association();
+	AssociationImpl a = new AssociationImpl();
 	a.setMode("unused");
 	a.setHandle(Crypto.generateHandle());
 	a.setSessionType(req.getSessionType());
@@ -91,8 +90,7 @@ public class MemoryStore extends Store
 
     public Nonce generateNonce(String nonce) throws OpenIdException
     {
-	org.verisign.joid.db.Nonce n 
-	    = new org.verisign.joid.db.Nonce();
+	NonceImpl n = new NonceImpl();
 	n.setNonce(nonce);
 	n.setCheckedDate(new Date());
 	return n;

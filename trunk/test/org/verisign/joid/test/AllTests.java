@@ -45,6 +45,7 @@ import org.verisign.joid.SimpleRegistration;
 import org.verisign.joid.Store;
 import org.verisign.joid.ServerInfo;
 import org.verisign.joid.StoreFactory;
+import org.verisign.joid.server.MemoryStore;
 import org.verisign.joid.db.Association;
 
 
@@ -55,7 +56,7 @@ public class AllTests extends TestCase
     protected void tearDown() throws Exception {super.tearDown();}
 
     private static Crypto crypto = new Crypto();
-    private static Store store = StoreFactory.getDbInstance();
+    private static Store store = StoreFactory.getInstance(MemoryStore.class.getName());
     private static ServerInfo serverInfo = new ServerInfo("http://example.com",
 							  store, crypto);
 

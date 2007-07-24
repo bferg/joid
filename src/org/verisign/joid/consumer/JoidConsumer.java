@@ -2,14 +2,12 @@ package org.verisign.joid.consumer;
 
 import org.verisign.joid.*;
 
-import java.util.Map;
-import java.util.Properties;
-import java.util.HashMap;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-
-import org.verisign.joid.consumer.Util;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * This is the main class for consumers to use.
@@ -55,9 +53,12 @@ public class JoidConsumer {
 		return props;
 	}
 
-	private Properties getPropsByHandle(String associationHandle) {
+	private Properties getPropsByHandle(String associationHandle) throws OpenIdException {
 		String idServer = (String) handleToIdServer.get(associationHandle);
 		System.out.println("got idserver for handle: " + associationHandle + " - " + idServer);
+		if(idServer == null){
+			throw new OpenIdException("handle for server not found!");
+		}
 		return getProps(idServer);
 	}
 
@@ -94,10 +95,6 @@ public class JoidConsumer {
 				Crypto.convertToString(DiffieHellman.DEFAULT_MODULUS));
 
 		props.setProperty("_dest", idserver);
-
-		/*File f = new File(fileName);
-		props.store(new FileOutputStream(f), "Association result");
-		System.out.println("Results written into " + f.getCanonicalPath());*/
 
 		/*
 	  Crypto crypto = new Crypto();
@@ -138,13 +135,6 @@ public class JoidConsumer {
 
 	public String authenticate(Map map)
 			throws IOException, OpenIdException, NoSuchAlgorithmException {
-		/*Properties p = new Properties();
-		File f = new File(fileName);
-		p.load(new FileInputStream(f));
-*/
-
-//		Response response = Util.send(ar, dest);
-//		System.out.println("Response=" + response + "\n");
 
 		AuthenticationResponse response =
 //				ResponseFactory.parse(responseString);

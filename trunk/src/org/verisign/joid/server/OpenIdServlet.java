@@ -1,24 +1,19 @@
 package org.verisign.joid.server;
 
-import org.verisign.joid.server.MemoryUserManager;
-import org.verisign.joid.server.MemoryStore;
+import org.verisign.joid.*;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
-import javax.servlet.RequestDispatcher;
-
-import org.verisign.joid.*;
-
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.io.PrintWriter;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.net.URL;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.Map;
 
@@ -42,7 +37,6 @@ public class OpenIdServlet extends HttpServlet {
 		String endPointUrl = config.getInitParameter("endPointUrl");
 		loginPage = config.getInitParameter("loginPage");
 		openId = new OpenId(new ServerInfo(endPointUrl, store, crypto));
-//		userManager = new MemoryUserManager();
 	}
 
 
@@ -92,9 +86,12 @@ public class OpenIdServlet extends HttpServlet {
 			if (isAuth && !loggedIn(request)) {
 				// ask user to accept this realm
 				RequestDispatcher rd = request.getRequestDispatcher(loginPage);
-				// would it be better to store these in the session?
 				request.setAttribute("query", query);
 				request.setAttribute("openid.realm", request.getParameter("openid.realm"));
+				// would it be better to store these in the session? Much better for ajaxy apps
+				request.getSession(true).setAttribute("query", query);
+				request.getSession(true).setAttribute("openid.realm", request.getParameter("openid.realm"));
+				request.getSession(true).setAttribute("openid.return_to", request.getParameter("openid.return_to"));
 				rd.forward(request, response);
 				return;
 			}

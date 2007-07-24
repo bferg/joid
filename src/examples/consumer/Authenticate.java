@@ -1,17 +1,19 @@
 package examples.consumer;
 
-import java.security.NoSuchAlgorithmException;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Map;
 import org.verisign.joid.AuthenticationRequest;
 import org.verisign.joid.AuthenticationResponse;
 import org.verisign.joid.Crypto;
 import org.verisign.joid.DiffieHellman;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.Response;
+import org.verisign.joid.consumer.Util;
+
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -43,7 +45,7 @@ public class Authenticate
  	String handle = p.getProperty("handle");
  	String dest = p.getProperty("_dest");
 
-	AuthenticationRequest ar 
+	AuthenticationRequest ar
 	    = AuthenticationRequest.create(identity, returnTo, trustRoot,
 					   handle);
 

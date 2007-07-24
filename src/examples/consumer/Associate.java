@@ -1,16 +1,17 @@
 package examples.consumer;
 
-import java.io.IOException;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.math.BigInteger;
-import java.util.Map;
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.AssociationResponse;
 import org.verisign.joid.Crypto;
 import org.verisign.joid.DiffieHellman;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.Response;
+import org.verisign.joid.consumer.Util;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Properties;
 
 /**

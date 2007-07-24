@@ -13,20 +13,10 @@
 
 package org.verisign.joid.test;
 
-import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.tsik.datatypes.Base64;
+import org.verisign.joid.Association;
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.AssociationResponse;
 import org.verisign.joid.AuthenticationRequest;
@@ -41,18 +31,34 @@ import org.verisign.joid.Request;
 import org.verisign.joid.RequestFactory;
 import org.verisign.joid.Response;
 import org.verisign.joid.ResponseFactory;
+import org.verisign.joid.ServerInfo;
 import org.verisign.joid.SimpleRegistration;
 import org.verisign.joid.Store;
-import org.verisign.joid.ServerInfo;
 import org.verisign.joid.StoreFactory;
+import org.verisign.joid.server.AssociationImpl;
 import org.verisign.joid.server.MemoryStore;
-import org.verisign.joid.db.Association;
+
+import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 
 public class AllTests extends TestCase
 {
+    private long defaultLifespan;
+
     public AllTests(String name) {super(name);}
-    protected void setUp() throws Exception {super.setUp();}
+    protected void setUp() throws Exception {
+        super.setUp();
+        defaultLifespan = MemoryStore.DEFAULT_LIFESPAN;
+    }
     protected void tearDown() throws Exception {super.tearDown();}
 
     private static Crypto crypto = new Crypto();
@@ -130,7 +136,7 @@ public class AllTests extends TestCase
 
     public void testAssociationLifeLength() throws Exception
     {
-	Association a = new Association();
+	Association a = new AssociationImpl();
 	a.setIssuedDate(new Date());
 	a.setLifetime(new Long(1));
 	assertFalse(a.hasExpired());
@@ -168,7 +174,7 @@ public class AllTests extends TestCase
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
-	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(defaultLifespan == ar.getExpiresIn());
 	assertTrue(null == ar.getMacKey());
 	assertTrue(null != ar.getEncryptedMacKey());
 	assertTrue(null != ar.getDhServerPublic());
@@ -279,7 +285,7 @@ public class AllTests extends TestCase
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
-	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(defaultLifespan == ar.getExpiresIn());
 	assertTrue(null == ar.getErrorCode());
 	assertTrue(null == ar.getMacKey());
 
@@ -322,7 +328,7 @@ public class AllTests extends TestCase
 	// check that we can authenticate the signaure
 	//
 	Map map = authr.toMap();
-	CheckAuthenticationRequest carq 
+	CheckAuthenticationRequest carq
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 	assertFalse(carq.isVersion2());
 
@@ -343,7 +349,7 @@ public class AllTests extends TestCase
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
-	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(defaultLifespan == ar.getExpiresIn());
 	assertTrue(null == ar.getErrorCode());
 	assertTrue(null == ar.getMacKey());
 
@@ -407,7 +413,7 @@ public class AllTests extends TestCase
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
-	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(defaultLifespan == ar.getExpiresIn());
 	assertTrue(null == ar.getErrorCode());
 	assertTrue(null == ar.getMacKey());
 
@@ -494,7 +500,7 @@ public class AllTests extends TestCase
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
-	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(defaultLifespan == ar.getExpiresIn());
 	assertTrue(null == ar.getMacKey());
 	assertTrue(null != ar.getEncryptedMacKey());
 	assertTrue(null != ar.getDhServerPublic());
@@ -512,7 +518,7 @@ public class AllTests extends TestCase
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
-	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(defaultLifespan == ar.getExpiresIn());
 	assertTrue(null == ar.getErrorCode());
 	assertTrue(null == ar.getMacKey());
 
@@ -582,7 +588,7 @@ public class AllTests extends TestCase
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
-	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(defaultLifespan == ar.getExpiresIn());
 	assertTrue(null == ar.getErrorCode());
 	assertTrue(null == ar.getMacKey());
 
@@ -654,7 +660,7 @@ public class AllTests extends TestCase
 
 	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
 	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
-	assertTrue(60 * 10 == ar.getExpiresIn());
+	assertTrue(defaultLifespan == ar.getExpiresIn());
 	assertTrue(null == ar.getErrorCode());
 	assertTrue(null == ar.getMacKey());
 

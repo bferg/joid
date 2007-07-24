@@ -1,19 +1,22 @@
 package org.verisign.joid.server;
 
+import org.verisign.joid.Association;
+import org.verisign.joid.AssociationRequest;
+import org.verisign.joid.Crypto;
+import org.verisign.joid.Nonce;
+import org.verisign.joid.OpenIdException;
+import org.verisign.joid.Store;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.ListIterator;
-import org.verisign.joid.Association;
-import org.verisign.joid.Nonce;
-import org.verisign.joid.AssociationRequest;
-import org.verisign.joid.Crypto;
-import org.verisign.joid.OpenIdException;
-import org.verisign.joid.Store;
 
 
 public class MemoryStore extends Store
 {
+
+    public static long DEFAULT_LIFESPAN = 300;
     private static List associationList = new ArrayList();
     private static List nonceList = new ArrayList();
 
@@ -40,7 +43,7 @@ public class MemoryStore extends Store
 	}
 	a.setMacKey(secret);
 	a.setIssuedDate(new Date());
-	a.setLifetime(new Long(300));
+	a.setLifetime(new Long(DEFAULT_LIFESPAN));
 
 	a.setAssociationType(req.getAssociationType());
 	return a;

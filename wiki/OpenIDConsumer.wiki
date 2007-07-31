@@ -1,4 +1,4 @@
-#summary One-sentence summary of this page.
+#summary How to use JOID as a consumer so you can OpenID enable your apps.
 #labels Phase-Deploy,Featured
 
 == Introduction ==

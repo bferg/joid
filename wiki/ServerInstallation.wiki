@@ -1,5 +1,5 @@
+#summary This page explains how to setup your own OpenID Server using JOID.
 #labels Phase-Deploy,Featured
-This page will explain how to setup your own OpenID Server using JOID.
 
 == Introduction ==
 

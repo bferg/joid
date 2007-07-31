@@ -2,15 +2,16 @@
 <%
 	String baseUrl = UrlUtils.getBaseUrl(request);
 	String openIdServer = baseUrl + "/login";
+    String username = (String) request.getAttribute("username");
 %>
 <html>
 <head>
-	<title>Someone's OpenId Identity Page</title>
+	<title><%=username%>'s OpenId Identity Page</title>
 	<link rel="openid.server" href="<%=openIdServer%>">
 
 </head>
 <body>
-<h1>Someones OpenID Identity Page</h1>
+<h1><%=username%>'s OpenID Identity Page</h1>
 <p>
 This is a sample OpenID identity page. It contains a &lt;link&gt; tag with the OpenID server.
 </p>

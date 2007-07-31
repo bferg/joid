@@ -38,7 +38,7 @@ An error occurred! Please press back and try again.
 <div style='margin: 1em 0 1em 2em; border-left: 2px solid black; padding-left: 1em;'>
 	<form action="index.jsp" method="post">
 		<input type="hidden" name="signin" value="true"/>
-		<b>Login with your OpenID URL:</b> <input type="text" size="30" value="<%=returnTo+"/me.jsp"%>"
+		<b>Login with your OpenID URL:</b> <input type="text" size="30" value="<%=returnTo+"/user/austinpowers"%>"
 		                                          name="openid_url"/>
 		<input type="submit" value="Login"/><br/>
 		<i>For example: <tt>someone.bloghost.com</tt></i>
@@ -51,7 +51,7 @@ An error occurred! Please press back and try again.
 	<a href="https://myvidoop.com/" target="_blank">one</a>.
 </p>
 <p>
-	Logged in with OpenId: <%=session.getAttribute(OpenIdFilter.OPENID_ATTRIBUTE)%>
+	Logged in with OpenId: <%=session.getAttribute(OpenIdFilter.OPENID_ATTRIBUTE)%> - <a href="logout.jsp">Logout</a>
 </p>
 </body>
 </html>

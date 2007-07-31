@@ -1,6 +1,7 @@
 package org.verisign.joid.consumer;
 
 import org.verisign.joid.*;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -31,6 +32,7 @@ import java.util.Properties;
  */
 public class JoidConsumer {
 
+    private static Logger log = Logger.getLogger(JoidConsumer.class);
 
     private Map/*<String, Properties>*/ propSingleton;
     private Map/*<String, String>*/ handleToIdServer;
@@ -164,6 +166,7 @@ public class JoidConsumer {
     public String authenticate(Map map)
             throws IOException, OpenIdException, NoSuchAlgorithmException {
 
+        log.debug("request map in authenticate: " + map);
         AuthenticationResponse response =
                 new AuthenticationResponse(map);
 

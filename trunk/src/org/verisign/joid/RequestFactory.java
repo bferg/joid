@@ -30,11 +30,11 @@ public class RequestFactory
 
     private RequestFactory(){}
 
-    private static String OPENID_MODE = "openid.mode";
-    private static String ASSOCIATE_MODE = "associate";
-    private static String CHECKID_IMMEDIATE_MODE = "checkid_immediate";
-    private static String CHECKID_SETUP_MODE = "checkid_setup";
-    private static String CHECK_AUTHENTICATION_MODE = "check_authentication";
+    public static String OPENID_MODE = "openid.mode";
+    public static String ASSOCIATE_MODE = "associate";
+    public static String CHECKID_IMMEDIATE_MODE = "checkid_immediate";
+    public static String CHECKID_SETUP_MODE = "checkid_setup";
+    public static String CHECK_AUTHENTICATION_MODE = "check_authentication";
 
     /**
      * Parses a query into a request.

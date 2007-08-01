@@ -58,6 +58,7 @@
                 System.out.println("usernamefromurl: " + usernameFromClaimedId);
                 if (username.equals(usernameFromClaimedId))
                 {
+                    // call this to verify that this user owns the claimed_id
                     OpenIdServlet.idClaimed(session, claimedId);
                     String query = request.getParameter("query");
                     // then we'll redirect to login servlet again to finish up

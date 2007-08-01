@@ -16,7 +16,7 @@ import java.util.ListIterator;
 public class MemoryStore extends Store
 {
 
-    public static long DEFAULT_LIFESPAN = 300;
+    public static long DEFAULT_LIFESPAN = 300; // todo: should probably increase this
     private static List associationList = new ArrayList();
     private static List nonceList = new ArrayList();
 

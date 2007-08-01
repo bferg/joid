@@ -14,34 +14,38 @@ import java.util.HashMap;
 import java.io.IOException;
 
 /**
+ * This filter will log a user in automatically if it sees the required openid
+ * parameters in the request.
+ *
  * User: treeder
  * Date: Jun 8, 2007
  * Time: 6:50:15 PM
  */
 public class OpenIdFilter implements Filter {
-	private static Logger logger = Logger.getLogger(OpenIdFilter.class.getName());
+	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(OpenIdFilter.class);
 	private FilterConfig filterConf;
 	private ServletContext servletContext;
-	static JoidConsumer joid = new JoidConsumer();
+	private static JoidConsumer joid = new JoidConsumer();
 	public static final String OPENID_ATTRIBUTE = "openid.identity"; // todo: remove one of these
 	public static final String OPENID_IDENTITY = OPENID_ATTRIBUTE;
 	boolean saveIdentityUrlAsCookie = false;
 	private String cookieDomain;
 
 	public void init(FilterConfig filterConfig) throws ServletException {
-		System.out.println("init OpenIdFilter");
+		log.debug("init OpenIdFilter");
 		this.filterConf = filterConfig;
 		this.servletContext = filterConfig.getServletContext();
 		String saveInCookie = filterConfig.getInitParameter("saveInCookie");
 		if(saveInCookie != null){
 			saveIdentityUrlAsCookie = Boolean.parseBoolean(saveInCookie);
-			System.out.println("saving identities in cookie: " + saveIdentityUrlAsCookie);
+			log.debug("saving identities in cookie: " + saveIdentityUrlAsCookie);
 		}
 		cookieDomain = filterConfig.getInitParameter("cookieDomain");
-		System.out.println("end init OpenIdFilter");
+		log.debug("end init OpenIdFilter");
 	}
 
-	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
+	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
+                         FilterChain filterChain) throws IOException, ServletException {
 		// basically just check for openId parameters
 		if (servletRequest.getParameter(OPENID_IDENTITY) != null) {
 			try {
@@ -57,8 +61,9 @@ public class OpenIdFilter implements Filter {
 					resp.addCookie(cookie);
 				}
 			} catch(AuthenticationException e){
-				System.out.println("auth failed: " + e.getMessage());
-			} catch(Exception e) {
+				log.info("auth failed: " + e.getMessage());
+                // should this be handled differently?
+            } catch(Exception e) {
 				e.printStackTrace();
 			}
 		}

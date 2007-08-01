@@ -61,6 +61,8 @@ public class ResponseFactory
 	    return new AssociationResponse(map);
 	} else if (set.contains(AuthenticationResponse.OPENID_SIG)){
 	    return new AuthenticationResponse(map);
+ 	} else if (set.contains(CheckAuthenticationResponse.OPENID_IS_VALID)){
+	    return new CheckAuthenticationResponse(map);
  	} else {
  	    throw new OpenIdException("Cannot parse response from "+query);
  	}

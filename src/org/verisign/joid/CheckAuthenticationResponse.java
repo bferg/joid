@@ -18,22 +18,44 @@ import org.apache.log4j.Logger;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.Iterator;
 
 /**
  * Represents an OpenID check authentication request.
  */
 public class CheckAuthenticationResponse extends Response
 {
-    private final static Logger log 
+    private final static Logger log
 	= Logger.getLogger(CheckAuthenticationResponse.class);
 
     private boolean isValid;
-    
-    private static String OPENID_IS_VALID = "is_valid";
-    private final static String OPENID_INVALIDATE_HANDLE = "invalidate_handle";
+
+    public static String OPENID_IS_VALID = "is_valid";
+    public final static String OPENID_INVALIDATE_HANDLE = "invalidate_handle";
 
     private AuthenticationResponse ar;
     private Map map;
+    private String invalidateHandle;
+
+    public CheckAuthenticationResponse(Map map)
+    {
+        super(map);
+        Set set = map.entrySet();
+	for (Iterator iter = set.iterator(); iter.hasNext();){
+	    Map.Entry mapEntry = (Map.Entry) iter.next();
+	    String key = (String) mapEntry.getKey();
+	    String value = (String) mapEntry.getValue();
+
+	    if (AuthenticationResponse.OPENID_MODE.equals(key)) {
+		    mode = value;
+	    } else if (OPENID_IS_VALID.equals(key)) {
+		    isValid = Boolean.parseBoolean(value);
+        } else if(OPENID_INVALIDATE_HANDLE.equals(key)) {
+            invalidateHandle = value;
+        }
+    }
+    }
 
     /**
      * Returns whether this response contains notification that the request
@@ -80,10 +102,10 @@ public class CheckAuthenticationResponse extends Response
 	}
 	map = new HashMap();
 	map.put("mode", "id_res");
-	map.put(CheckAuthenticationResponse.OPENID_IS_VALID, 
+	map.put(CheckAuthenticationResponse.OPENID_IS_VALID,
 		isValid ? "true":"false");
 	if (invalidateHandle != null) {
-	    map.put(CheckAuthenticationResponse.OPENID_INVALIDATE_HANDLE, 
+	    map.put(CheckAuthenticationResponse.OPENID_INVALIDATE_HANDLE,
 		    invalidateHandle);
 	}
     }
@@ -95,5 +117,10 @@ public class CheckAuthenticationResponse extends Response
             +", is valid="+isValid
 	    +", authentication response="+ar
 	    +"]";
+    }
+
+    public String getInvalidateHandle()
+    {
+        return invalidateHandle;
     }
 }

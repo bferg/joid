@@ -21,9 +21,11 @@ import java.net.URLDecoder;
 public class UserUrlFilter implements Filter
 {
     private static Logger log = Logger.getLogger(UserUrlFilter.class);
+    private String idJsp;
 
     public void init(FilterConfig filterConfig) throws ServletException
     {
+        idJsp = filterConfig.getInitParameter("idJsp");
     }
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain filterChain) throws IOException, ServletException
@@ -48,9 +50,9 @@ public class UserUrlFilter implements Filter
                 {
                     String username = sections[i + 1];
                     log.debug("username: " + username);
-                    log.debug("forwarding to: " + contextPath + "/me.jsp");
+                    log.debug("forwarding to: " + contextPath + idJsp);
                     request.setAttribute("username", username);
-                    forward(request, response, "/me.jsp");
+                    forward(request, response, idJsp);
                     return;
                 }
             }

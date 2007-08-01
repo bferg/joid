@@ -325,7 +325,7 @@ public class AllTests extends TestCase
 	assertEquals(reSigned, signature);
 
 
-	// check that we can authenticate the signaure
+	// check that we can authenticate the signature
 	//
 	Map map = authr.toMap();
 	CheckAuthenticationRequest carq

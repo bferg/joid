@@ -24,6 +24,11 @@
         <description>This filter (for Server side) takes url's of the form: http://hostname/user/username
         to provide an id page for each user.</description>
         <filter-class>examples.server.UserUrlFilter</filter-class>
+        <init-param>
+			<param-name>idJsp</param-name>
+			<param-value>/me.jsp</param-value>
+			<description>Required. The jsp page used as the identity page.</description>
+		</init-param>
     </filter>
 
     <filter-mapping>

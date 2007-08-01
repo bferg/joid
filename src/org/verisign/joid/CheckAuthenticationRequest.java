@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
  */
 public class CheckAuthenticationRequest extends Request
 {
-    private final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
+    public final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
 
     private final static Logger log 
 	= Logger.getLogger(CheckAuthenticationRequest.class);

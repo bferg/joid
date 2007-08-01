@@ -108,7 +108,8 @@
 				<exclude name="**/create.sql"/>
 				<exclude name="**/web.xml"/>
 				<exclude name="**/org.verisign.joid.db.hibernate.cfg.xml"/>
-			</fileset>
+                <exclude name="**/log4j.properties"/>
+            </fileset>
 		</copy>
 	</target>
 

@@ -1,6 +1,7 @@
 package org.verisign.joid.server;
 
 import org.verisign.joid.*;
+import org.apache.log4j.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -25,6 +26,7 @@ import java.util.Map;
  */
 public class OpenIdServlet extends HttpServlet
 {
+    private static Logger log = Logger.getLogger(OpenIdServlet.class);
     private static final long serialVersionUID = 297366254782L;
     private static OpenId openId;
     private Store store;
@@ -32,6 +34,7 @@ public class OpenIdServlet extends HttpServlet
     private String loginPage;
     public static final String USER_ATTRIBUTE = "user";
     public static final String ID_CLAIMED = "idClaimed";
+    public static final String QUERY = "query";
 
     public void init(ServletConfig config) throws ServletException
     {
@@ -101,10 +104,10 @@ public class OpenIdServlet extends HttpServlet
             {
                 // ask user to accept this realm
                 RequestDispatcher rd = request.getRequestDispatcher(loginPage);
-                request.setAttribute("query", query);
-                request.setAttribute("openid.realm", request.getParameter("openid.realm"));
+                request.setAttribute(QUERY, query);
+                request.setAttribute(AuthenticationRequest.OPENID_REALM, request.getParameter(AuthenticationRequest.OPENID_REALM));
                 // would it be better to store these in the session? Much better for ajaxy apps
-                session.setAttribute("query", query);
+                session.setAttribute(QUERY, query);
                 session.setAttribute(
                         AuthenticationRequest.OPENID_CLAIMED_ID,
                         request.getParameter(AuthenticationRequest.OPENID_CLAIMED_ID));
@@ -124,6 +127,7 @@ public class OpenIdServlet extends HttpServlet
                 AuthenticationRequest authReq = (AuthenticationRequest)
                         RequestFactory.parse(query);
                 String claimedId = (String) session.getAttribute(ID_CLAIMED);
+                log.info("claimedId: " + claimedId);
                 if (claimedId != null && claimedId.equals(authReq.getClaimedIdentity()))
                 {
                     String returnTo = authReq.getReturnTo();

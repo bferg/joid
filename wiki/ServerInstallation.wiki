@@ -35,6 +35,18 @@ Add the servlet from above to your web.xml:
 				approves the authentication for the site.
 			</description>
 		</init-param>
+                <init-param>
+			<param-name>storeClassName</param-name>
+			<param-value>org.verisign.joid.server.MemoryStore</param-value>
+			<description>Specify the className for your Store implementation.
+			</description>
+		</init-param>
+                <init-param>
+			<param-name>userManagerClassName</param-name>
+			<param-value>org.verisign.joid.server.MemoryUserManager</param-value>
+			<description>Specify the className for your UserManager implementation.
+			</description>
+		</init-param>
 	</servlet>
 
         <servlet-mapping>

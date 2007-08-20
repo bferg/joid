@@ -30,7 +30,8 @@ import java.util.Properties;
  * Date: Jun 27, 2007
  * Time: 11:52:40 AM
  */
-public class JoidConsumer {
+public class JoidConsumer
+{
 
     private static Logger log = Logger.getLogger(JoidConsumer.class);
 
@@ -43,13 +44,15 @@ public class JoidConsumer {
         log.info("Constructor: JoidConsumer");
     }
 
-    private synchronized Properties getProps(String idserver) {
+    private synchronized Properties getProps(String idserver)
+    {
+        // todo: just store the AssociationResponse instead of converting to props
         if (propSingleton == null) {
             propSingleton = new HashMap();
             handleToIdServer = new HashMap();
         }
         Properties props = (Properties) propSingleton.get(idserver);
-        if (props == null) {
+        if (props == null) { // todo: also check expires_in time to make sure it's still valid
             try {
                 props = associate(idserver);
                 propSingleton.put(idserver, props);
@@ -62,7 +65,8 @@ public class JoidConsumer {
     }
 
     private Properties getPropsByHandle(String associationHandle)
-            throws OpenIdException {
+            throws OpenIdException
+    {
         String idServer = (String) handleToIdServer.get(associationHandle);
         log.info("got idserver for handle: " + associationHandle +
                 " - " + idServer);
@@ -82,12 +86,16 @@ public class JoidConsumer {
      *
      */
     public Properties associate(String idserver)
-            throws IOException, OpenIdException {
+            throws IOException, OpenIdException
+    {
         DiffieHellman dh = DiffieHellman.getDefault();
         Crypto crypto = new Crypto();
         crypto.setDiffieHellman(dh);
 
         AssociationRequest ar = AssociationRequest.create(crypto);
+
+        log.info("[JoidConsumer] Attempting to associate with: " + idserver);
+        log.info("Request=" + ar);
 
         Response response = Util.send(ar, idserver);
         log.info("Response=" + response + "\n");
@@ -108,6 +116,7 @@ public class JoidConsumer {
                 Crypto.convertToString(DiffieHellman.DEFAULT_MODULUS));
 
         props.setProperty("_dest", idserver);
+        props.setProperty("expiresIn", "" + asr.getExpiresIn());
 
         /*
         Crypto crypto = new Crypto();
@@ -121,20 +130,24 @@ public class JoidConsumer {
     }
 
     /**
+     * <p>
      * This method is used by a relying party to create the url to redirect a
      * user to after entering their OpenId URL in a form.
-     *
+     * </p>
+     * <p>
      * It will find the id server found at the OpenID url, associate with the
      * server if necessary and return an authentication request url.
+     * </p>
      *
-     * @param identity users OpenID url
-     * @param returnTo the url to return to after user is finished with OpenId provider
+     * @param identity  users OpenID url
+     * @param returnTo  the url to return to after user is finished with OpenId provider
      * @param trustRoot base url that the authentication should apply to
      * @return
      * @throws OpenIdException
      */
     public String getAuthUrl(String identity, String returnTo, String trustRoot)
-            throws OpenIdException {
+            throws OpenIdException
+    {
 
         // find id server
         ServerAndDelegate idserver = null;
@@ -161,7 +174,7 @@ public class JoidConsumer {
 
 
     /**
-     * This method will attempt to authenticate against
+     * This method will attempt to authenticate against the OpenID server.
      *
      * @param map
      * @return openid.identity if authentication was successful, null if unsuccessful
@@ -169,58 +182,70 @@ public class JoidConsumer {
      * @throws OpenIdException
      * @throws NoSuchAlgorithmException
      */
-    public String authenticate(Map map)
-            throws IOException, OpenIdException, NoSuchAlgorithmException {
+    public AuthenticationResult authenticate(Map map)
+            throws IOException, OpenIdException, NoSuchAlgorithmException
+    {
 
         log.debug("request map in authenticate: " + map);
         AuthenticationResponse response =
                 new AuthenticationResponse(map);
-
+        // todo: store nonce's to ensure we never accept the same value again - see sec 11.3 of spec 2.0
         Properties props;
-        if(response.getInvalidateHandle() != null){
+        if (response.getInvalidateHandle() != null) {
             // then we have to send a authentication_request (dumb mode) to verify the signature
             CheckAuthenticationRequest checkReq =
                     new CheckAuthenticationRequest(response.toMap(), RequestFactory.CHECK_AUTHENTICATION_MODE);
             props = getPropsByHandle(response.getInvalidateHandle());
             CheckAuthenticationResponse response2 = (CheckAuthenticationResponse)
                     Util.send(checkReq, props.getProperty("idServer"));
+            // todo: verify the invalidate_handle in response2 is the same as in response
             removeInvalidHandle(response.getInvalidateHandle());
-            if(!response2.isValid()){
-                throw new AuthenticationException("Invalid signature received from server.");
+            if (response2.isValid()) {
+                // then this is a valid request, lets send it back
+                return new AuthenticationResult(response.getIdentity(), response);
+            } else {
+                throw new AuthenticationException("Signature invalid, identity denied.");
             }
-
         } else {
             // normal properties
             props = getPropsByHandle(response.getAssociationHandle());
+
+            // todo: before returning a valid response, ensure return_to is a suburl of trust_root
+            
+            BigInteger privKey
+                    = Crypto.convertToBigIntegerFromString(props.getProperty("privateKey"));
+            BigInteger modulus
+                    = Crypto.convertToBigIntegerFromString(props.getProperty("modulus"));
+            BigInteger serverPublic
+                    = Crypto.convertToBigIntegerFromString(props.getProperty("publicKey"));
+            byte[] encryptedKey
+                    = Crypto.convertToBytes(props.getProperty("encryptedKey"));
+
+            /* String sig = response.sign(response.getAssociationType(),
+                             a.getMacKey(), response.getSignedList());
+                    isValid = sig.equals(response.getSignature());
+            */
+            DiffieHellman dh = DiffieHellman.recreate(privKey, modulus);
+            Crypto crypto = new Crypto();
+            crypto.setDiffieHellman(dh);
+            byte[] clearKey = crypto.decryptSecret(serverPublic, encryptedKey);
+
+            String signature = response.getSignature();
+            log.info("Server's signature: " + signature);
+
+            String sigList = response.getSignedList();
+            String reSigned = response.sign(clearKey, sigList);
+            log.info("Our signature:      " + reSigned);
+            String identity = response.getIdentity();
+            if (!signature.equals(reSigned)) {
+                throw new AuthenticationException("OpenID signatures do not match! " +
+                        "claimed identity: " + identity);
+            }
+            log.info("Signatures match, identity is ok: " + identity);
+            return new AuthenticationResult(identity, response);
         }
-        BigInteger privKey
-                = Crypto.convertToBigIntegerFromString(props.getProperty("privateKey"));
-        BigInteger modulus
-                = Crypto.convertToBigIntegerFromString(props.getProperty("modulus"));
-        BigInteger serverPublic
-                = Crypto.convertToBigIntegerFromString(props.getProperty("publicKey"));
-        byte[] encryptedKey
-                = Crypto.convertToBytes(props.getProperty("encryptedKey"));
 
-        DiffieHellman dh = DiffieHellman.recreate(privKey, modulus);
-        Crypto crypto = new Crypto();
-        crypto.setDiffieHellman(dh);
-        byte[] clearKey = crypto.decryptSecret(serverPublic, encryptedKey);
-
-        String signature = response.getSignature();
-        log.info("Server's signature: " + signature);
-
-        String sigList = response.getSignedList();
-        String reSigned = response.sign(clearKey, sigList);
-        log.info("Our signature:      " + reSigned);
-        String identity = (String) map.get("openid.identity");
-        if (!signature.equals(reSigned)) {
-            throw new AuthenticationException("OpenId tokens do not match! " +
-                    "claimed identity: " + identity);
-        }
-        log.info("tokens match, identity is ok: " + identity);
-        return identity;
-	}
+    }
 
     /**
      * If openid.invalidate_handle was received, this will remove it from our
@@ -231,7 +256,7 @@ public class JoidConsumer {
     private void removeInvalidHandle(String invalidateHandle)
     {
         String idServer = (String) handleToIdServer.remove(invalidateHandle);
-        if(idServer != null){
+        if (idServer != null) {
             propSingleton.remove(idServer);
         }
     }

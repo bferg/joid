@@ -1,17 +1,24 @@
 package org.verisign.joid.consumer;
 
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
-import java.util.logging.Logger;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Iterator;
-import java.util.HashMap;
-import java.io.IOException;
 
 /**
  * This filter will log a user in automatically if it sees the required openid
@@ -23,35 +30,43 @@ import java.io.IOException;
  */
 public class OpenIdFilter implements Filter {
 	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(OpenIdFilter.class);
-	private FilterConfig filterConf;
-	private ServletContext servletContext;
 	private static JoidConsumer joid = new JoidConsumer();
 	public static final String OPENID_ATTRIBUTE = "openid.identity"; // todo: remove one of these
 	public static final String OPENID_IDENTITY = OPENID_ATTRIBUTE;
 	boolean saveIdentityUrlAsCookie = false;
 	private String cookieDomain;
+    private List ignorePaths = new ArrayList();
 
-	public void init(FilterConfig filterConfig) throws ServletException {
+    public void init(FilterConfig filterConfig) throws ServletException {
 		log.debug("init OpenIdFilter");
-		this.filterConf = filterConfig;
-		this.servletContext = filterConfig.getServletContext();
 		String saveInCookie = filterConfig.getInitParameter("saveInCookie");
 		if(saveInCookie != null){
 			saveIdentityUrlAsCookie = Boolean.parseBoolean(saveInCookie);
 			log.debug("saving identities in cookie: " + saveIdentityUrlAsCookie);
 		}
 		cookieDomain = filterConfig.getInitParameter("cookieDomain");
-		log.debug("end init OpenIdFilter");
+        String ignorePaths = filterConfig.getInitParameter("ignorePaths");
+        if(ignorePaths != null){
+            String paths[] = ignorePaths.split(",");
+            for (int i = 0; i < paths.length; i++)
+            {
+                String path = paths[i].trim();
+                this.ignorePaths.add(path);
+            }
+        }
+        log.debug("end init OpenIdFilter");
 	}
 
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
 		// basically just check for openId parameters
-		if (servletRequest.getParameter(OPENID_IDENTITY) != null) {
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        if (servletRequest.getParameter(OPENID_IDENTITY) != null && !ignored(request)) {
 			try {
-				String identity = joid.authenticate(convertToStringValueMap(servletRequest.getParameterMap()));
-				if(identity != null){
-					HttpServletRequest req = (HttpServletRequest) servletRequest;
+                AuthenticationResult result = joid.authenticate(convertToStringValueMap(servletRequest.getParameterMap()));
+                String identity = result.getIdentity();
+                if(identity != null){
+                    HttpServletRequest req = (HttpServletRequest) servletRequest;
 					req.getSession(true).setAttribute(OpenIdFilter.OPENID_ATTRIBUTE, identity);
 					HttpServletResponse resp = (HttpServletResponse) servletResponse; // could check this before setting
 					Cookie cookie = new Cookie(OPENID_IDENTITY, identity);
@@ -59,9 +74,13 @@ public class OpenIdFilter implements Filter {
 						cookie.setDomain(cookieDomain);
 					}
 					resp.addCookie(cookie);
-				}
+                    // redirect to get rid of the long url
+                    resp.sendRedirect(result.getResponse().getReturnTo());
+                    return;
+                }
 			} catch(AuthenticationException e){
-				log.info("auth failed: " + e.getMessage());
+                e.printStackTrace();
+                log.info("auth failed: " + e.getMessage());
                 // should this be handled differently?
             } catch(Exception e) {
 				e.printStackTrace();
@@ -70,7 +89,25 @@ public class OpenIdFilter implements Filter {
 		filterChain.doFilter(servletRequest, servletResponse);
 	}
 
-	private Map/*<String, String>*/ convertToStringValueMap(Map/*<String, String[]>*/ parameterMap) {
+    private boolean ignored(HttpServletRequest request)
+    {
+        String servletPath = request.getServletPath();
+        for (int i = 0; i < ignorePaths.size(); i++)
+        {
+            String s = (String) ignorePaths.get(i);
+            if(servletPath.startsWith(s)){
+//                System.out.println("IGNORING: " + servletPath);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void logout(HttpSession session){
+        session.removeAttribute(OPENID_ATTRIBUTE);
+    }
+
+    private Map/*<String, String>*/ convertToStringValueMap(Map/*<String, String[]>*/ parameterMap) {
 		Map/*<String,String>*/ ret = new HashMap();
 		Set set = parameterMap.entrySet();
 		for (Iterator iter = set.iterator(); iter.hasNext();) {

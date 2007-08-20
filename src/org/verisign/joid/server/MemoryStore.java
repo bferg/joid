@@ -19,6 +19,7 @@ public class MemoryStore extends Store
     public static long DEFAULT_LIFESPAN = 300; // todo: should probably increase this
     private static List associationList = new ArrayList();
     private static List nonceList = new ArrayList();
+    private long associationLifetime = DEFAULT_LIFESPAN;
 
     public Association generateAssociation(AssociationRequest req, 
 					   Crypto crypto) 
@@ -43,7 +44,7 @@ public class MemoryStore extends Store
 	}
 	a.setMacKey(secret);
 	a.setIssuedDate(new Date());
-	a.setLifetime(new Long(DEFAULT_LIFESPAN));
+	a.setLifetime(new Long(associationLifetime));
 
 	a.setAssociationType(req.getAssociationType());
 	return a;
@@ -97,5 +98,10 @@ public class MemoryStore extends Store
 	n.setNonce(nonce);
 	n.setCheckedDate(new Date());
 	return n;
+    }
+
+    public void setAssociationLifetime(long associationLifetime)
+    {
+        this.associationLifetime = associationLifetime;
     }
 }

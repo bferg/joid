@@ -81,6 +81,11 @@ public class AssociationImpl implements org.verisign.joid.Association {
     }
 
     public Long getLifetime() {return lifetime;}
+
+    /**
+     *
+     * @param lifetime in seconds for this association. Expires after.
+     */
     public void setLifetime(Long lifetime) {this.lifetime = lifetime;}
 
     public String getAssociationType() {return associationType;}

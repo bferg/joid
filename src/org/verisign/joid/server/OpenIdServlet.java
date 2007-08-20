@@ -1,7 +1,16 @@
 package org.verisign.joid.server;
 
-import org.verisign.joid.*;
 import org.apache.log4j.Logger;
+import org.verisign.joid.AuthenticationRequest;
+import org.verisign.joid.Crypto;
+import org.verisign.joid.OpenId;
+import org.verisign.joid.OpenIdException;
+import org.verisign.joid.RequestFactory;
+import org.verisign.joid.ServerInfo;
+import org.verisign.joid.Store;
+import org.verisign.joid.StoreFactory;
+import org.verisign.joid.util.CookieUtils;
+import org.verisign.joid.util.DependencyUtils;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -32,17 +41,25 @@ public class OpenIdServlet extends HttpServlet
     private Store store;
     private Crypto crypto;
     private String loginPage;
-    public static final String USER_ATTRIBUTE = "user";
+    public static final String USERNAME_ATTRIBUTE = "username";
     public static final String ID_CLAIMED = "idClaimed";
     public static final String QUERY = "query";
+    public static final String COOKIE_AUTH_NAME = "authKey";
+    public static final String COOKIE_USERNAME = "username";
+    private static UserManager userManager;
 
     public void init(ServletConfig config) throws ServletException
     {
         super.init(config);
-        store = StoreFactory.getInstance(MemoryStore.class.getName());
+        String storeClassName = config.getInitParameter("storeClassName");
+        String userManagerClassName = config.getInitParameter("userManagerClassName");
+        store = StoreFactory.getInstance(storeClassName);
+        MemoryStore mStore = (MemoryStore) store;
+        mStore.setAssociationLifetime(600);
+        userManager = (UserManager) DependencyUtils.newInstance(userManagerClassName);
         crypto = new Crypto();
-        String endPointUrl = config.getInitParameter("endPointUrl");
         loginPage = config.getInitParameter("loginPage");
+        String endPointUrl = config.getInitParameter("endPointUrl");
         openId = new OpenId(new ServerInfo(endPointUrl, store, crypto));
     }
 
@@ -60,25 +77,20 @@ public class OpenIdServlet extends HttpServlet
     {
         StringBuffer sb = new StringBuffer();
         Enumeration e = request.getParameterNames();
-        while (e.hasMoreElements())
-        {
+        while (e.hasMoreElements()) {
             String name = (String) e.nextElement();
             String[] values = request.getParameterValues(name);
-            if (values.length == 0)
-            {
+            if (values.length == 0) {
                 throw new IOException("Empty value not allowed: "
                         + name + " has no value");
             }
-            try
-            {
+            try {
                 sb.append(URLEncoder.encode(name, "UTF-8") + "="
                         + URLEncoder.encode(values[0], "UTF-8"));
-            } catch (UnsupportedEncodingException ex)
-            {
+            } catch (UnsupportedEncodingException ex) {
                 throw new IOException(ex.toString());
             }
-            if (e.hasMoreElements())
-            {
+            if (e.hasMoreElements()) {
                 sb.append("&");
             }
         }
@@ -91,17 +103,17 @@ public class OpenIdServlet extends HttpServlet
             throws ServletException, IOException
     {
         log("\nrequest\n-------\n" + query + "\n");
-        if (!(openId.canHandle(query)))
-        {
+        if (!(openId.canHandle(query))) {
             returnError(query, response);
             return;
         }
-        try
-        {
+        try {
             boolean isAuth = openId.isAuthenticationRequest(query);
             HttpSession session = request.getSession(true);
-            if (isAuth && !loggedIn(request))
-            {
+            String user = loggedIn(request);
+            System.out.println("[OpenIdServlet] Logged in as: " + user);
+            if (isAuth && user == null) {
+                // todo: should ask user to accept realm even if logged in, but only once
                 // ask user to accept this realm
                 RequestDispatcher rd = request.getRequestDispatcher(loginPage);
                 request.setAttribute(QUERY, query);
@@ -117,50 +129,62 @@ public class OpenIdServlet extends HttpServlet
                 session.setAttribute(
                         AuthenticationRequest.OPENID_RETURN_TO,
                         request.getParameter(AuthenticationRequest.OPENID_RETURN_TO));
-                rd.forward(request, response);
+//                rd.forward(request, response);
+                response.sendRedirect(loginPage);
                 return;
             }
             String s = openId.handleRequest(query);
             log("\nresponse\n--------\n" + s + "\n");
-            if (isAuth)
-            {
+            if (isAuth) {
                 AuthenticationRequest authReq = (AuthenticationRequest)
                         RequestFactory.parse(query);
-                String claimedId = (String) session.getAttribute(ID_CLAIMED);
-                log.info("claimedId: " + claimedId);
-                if (claimedId != null && claimedId.equals(authReq.getClaimedIdentity()))
-                {
+//                String claimedId = (String) session.getAttribute(ID_CLAIMED);
+                /* Ensure that the previously claimed id is the same as the just
+                passed in claimed id. */
+                if (getUserManager().canClaim(user, authReq.getClaimedIdentity())) {
                     String returnTo = authReq.getReturnTo();
                     String delim = (returnTo.indexOf('?') >= 0) ? "&" : "?";
                     s = response.encodeRedirectURL(returnTo + delim + s);
                     response.sendRedirect(s);
                 } else {
-                    throw new OpenIdException("The claimed id has not been verified.");
+                    throw new OpenIdException("User cannot claim this id.");
                 }
-            } else
-            {
+
+            } else {
                 // Association request
                 int len = s.length();
                 PrintWriter out = response.getWriter();
                 response.setHeader("Content-Length", Integer.toString(len));
-                if (openId.isAnErrorResponse(s))
-                {
+                if (openId.isAnErrorResponse(s)) {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 }
                 out.print(s);
                 out.flush();
             }
-        } catch (OpenIdException e)
-        {
+        } catch (OpenIdException e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse
                     .SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    private boolean loggedIn(HttpServletRequest request)
+    private String loggedIn(HttpServletRequest request)
     {
-        return request.getSession(true).getAttribute(USER_ATTRIBUTE) != null;
+        String o = (String) request.getSession(true).getAttribute(USERNAME_ATTRIBUTE);
+        if (o != null) return o;
+        // check Remember Me cookies
+        String authKey = CookieUtils.getCookieValue(request, COOKIE_AUTH_NAME, null);
+        if (authKey != null) {
+            String username = CookieUtils.getCookieValue(request, COOKIE_USERNAME, null);
+            if (username != null) {
+                // lets check the UserManager to make sure this is a valid match
+                o = getUserManager().getRememberedUser(username, authKey);
+                if (o != null) {
+                    request.getSession(true).setAttribute(USERNAME_ATTRIBUTE, o);
+                }
+            }
+        }
+        return o;
     }
 
     private void returnError(String query, HttpServletResponse response)
@@ -169,22 +193,19 @@ public class OpenIdServlet extends HttpServlet
         Map map = RequestFactory.parseQuery(query);
         String returnTo = (String) map.get("openid.return_to");
         boolean goodReturnTo = false;
-        try
-        {
+        try {
             URL url = new URL(returnTo);
             goodReturnTo = true;
-        } catch (MalformedURLException e)
-        {
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         }
 
-        if (goodReturnTo)
-        {
+        if (goodReturnTo) {
             String s = "?openid.ns:http://specs.openid.net/auth/2.0"
                     + "&openid.mode=error&openid.error=BAD_REQUEST";
             s = response.encodeRedirectURL(returnTo + s);
             response.sendRedirect(s);
-        } else
-        {
+        } else {
             PrintWriter out = response.getWriter();
             // response.setContentLength() seems to be broken,
             // so set the header manually
@@ -215,5 +236,10 @@ public class OpenIdServlet extends HttpServlet
     public static void idClaimed(HttpSession session, String claimedId)
     {
         session.setAttribute(ID_CLAIMED, claimedId);
+    }
+
+    public static UserManager getUserManager()
+    {
+        return userManager;
     }
 }

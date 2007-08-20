@@ -18,7 +18,12 @@
 			<description>Optional. Domain to store cookie based on RFC 2109. Defaults to current context.</description>
 		</init-param>
 		-->
-	</filter>
+        <init-param>
+			<param-name>ignorePaths</param-name>
+			<param-value>/login,/server,/echo</param-value>
+			<description>Optional. Will not apply filter to the paths set here. Comma delimited.</description>
+		</init-param>
+    </filter>
     <filter>
 		<filter-name>UserUrlFilter</filter-name>
         <description>This filter (for Server side) takes url's of the form: http://hostname/user/username
@@ -65,7 +70,19 @@
 				approves the authentication for the site.
 			</description>
 		</init-param>
-	</servlet>
+         <init-param>
+			<param-name>storeClassName</param-name>
+			<param-value>org.verisign.joid.server.MemoryStore</param-value>
+			<description>Specify the className for your Store implementation.
+			</description>
+		</init-param>
+        <init-param>
+			<param-name>userManagerClassName</param-name>
+			<param-value>org.verisign.joid.server.MemoryUserManager</param-value>
+			<description>Specify the className for your UserManager implementation.
+			</description>
+		</init-param>
+    </servlet>
 
 	<servlet-mapping>
 		<servlet-name>joid</servlet-name>

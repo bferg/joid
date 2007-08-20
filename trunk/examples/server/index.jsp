@@ -6,8 +6,8 @@ This page is a sample for consumers to use, but also serves as a testing page fo
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
 	String returnTo = UrlUtils.getBaseUrl(request);
-
-	if (request.getParameter("signin") != null) {
+    
+    if (request.getParameter("signin") != null) {
 		try {
 			String id = request.getParameter("openid_url");
 			if (!id.startsWith("http:")) {

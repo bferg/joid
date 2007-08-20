@@ -89,7 +89,8 @@
 			<lib file="${joid_examples_jar}"/>
 			<lib file="${joid_jar}"/>
 			<lib file="${tsik_jar}"/>
-			<lib file="${mysql_jar}"/>
+            <lib file="${commons_lang_jar}"/>
+            <lib file="${mysql_jar}"/>
 			<lib file="${log4j_jar}"/>
 			<lib file="${dom4j_jar}"/>
 			<lib file="${hibernate_jar}"/>
@@ -132,7 +133,8 @@
 
 	<path id="compile.test.classpath">
 		<pathelement location="${tsik_jar}"/>
-		<pathelement location="${servlet_jar}"/>
+        <pathelement location="${commons_lang_jar}"/>
+        <pathelement location="${servlet_jar}"/>
 		<pathelement location="${classes}"/>
 		<pathelement location="${cactus_jar}"/>
 		<pathelement location="${junit_jar}"/>
@@ -147,7 +149,8 @@
 				<pathelement location="${joid_jar}"/>
 				<pathelement location="${log4j_jar}"/>
 				<pathelement location="${tsik_jar}"/>
-				<pathelement location="${dom4j_jar}"/>
+                <pathelement location="${commons_lang_jar}"/>
+                <pathelement location="${dom4j_jar}"/>
 				<pathelement location="${hibernate_jar}"/>
 				<pathelement location="${commons_collections_jar}"/>
 				<pathelement location="${cglib_jar}"/>

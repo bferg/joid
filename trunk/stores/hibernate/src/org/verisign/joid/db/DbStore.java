@@ -16,7 +16,6 @@ package org.verisign.joid.db;
 import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
-import org.apache.tsik.datatypes.Base64;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -31,6 +30,9 @@ import org.verisign.joid.Store;
 public class DbStore extends Store
 {
     private final static Logger log = Logger.getLogger(DbStore.class);
+
+    private long associationLifetime = 600;
+
     private DbStore() {}
     private static DbStore dbStore;
 
@@ -70,7 +72,7 @@ public class DbStore extends Store
 	a.setMacKey(secret);
 	a.setIssuedDate(new Date());
 	// lifetime in seconds
-	a.setLifetime(new Long(60*10));
+	a.setLifetime(new Long(associationLifetime));
 
 	a.setAssociationType(req.getAssociationType());
 	return a;

@@ -11,14 +11,24 @@ public class UrlUtils {
 	/**
 	 *
 	 * @param request
-	 * @return the url of the local host including the context
+	 * @return the url of the local host including the context, not including a trailing "/"
 	 */
 	public static String getBaseUrl(HttpServletRequest request) {
-		String scheme = request.getScheme();
-		String serverName = request.getServerName();
-		String port = request.getServerPort() != 80 ? ":" + request.getServerPort() : "";
-		String context = request.getContextPath();
-		String returnTo = scheme + "://" + serverName + port + context;
-		return returnTo;
+        String start = getHostUrl(request);
+        String context = request.getContextPath();
+        String ret = start;
+        if(context != null){
+            ret += context;
+        }
+        return ret;
 	}
+
+    public static String getHostUrl(HttpServletRequest request)
+    {
+        String scheme = request.getScheme();
+        String serverName = request.getServerName();
+        String port = request.getServerPort() != 80 ? ":" + request.getServerPort() : "";
+        String start = scheme + "://" + serverName + port;
+        return start;
+    }
 }

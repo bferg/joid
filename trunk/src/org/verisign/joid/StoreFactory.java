@@ -13,6 +13,8 @@
 
 package org.verisign.joid;
 
+import org.verisign.joid.util.DependencyUtils;
+
 
 /**
  * Creates stores. JOID comes with the {@link org.verisign.joid.db.DbStore}.
@@ -43,16 +45,7 @@ public class StoreFactory
      */
     public static Store getInstance(String className)
     {
-	try {
-	    return (Store) Class.forName(className).newInstance();
-	} catch (ClassNotFoundException e){
-	    throw new IllegalArgumentException("Not found "+className);
-	} catch (IllegalAccessException e){
-	    throw new IllegalArgumentException("No access to "+className);
-	} catch (InstantiationException e){
-	    throw new IllegalArgumentException("Cannot instantiate "
-					       +className);
-	}
+	    return (Store) DependencyUtils.newInstance(className);
     }
 
 

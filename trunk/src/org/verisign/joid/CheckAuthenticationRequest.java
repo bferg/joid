@@ -91,4 +91,14 @@ public class CheckAuthenticationRequest extends Request
 	    +", authentication response="+ar
 	    +"]";
     }
+
+    Map toMap()
+    {
+        // need to send all values exactly from AuthenticationResponse...
+        Map map = ar.toMap();
+        // ... except mode
+        map.putAll(super.toMap());
+
+        return map;
+    }
 }

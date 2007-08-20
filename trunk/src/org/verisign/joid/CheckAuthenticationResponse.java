@@ -38,6 +38,10 @@ public class CheckAuthenticationResponse extends Response
     private Map map;
     private String invalidateHandle;
 
+    /**
+     * This constructor is for a Consumer side response received from the server.
+     * @param map
+     */
     public CheckAuthenticationResponse(Map map)
     {
         super(map);

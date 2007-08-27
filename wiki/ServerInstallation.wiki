@@ -5,7 +5,7 @@
 
 There are two pieces required to run the server:
 
-  # A Store implementation - example: [http://joid.googlecode.com/svn/trunk/src/examples/server/MemoryStore.java MemoryStore]
+  # A Store implementation - example: [http://joid.googlecode.com/svn/trunk/src/org/verisign/joid/server/MemoryStore.java MemoryStore]
   # A Servlet - example: [http://joid.googlecode.com/svn/trunk/src/examples/server/OpenIdServlet.java OpenIdServlet]
   # A [http://joid.googlecode.com/svn/trunk/src/org/verisign/joid/server/UserManager.java UserManager] Implementation
 

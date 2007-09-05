@@ -33,22 +33,6 @@ public class DbStore extends Store
 
     private long associationLifetime = 600;
 
-    private DbStore() {}
-    private static DbStore dbStore;
-
-    /**
-     * Returns the one database store.
-     *
-     * @return the database store.
-     */
-    public static DbStore getInstance()
-    {
-	if (dbStore == null){
-	    dbStore = new DbStore();
-	}
-	return dbStore;
-    }
-
     public org.verisign.joid.Association 
 	generateAssociation(AssociationRequest req, Crypto crypto) 
 	throws OpenIdException

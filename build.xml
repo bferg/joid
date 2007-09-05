@@ -43,9 +43,14 @@
 				<exclude name="**/package.html"/>
 				<exclude name="examples/*"/>
 			</packageset>
+			<packageset dir="${src.hibernate}" defaultexcludes="yes">
+				<exclude name="**/package.html"/>
+				<exclude name="lib/*"/>
+			</packageset>
 
 			<classpath refid="compile.classpath"/>
 			<classpath location="${classes}"/>
+			<classpath location="${classes.hibernate}"/>
 		</javadoc>
 	</target>
 
@@ -83,6 +88,9 @@
 				<include name="examples/**/*.class"/>
 			</fileset>
 		</jar>
+		<jar jarfile="${hibernate_store_jar}">
+			<fileset dir="${classes.hibernate}"/>
+		</jar>
 		<war webxml="${examples}/server/web.xml"
 		     basedir="./examples/server" destfile="${joid_examples_war}">
 			<!-- todo: put all the examples stuff together in a single module -->
@@ -111,6 +119,11 @@
 				<exclude name="**/org.verisign.joid.db.hibernate.cfg.xml"/>
                 <exclude name="**/log4j.properties"/>
             </fileset>
+		</copy>
+		<copy todir="${classes.hibernate}">
+			<fileset dir="${src.hibernate}">
+				<include name="**/*.hbm.xml"/>
+			</fileset>
 		</copy>
 	</target>
 

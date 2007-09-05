@@ -29,8 +29,9 @@ public class AssociationResponse extends Response
 {
     private final static Logger log 
 	= Logger.getLogger(AssociationResponse.class);
-    private static String OPENID_SESSION_TYPE = "session_type";
-    private static String OPENID_ASSOCIATION_TYPE = "assoc_type";
+    // package scope so that ResponseFactory can trigger on this key
+    static String OPENID_SESSION_TYPE = "session_type";
+    static String OPENID_ASSOCIATION_TYPE = "assoc_type";
 
     private static String OPENID_ERROR_CODE = "error_code";
     private static String OPENID_ASSOCIATION_HANDLE = "assoc_handle";
@@ -106,7 +107,11 @@ public class AssociationResponse extends Response
 	if (errorCode != null){
 	    map.put(AssociationResponse.OPENID_ERROR_CODE, errorCode);
 	} else {
-	    map.put(AssociationResponse.OPENID_SESSION_TYPE, sessionType);
+        if (!(!isVersion2()  // OpenID 1.x
+              && AssociationRequest.NO_ENCRYPTION.equals(sessionType))) {
+            // do not send session type for 1.1 responses if it is no-encryption
+            map.put(AssociationResponse.OPENID_SESSION_TYPE, sessionType);
+        }
 	    map.put(AssociationResponse.OPENID_ASSOCIATION_HANDLE, 
 		    associationHandle);
 	    map.put(AssociationResponse.OPENID_ASSOCIATION_TYPE, 

@@ -57,7 +57,9 @@ public class ResponseFactory
 	}
 
 	Set set = map.keySet();
-	if (set.contains(AssociationResponse.OPENID_ENC_MAC_KEY)){
+	if ((set.contains(AssociationResponse.OPENID_SESSION_TYPE) && 
+         set.contains(AssociationResponse.OPENID_ENC_MAC_KEY)) ||
+        set.contains(AssociationResponse.OPENID_ASSOCIATION_TYPE)){
 	    return new AssociationResponse(map);
 	} else if (set.contains(AuthenticationResponse.OPENID_SIG)){
 	    return new AuthenticationResponse(map);

@@ -171,7 +171,7 @@ public class AuthenticationRequest extends Request {
 	 * Returns whether this request is immediate, that is, whether the
 	 * authentication mode is "CHECKID_IMMEDIATE".
 	 *
-	 * @return trut if this request is immediate; false otherwise.
+	 * @return true if this request is immediate; false otherwise.
 	 */
 	public boolean isImmediate() {
 		return AuthenticationRequest.CHECKID_IMMEDIATE
@@ -189,7 +189,12 @@ public class AuthenticationRequest extends Request {
 			throw new OpenIdException("claimed_id not valid in version 1.x");
 		}
 		if (trustRoot == null) {
-			throw new OpenIdException("Missing trust root");
+            if (!this.isVersion2() && returnTo != null) {
+                trustRoot = returnTo;
+            }
+            else {
+                throw new OpenIdException("Missing trust root");
+            }
 		}
 
 		checkTrustRoot();

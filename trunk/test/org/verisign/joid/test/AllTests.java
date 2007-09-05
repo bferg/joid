@@ -790,9 +790,11 @@ public class AllTests extends TestCase
 	    +"&openid.trust_root=";
 
 	try {
+	    // no longer throws an exception because an unspecified
+	    // trust_root is assumed to be the return_to url
 	    Request req = RequestFactory.parse(s);
-	    assertTrue(false);
-	} catch (OpenIdException expected){
+	} catch (OpenIdException unexpected){
+        assertTrue(false);
 	}
     }
 

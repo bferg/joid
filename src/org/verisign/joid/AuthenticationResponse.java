@@ -117,6 +117,9 @@ public class AuthenticationResponse extends Response
 	    String value = (String) mapEntry.getValue();
 	    map.put(SimpleRegistration.OPENID_SREG +"."+ key, value);
 	}
+    if (!set.isEmpty() && isVersion2()) {
+        map.put(Message.OPENID_NS + ".sreg", SimpleRegistration.OPENID_SREG_NAMESPACE);
+    }
 
 	return map;
     }

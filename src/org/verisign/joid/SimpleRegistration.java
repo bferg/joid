@@ -56,6 +56,8 @@ public class SimpleRegistration
     public final static String OPENID_SREG_POLICY_URL 
 	= OPENID_SREG + ".policy_url";
 
+    public final static String OPENID_SREG_NAMESPACE = "http://openid.net/extensions/sreg/1.1";
+
     private final static String SREG_NICKNAME = "nickname";
     private final static String SREG_EMAIL = "email";
     private final static String SREG_FULLNAME = "fullname";

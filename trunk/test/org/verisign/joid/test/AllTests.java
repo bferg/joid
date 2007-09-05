@@ -505,12 +505,17 @@ public class AllTests extends TestCase
 	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
 
-
 	// check that we can authenticate the signaure
 	//
 	Map map = authr.toMap();
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
+
+    // Check for sreg namespace
+    if (resp.isVersion2()) {
+        assertEquals((String)map.get("openid.ns.sreg"), 
+                     SimpleRegistration.OPENID_SREG_NAMESPACE);
+    }
 
 	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());

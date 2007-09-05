@@ -206,6 +206,31 @@ public class AllTests extends TestCase
 	assertFalse(openId.isAuthenticationRequest(s));
     }
 
+    // Test no encryption 1.1 association request
+    public void testAssocNoEncryption() throws Exception
+    {
+	String s = Utils.readFileAsString("5.txt");
+
+	Request req = RequestFactory.parse(s);
+	assertTrue(req instanceof AssociationRequest);
+	Response resp = req.processUsing(serverInfo);
+	assertTrue(resp instanceof AssociationResponse);
+
+	s = resp.toUrlString();
+
+	Response resp2 = ResponseFactory.parse(s);
+	assertTrue(resp2 instanceof AssociationResponse);
+	AssociationResponse ar = (AssociationResponse) resp2;
+
+	assertTrue(null == ar.getSessionType());
+	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
+	assertTrue(defaultLifespan == ar.getExpiresIn());
+	assertTrue(null != ar.getMacKey());
+	assertTrue(null == ar.getEncryptedMacKey());
+	assertTrue(null == ar.getDhServerPublic());
+	assertTrue(null == ar.getErrorCode());
+    }
+
     public void testMarshall() throws Exception
     {
 	DiffieHellman dh = new DiffieHellman(p, g);

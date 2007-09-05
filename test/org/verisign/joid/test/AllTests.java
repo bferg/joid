@@ -356,7 +356,8 @@ public class AllTests extends TestCase
 	assertTrue(resp2 instanceof AuthenticationResponse);
 	AuthenticationResponse authr = (AuthenticationResponse) resp2;
 	assertFalse(authr.isVersion2());
-
+    assertTrue(null == authr.getUrlEndPoint());
+    
 	String sigList = authr.getSignedList();
 	assertTrue(sigList != null);
 	String signature = authr.getSignature();
@@ -669,6 +670,7 @@ public class AllTests extends TestCase
 	assertTrue(resp2 instanceof AuthenticationResponse);
 	assertTrue(resp2.isVersion2());
 	AuthenticationResponse authr = (AuthenticationResponse) resp;
+    assertTrue(null != authr.getUrlEndPoint());
 
 	String sigList = authr.getSignedList();
 	assertTrue(sigList != null);

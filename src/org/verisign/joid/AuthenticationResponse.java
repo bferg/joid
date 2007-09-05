@@ -88,8 +88,10 @@ public class AuthenticationResponse extends Response
     public Map toMap()
     {
 	Map map = super.toMap();
-	
-	map.put(AuthenticationResponse.OPENID_OP_ENDPOINT, urlEndPoint);
+
+    if (isVersion2()) {
+        map.put(AuthenticationResponse.OPENID_OP_ENDPOINT, urlEndPoint);
+    }
 	map.put(AuthenticationResponse.OPENID_MODE, mode);
 	map.put(AuthenticationResponse.OPENID_IDENTITY, identity);
 	map.put(AuthenticationResponse.OPENID_RETURN_TO, returnTo);

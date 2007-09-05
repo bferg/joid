@@ -28,8 +28,10 @@ import org.apache.log4j.Logger;
 
 /**
  * Parses an OpenID message. 
+ *
+ * TODO: Made public only for unit tests. 
  */
-class MessageParser
+public class MessageParser
 {
     private final static Logger log = Logger.getLogger(MessageParser.class);
     static char newline = '\n'; 
@@ -97,18 +99,23 @@ class MessageParser
 	return n;
     }
 
-    static Map urlEncodedToMap(String query) 
+    /**
+     * Translate a query string to a Map.  
+     *
+     * TODO: Made public only for unit tests. Do not use.
+     */
+    public static Map urlEncodedToMap(String query) 
 	throws UnsupportedEncodingException
     {
 	Map map = new HashMap();
 	if (query == null) {
 	    return map;
 	}
-	StringTokenizer st = new StringTokenizer(query, "?&=", true);
+	StringTokenizer st = new StringTokenizer(query, "?&=;", true);
 	String previous = null;
 	while (st.hasMoreTokens()) {
 	    String current = st.nextToken();
-	    if ("?".equals(current) || "&".equals(current)) {
+	    if ("?".equals(current) || "&".equals(current) || ";".equals(current)) {
 		//ignore
 	    } else if ("=".equals(current)) {
 		String name = URLDecoder.decode(previous, "UTF-8");
@@ -127,7 +134,7 @@ class MessageParser
 
     private static boolean isGoodValue(String value)
     {
-	if ("&".equals(value)){
+	if ("&".equals(value) || ";".equals(value)){
 	    return false;
 	}
 	// more tests here perchance

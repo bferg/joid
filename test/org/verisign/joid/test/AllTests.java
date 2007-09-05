@@ -25,6 +25,7 @@ import org.verisign.joid.CheckAuthenticationRequest;
 import org.verisign.joid.CheckAuthenticationResponse;
 import org.verisign.joid.Crypto;
 import org.verisign.joid.DiffieHellman;
+import org.verisign.joid.MessageParser;
 import org.verisign.joid.OpenId;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.Request;
@@ -131,6 +132,21 @@ public class AllTests extends TestCase
 	assertTrue(resp2 instanceof AssociationResponse);
 	AssociationResponse ar = (AssociationResponse) resp;
 	return ar;
+    }
+
+    
+    public void testUrlToMap() throws Exception
+    {
+        String testStr = "path?foo=bar&baz=qux";
+        Map map = MessageParser.urlEncodedToMap(testStr);
+        assertTrue(map.size() == 2);
+        assertTrue(((String)map.get("foo")).equals("bar"));
+        assertTrue(((String)map.get("baz")).equals("qux"));
+        testStr = "path?foo=bar;baz=qux";
+        map = MessageParser.urlEncodedToMap(testStr);
+        assertTrue(map.size() == 2);
+        assertTrue(((String)map.get("foo")).equals("bar"));
+        assertTrue(((String)map.get("baz")).equals("qux"));
     }
 
 

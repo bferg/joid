@@ -1,10 +1,12 @@
 package org.verisign.joid.consumer;
 
-import java.io.IOException;
+import org.verisign.joid.OpenIdException;
+
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
 import java.net.HttpURLConnection;
+import java.net.URL;
 
 /**
  *
@@ -13,7 +15,10 @@ import java.net.HttpURLConnection;
  * Time: 5:05:52 PM
  */
 public class Discoverer {
-	public ServerAndDelegate findIdServer(String identityUrl) throws IOException {
+
+    public ServerAndDelegate findIdServer(String identityUrl)
+            throws IOException, OpenIdException
+    {
 		ServerAndDelegate serverAndDelegate = new ServerAndDelegate();
 		BufferedReader in = null;
 		try {
@@ -38,10 +43,14 @@ public class Discoverer {
 		} finally {
 			if (in != null) in.close();
 		}
-		return serverAndDelegate;
+        if(serverAndDelegate.getServer() == null){
+            throw new OpenIdException("No openid.server found on identity page.");
+        }
+        return serverAndDelegate;
 	}
 
-	private String findLinkTag(String str, String rel, BufferedReader in) throws IOException {
+	private String findLinkTag(String str, String rel, BufferedReader in)
+            throws IOException {
 		int index = str.indexOf(rel);
 		if(index != -1){
 			// todo: ensure it's a proper link tag

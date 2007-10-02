@@ -110,7 +110,7 @@ public class OpenIdServlet extends HttpServlet
         try {
             boolean isAuth = openId.isAuthenticationRequest(query);
             HttpSession session = request.getSession(true);
-            String user = loggedIn(request);
+            String user = getLoggedIn(request);
             System.out.println("[OpenIdServlet] Logged in as: " + user);
             if (isAuth && user == null) {
                 // todo: should ask user to accept realm even if logged in, but only once
@@ -168,7 +168,12 @@ public class OpenIdServlet extends HttpServlet
         }
     }
 
-    private String loggedIn(HttpServletRequest request)
+    /**
+     *
+     * @param request
+     * @return Username the user is logged in as
+     */
+    public static String getLoggedIn(HttpServletRequest request)
     {
         String o = (String) request.getSession(true).getAttribute(USERNAME_ATTRIBUTE);
         if (o != null) return o;
@@ -185,6 +190,15 @@ public class OpenIdServlet extends HttpServlet
             }
         }
         return o;
+    }
+
+    /**
+     *
+     * @param request
+     * @param username if null, will logout
+     */
+    public static void setLoggedIn(HttpServletRequest request, String username){
+        request.getSession(true).setAttribute(USERNAME_ATTRIBUTE, username);
     }
 
     private void returnError(String query, HttpServletResponse response)

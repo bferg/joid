@@ -5,14 +5,14 @@
 
 To use JOID as a Consumer, there are basically two steps.
 
-# Add OpenIdFilter to your web.xml
-# Create an OpenID login form
+  # Add OpenIdFilter to your web.xml
+  # Create an OpenID login form
 
 == OpenIdFilter ==
 
 Add the following to web.xml
 {{{
-<filter>
+        <filter>
 		<filter-name>OpenIdFilter</filter-name>
 		<filter-class>org.verisign.joid.consumer.OpenIdFilter</filter-class>
 		<init-param>
@@ -28,6 +28,10 @@ Add the following to web.xml
 		</init-param>
 		-->
 	</filter>
+        <filter-mapping>
+		<filter-name>OpenIdFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 }}}
 
 == OpenID Form ==

@@ -153,7 +153,7 @@ public class JoidConsumer
         ServerAndDelegate idserver = null;
         try {
             idserver = discoverer.findIdServer(identity);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new OpenIdException("Could not get OpenId server from " +
                     "identifier.", e);

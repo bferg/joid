@@ -23,6 +23,11 @@ public class UrlUtils {
         return ret;
 	}
 
+    /**
+     *
+     * @param request
+     * @return the host url without the context
+     */
     public static String getHostUrl(HttpServletRequest request)
     {
         String scheme = request.getScheme();

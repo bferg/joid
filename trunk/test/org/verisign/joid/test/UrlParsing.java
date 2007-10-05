@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public class UrlParsing extends TestCase{
 	
-	public void testGettingServerAndDelegate() throws IOException {
+	public void testGettingServerAndDelegate() throws Exception {
 		Discoverer discoverer = new Discoverer();
 
 		ServerAndDelegate serverAndDelegate = discoverer.findIdServer("http://netevil.org/blog/2007/06/howto-set-yourself-up-with-an-openid");

@@ -50,7 +50,7 @@ public class ServerInfo
 	this.crypto = crypto;
     }
 
-    String getUrlEndPoint(){return urlEndPoint;}
-    Store getStore(){return store;}
-    Crypto getCrypto(){return crypto;}
+    public String getUrlEndPoint(){return urlEndPoint;}
+    public Store getStore(){return store;}
+    public Crypto getCrypto(){return crypto;}
 }

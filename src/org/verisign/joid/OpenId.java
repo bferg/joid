@@ -73,6 +73,13 @@ public class OpenId
 	}
     }
 
+    /**
+     * Return the server info
+     */
+    public ServerInfo getServerInfo ()
+    {
+        return serverInfo;
+    }
 
     /**
      * Call this method if the data is posted by way of HTTP POST

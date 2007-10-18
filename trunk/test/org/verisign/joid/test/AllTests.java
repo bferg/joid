@@ -43,9 +43,11 @@ import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -959,4 +961,101 @@ public class AllTests extends TestCase
 	assertTrue(map.containsKey("foo.bar"));
     }
 
+    public void xtestAssociateSHA256 () throws Exception
+    {
+        String s = "openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.session_type=DH-SHA256"
+            + "&openid.assoc_type=HMAC-SHA256"
+            + "&openid.mode=associate"
+            + "&openid.dh_consumer_public=AJvqGzvFfjNk4LYWn8ZHSM7QyQnvxaaYUNwpSn089xdgBJx2okrYOWPesAl1%2B1oosnKPej6WBN9h2glimmv2g80h%2FAkDHLWU692efHdVhxnt4ZryI9SWAP0CIbznMs%2BphjGev4nS%2B5bLSR0lAbtvS7YQhiwfCJVrK5RrwplhZPzM";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AssociationRequest);
+        AssociationRequest areq = (AssociationRequest) req;
+        assertTrue(areq.isVersion2());
+
+        // should not cause an exception in diffiehellman 
+        Response resp = req.processUsing(serverInfo);  
+        assertTrue(resp instanceof AssociationResponse);
+        AssociationResponse aresp = (AssociationResponse) resp;
+        assertTrue(aresp.isVersion2());
+        System.out.println("assoc resp: " + aresp.toString());
+    }
+
+    public void testAssociate20 () throws Exception
+    {
+        String s = "openid.dh_consumer_public=GXmne0vGvF%2Fw9RHrk4McrUgxq3dmwURoKPhkrVdtBVNZtRlulFau2SBf%2FFT7JRo5LEcqY5CrctJlk%2B7YFcAyOX9VGd%2BmPfIE6cGPCTxy26USiJgjMEFPtkIRzT1y8lC7ypXvjZ5p0Q1hSg%2FuKdz1v0RAPICrVUrZ%2FgASGuqIpvQ%3D"
+            + "&openid.assoc_type=HMAC-SHA1"
+            + "&openid.session_type=DH-SHA1"
+            + "&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.mode=associate";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AssociationRequest);
+        AssociationRequest areq = (AssociationRequest) req;
+        assertTrue(areq.isVersion2());
+
+        Response resp = req.processUsing(serverInfo);  
+        assertTrue(resp instanceof AssociationResponse);
+        AssociationResponse aresp = (AssociationResponse) resp;
+        assertTrue(aresp.isVersion2());
+        
+        // validate 2.0 association response
+        Set validParams = new HashSet(Arrays.asList(new String[] { 
+                    "assoc_handle",
+                    "assoc_type",
+                    "dh_server_public",
+                    "enc_mac_key",
+                    "expires_in",
+                    "mac_key",
+                    "ns",
+                    "session_type"}));
+        String respStr = resp.toPostString();
+        String[] respParamStrs = respStr.split("\n");
+        for (int i = 0; i < respParamStrs.length; i++) {
+            String name = respParamStrs[i].substring(0, respParamStrs[i].indexOf(":"));
+            String value = respParamStrs[i].substring(respParamStrs[i].indexOf(":") + 1);
+            assertTrue("'" + name + "' not a valid association response parameter", 
+                       validParams.contains(name));
+            if (name.equals("ns")) {
+                assertTrue("Bad namespace: " + value,
+                           value.equals("http://specs.openid.net/auth/2.0"));
+            }
+        }
+    }
+
+    public void testAssociate1x () throws Exception
+    {
+        String s = "openid.dh_consumer_public=GXmne0vGvF%2Fw9RHrk4McrUgxq3dmwURoKPhkrVdtBVNZtRlulFau2SBf%2FFT7JRo5LEcqY5CrctJlk%2B7YFcAyOX9VGd%2BmPfIE6cGPCTxy26USiJgjMEFPtkIRzT1y8lC7ypXvjZ5p0Q1hSg%2FuKdz1v0RAPICrVUrZ%2FgASGuqIpvQ%3D"
+            + "&openid.assoc_type=HMAC-SHA1"
+            + "&openid.session_type=DH-SHA1"
+            + "&openid.mode=associate";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AssociationRequest);
+        AssociationRequest areq = (AssociationRequest) req;
+        assertFalse(areq.isVersion2());
+
+        Response resp = req.processUsing(serverInfo);  
+        assertTrue(resp instanceof AssociationResponse);
+        AssociationResponse aresp = (AssociationResponse) resp;
+        assertFalse(aresp.isVersion2());
+        
+        // validate 1.1 association response
+        Set validParams = new HashSet(Arrays.asList(new String[] { 
+                    "assoc_handle",
+                    "assoc_type",
+                    "dh_server_public",
+                    "enc_mac_key",
+                    "expires_in",
+                    "mac_key",
+                    "session_type"}));
+        String respStr = resp.toPostString();
+        String[] respParamStrs = respStr.split("\n");
+        for (int i = 0; i < respParamStrs.length; i++) {
+            String[] tmp = respParamStrs[i].split(":");
+            assertTrue("'" + tmp[0] + "' not a valid association response parameter", 
+                       validParams.contains(tmp[0]));
+        }
+    }
 }

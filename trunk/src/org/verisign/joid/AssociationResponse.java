@@ -33,6 +33,7 @@ public class AssociationResponse extends Response
     static String OPENID_SESSION_TYPE = "session_type";
     static String OPENID_ASSOCIATION_TYPE = "assoc_type";
 
+    private static String OPENID_ASSOC_NS = "ns";
     private static String OPENID_ERROR_CODE = "error_code";
     private static String OPENID_ASSOCIATION_HANDLE = "assoc_handle";
     private static String OPENID_MAC_KEY = "mac_key";
@@ -103,6 +104,14 @@ public class AssociationResponse extends Response
     Map toMap()
     {
 	Map map = super.toMap();
+
+        // remove "openid.ns" from map and replace with just "ns"
+        // openid prefix is invalid for association responses
+        String ns = (String)map.get(Message.OPENID_NS);
+        if (ns != null) {
+            map.put(OPENID_ASSOC_NS, ns);
+            map.remove(Message.OPENID_NS);
+        }
        
 	if (errorCode != null){
 	    map.put(AssociationResponse.OPENID_ERROR_CODE, errorCode);
@@ -187,6 +196,10 @@ public class AssociationResponse extends Response
 	    else if (OPENID_ERROR_CODE.equals(key)){
 		errorCode = value;	
 	    }
+            // set namespace using association ns key
+            else if (OPENID_ASSOC_NS.equals(key)) {
+                ns = value;
+            }
 	}
     }
 

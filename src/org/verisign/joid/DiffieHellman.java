@@ -179,7 +179,13 @@ public class DiffieHellman
 	}
 
         BigInteger shared = getSharedSecret(otherPublic);
-        byte[] hashed = Crypto.sha1(shared.toByteArray());
+        byte[] hashed;
+        if (secret.length == 32) {
+            hashed = Crypto.sha256(shared.toByteArray());
+        }
+        else {
+            hashed = Crypto.sha1(shared.toByteArray());
+        }
 
         if (secret.length != hashed.length) {
             log.warn("invalid secret byte[] length: secret="+secret.length
@@ -194,6 +200,3 @@ public class DiffieHellman
         return result;
     }
 }
-
-
-

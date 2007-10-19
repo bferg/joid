@@ -53,6 +53,18 @@ public class Crypto
     }
 
     /**
+     * Digests a message using SHA-256.
+     * @param text the bytes to digest.
+     * @return the digested bytes.
+     * @throws NoSuchAlgorithmException if SHA-256 is not available.
+     */
+    public static byte[] sha256(byte[] text) throws NoSuchAlgorithmException
+    {
+	MessageDigest d = MessageDigest.getInstance("SHA-256");
+	return d.digest(text);
+    }
+
+    /**
      * Signs a message using HMAC SHA1.
      *
      * @param key the key to sign with.

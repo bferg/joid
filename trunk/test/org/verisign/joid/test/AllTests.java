@@ -961,7 +961,7 @@ public class AllTests extends TestCase
 	assertTrue(map.containsKey("foo.bar"));
     }
 
-    public void xtestAssociateSHA256 () throws Exception
+    public void testAssociateSHA256 () throws Exception
     {
         String s = "openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
             + "&openid.session_type=DH-SHA256"

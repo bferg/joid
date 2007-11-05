@@ -13,7 +13,7 @@ There are two pieces required to run the server:
 
 You'll need the following in your classpath along with joid.jar.
 
-  * log4j-X.jar
+  * commons-logging-1.X.jar
   * tsik.jar
 
 ==web.xml==

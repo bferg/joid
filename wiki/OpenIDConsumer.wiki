@@ -37,3 +37,6 @@ Add the following to web.xml
 == OpenID Form ==
 
 This form will accept a users OpenID URL identifier and upon submit, it redirects to the OpenID server identified by the URL and asks the user to accept the authentication request. 
+
+See here for example pages you can use and modify:
+http://joid.googlecode.com/svn/trunk/examples/server/

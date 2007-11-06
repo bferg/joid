@@ -18,7 +18,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import java.io.UnsupportedEncodingException;
 
 /**

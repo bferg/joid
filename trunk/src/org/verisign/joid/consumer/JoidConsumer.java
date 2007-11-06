@@ -1,7 +1,8 @@
 package org.verisign.joid.consumer;
 
 import org.verisign.joid.*;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -33,7 +34,7 @@ import java.util.Properties;
 public class JoidConsumer
 {
 
-    private static Logger log = Logger.getLogger(JoidConsumer.class);
+    private static Log log = LogFactory.getLog(JoidConsumer.class);
 
     private Map/*<String, Properties>*/ propSingleton;
     private Map/*<String, String>*/ handleToIdServer;

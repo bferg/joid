@@ -14,14 +14,15 @@
 package org.verisign.joid;
 
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Represents an OpenID request. Valid for OpenID 1.1 and 2.0 namespace.
  */
 public abstract class Request extends Message
 {
-    private final static Logger log = Logger.getLogger(Request.class);
+    private final static Log log = LogFactory.getLog(Request.class);
 
 
     Request(Map map, String mode)

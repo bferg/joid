@@ -13,7 +13,8 @@
 
 package org.verisign.joid.db;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.verisign.joid.server.AssociationImpl;
 
 /**
@@ -21,6 +22,6 @@ import org.verisign.joid.server.AssociationImpl;
  */
 public class Association extends AssociationImpl implements org.verisign.joid.Association
 {
-    private final static Logger log = Logger.getLogger(Association.class);
+    private final static Log log = LogFactory.getLog(Association.class);
 
 }

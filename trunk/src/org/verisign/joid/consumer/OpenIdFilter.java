@@ -1,10 +1,12 @@
 package org.verisign.joid.consumer;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -29,7 +31,7 @@ import java.util.Set;
  * Time: 6:50:15 PM
  */
 public class OpenIdFilter implements Filter {
-	private static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(OpenIdFilter.class);
+	private static Log log = LogFactory.getLog(OpenIdFilter.class);
 	private static JoidConsumer joid = new JoidConsumer();
 	public static final String OPENID_ATTRIBUTE = "openid.identity"; // todo: remove one of these
 	public static final String OPENID_IDENTITY = OPENID_ATTRIBUTE;

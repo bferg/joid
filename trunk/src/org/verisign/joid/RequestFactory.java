@@ -19,14 +19,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Produces requests from incoming queries.
  */
 public class RequestFactory
 {
-    private final static Logger log = Logger.getLogger(RequestFactory.class);
+    private final static Log log = LogFactory.getLog(RequestFactory.class);
 
     private RequestFactory(){}
 

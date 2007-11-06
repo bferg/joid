@@ -1,6 +1,7 @@
 package org.verisign.joid.server;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.verisign.joid.AuthenticationRequest;
 import org.verisign.joid.Crypto;
 import org.verisign.joid.OpenId;
@@ -35,7 +36,7 @@ import java.util.Map;
  */
 public class OpenIdServlet extends HttpServlet
 {
-    private static Logger log = Logger.getLogger(OpenIdServlet.class);
+    private static Log log = LogFactory.getLog(OpenIdServlet.class);
     private static final long serialVersionUID = 297366254782L;
     private static OpenId openId;
     private Store store;

@@ -21,7 +21,8 @@ import java.security.SecureRandom;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.apache.tsik.datatypes.Base64;
 import org.apache.tsik.uuid.UUID;
 import org.verisign.joid.AssociationRequest;
@@ -38,7 +39,7 @@ public class Crypto
     public Crypto() {}
 
     private DiffieHellman dh;
-    private final static Logger log = Logger.getLogger(Crypto.class);
+    private final static Log log = LogFactory.getLog(Crypto.class);
 
     /**
      * Digests a message using SHA-1.

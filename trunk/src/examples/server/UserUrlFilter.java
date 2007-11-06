@@ -1,6 +1,7 @@
 package examples.server;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -20,7 +21,7 @@ import java.net.URLDecoder;
  */
 public class UserUrlFilter implements Filter
 {
-    private static Logger log = Logger.getLogger(UserUrlFilter.class);
+    private static Log log = LogFactory.getLog(UserUrlFilter.class);
     private String idJsp;
 
     public void init(FilterConfig filterConfig) throws ServletException

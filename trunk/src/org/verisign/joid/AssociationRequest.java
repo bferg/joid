@@ -20,15 +20,16 @@ import java.util.HashMap;
 import java.util.Set;
 import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Represents an OpenID association request.
  */
 public class AssociationRequest extends Request
 {
-    private final static Logger log 
-	= Logger.getLogger(AssociationRequest.class);
+    private final static Log log
+	= LogFactory.getLog(AssociationRequest.class);
 
     private String sessionType;
     private String associationType;

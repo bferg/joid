@@ -20,7 +20,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Simple registration extensions, as defined by
@@ -33,8 +34,8 @@ import org.apache.log4j.Logger;
  */
 public class SimpleRegistration
 {
-    private final static Logger log 
-	= Logger.getLogger(SimpleRegistration.class);
+    private final static Log log
+	= LogFactory.getLog(SimpleRegistration.class);
 
     private Set required;
     private Set optional;

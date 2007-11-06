@@ -24,7 +24,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Parses an OpenID message. 
@@ -33,7 +34,7 @@ import org.apache.log4j.Logger;
  */
 public class MessageParser
 {
-    private final static Logger log = Logger.getLogger(MessageParser.class);
+    private final static Log log = LogFactory.getLog(MessageParser.class);
     static char newline = '\n'; 
 
     /**

@@ -1,6 +1,7 @@
 package org.verisign.joid.server;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.Crypto;
 
@@ -16,7 +17,7 @@ import java.text.SimpleDateFormat;
  */
 public class AssociationImpl implements org.verisign.joid.Association {
 
-	private final static Logger log = Logger.getLogger(AssociationImpl.class);
+	private final static Log log = LogFactory.getLog(AssociationImpl.class);
     private Long id;
     private String mode;
     private String handle;

@@ -20,15 +20,16 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Represents an OpenID association response.
  */
 public class AssociationResponse extends Response
 {
-    private final static Logger log 
-	= Logger.getLogger(AssociationResponse.class);
+    private final static Log log 
+	= LogFactory.getLog(AssociationResponse.class);
     // package scope so that ResponseFactory can trigger on this key
     static String OPENID_SESSION_TYPE = "session_type";
     static String OPENID_ASSOCIATION_TYPE = "assoc_type";

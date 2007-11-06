@@ -13,7 +13,8 @@
 
 package org.verisign.joid.db;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.verisign.joid.server.NonceImpl;
 
 /**
@@ -21,6 +22,6 @@ import org.verisign.joid.server.NonceImpl;
  */
 public class Nonce extends NonceImpl implements org.verisign.joid.Nonce
 {
-    private final static Logger log = Logger.getLogger(Nonce.class);
+    private final static Log log = LogFactory.getLog(Nonce.class);
 
 }

@@ -22,7 +22,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.apache.tsik.datatypes.DateTime;
 
 /**
@@ -30,7 +31,7 @@ import org.apache.tsik.datatypes.DateTime;
  */
 public class AuthenticationResponse extends Response
 {
-    private static Logger log = Logger.getLogger(AuthenticationResponse.class);
+    private static Log log = LogFactory.getLog(AuthenticationResponse.class);
 
     public static String OPENID_RETURN_TO = "openid.return_to";
     public static String OPENID_OP_ENDPOINT = "openid.op_endpoint";

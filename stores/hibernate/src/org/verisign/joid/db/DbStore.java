@@ -15,7 +15,8 @@ package org.verisign.joid.db;
 
 import java.util.Date;
 import java.util.List;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -29,7 +30,7 @@ import org.verisign.joid.Store;
  */
 public class DbStore extends Store
 {
-    private final static Logger log = Logger.getLogger(DbStore.class);
+    private final static Log log = LogFactory.getLog(DbStore.class);
 
     private long associationLifetime = 600;
 

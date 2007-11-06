@@ -15,7 +15,8 @@ package org.verisign.joid;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import org.verisign.joid.Crypto;
 
 /**
@@ -41,7 +42,7 @@ import org.verisign.joid.Crypto;
  */
 public class OpenId
 {
-    private final static Logger log = Logger.getLogger(OpenId.class);
+    private final static Log log = LogFactory.getLog(OpenId.class);
     private ServerInfo serverInfo;
 
     /**

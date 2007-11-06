@@ -13,7 +13,8 @@
 
 package org.verisign.joid;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,8 +27,8 @@ import java.util.Iterator;
  */
 public class CheckAuthenticationResponse extends Response
 {
-    private final static Logger log
-	= Logger.getLogger(CheckAuthenticationResponse.class);
+    private final static Log log
+	= LogFactory.getLog(CheckAuthenticationResponse.class);
 
     private boolean isValid;
 

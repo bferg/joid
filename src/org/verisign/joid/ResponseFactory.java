@@ -20,14 +20,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Produces requests from incoming queries.
  */
 public class ResponseFactory
 {
-    private final static Logger log = Logger.getLogger(ResponseFactory.class);
+    private final static Log log = LogFactory.getLog(ResponseFactory.class);
 
     private ResponseFactory(){}
 

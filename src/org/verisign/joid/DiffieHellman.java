@@ -16,7 +16,8 @@ package org.verisign.joid;
 import org.apache.tsik.uuid.UUID;
 import java.security.SecureRandom;
 import java.math.BigInteger;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import java.security.NoSuchAlgorithmException;
 import org.apache.tsik.datatypes.Base64;
 
@@ -30,7 +31,7 @@ public class DiffieHellman
     private BigInteger privateKey;
     private BigInteger publicKey;
 
-    private final static Logger log = Logger.getLogger(DiffieHellman.class);
+    private final static Log log = LogFactory.getLog(DiffieHellman.class);
 
     private DiffieHellman() {}
 

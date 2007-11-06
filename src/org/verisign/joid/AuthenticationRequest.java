@@ -23,14 +23,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Arrays;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Represents an OpenID authentication request.
  */
 public class AuthenticationRequest extends Request {
-	private final static Logger log
-			= Logger.getLogger(AuthenticationRequest.class);
+	private final static Log log
+			= LogFactory.getLog(AuthenticationRequest.class);
 
 	private Map extendedMap;
 

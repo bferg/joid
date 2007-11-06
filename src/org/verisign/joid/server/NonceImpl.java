@@ -1,6 +1,7 @@
 package org.verisign.joid.server;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 import java.util.Date;
 import java.text.SimpleDateFormat;
@@ -12,7 +13,7 @@ import java.text.SimpleDateFormat;
  */
 public class NonceImpl implements org.verisign.joid.Nonce
 {
-    private final static Logger log = Logger.getLogger(NonceImpl.class);
+    private final static Log log = LogFactory.getLog(NonceImpl.class);
     private Long id;
     private String nonce;
     private Date checkedDate;

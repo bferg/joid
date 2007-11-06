@@ -18,7 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Represents an OpenID check authentication request.
@@ -27,8 +28,8 @@ public class CheckAuthenticationRequest extends Request
 {
     public final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
 
-    private final static Logger log 
-	= Logger.getLogger(CheckAuthenticationRequest.class);
+    private final static Log log
+	= LogFactory.getLog(CheckAuthenticationRequest.class);
 
     private AuthenticationResponse ar;
     private String handle;

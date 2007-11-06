@@ -19,14 +19,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 
 /**
  * Represents an OpenID response. Valid for OpenID 1.1 and 2.0 namespace.
  */
 public abstract class Response extends Message
 {
-    private final static Logger log = Logger.getLogger(Response.class);
+    private final static Log log = LogFactory.getLog(Response.class);
     static String OPENID_ERROR = "error";
 
     String error;

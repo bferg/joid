@@ -225,17 +225,20 @@ public class AuthenticationRequest extends Request {
 				entries.add(key);
 			}
 		}
-		for (Iterator iter = entries.iterator(); iter.hasNext();) {
-			String key = (String) iter.next();
-			int period = key.indexOf('.');
-			if (period != -1) {
-				key = key.substring(0, period);
-			}
-			if (!namespaces.contains(key)) {
-				throw new OpenIdException("No such namespace: " + key);
-			}
-		}
-
+        // don't check for invalid parameters on 1.x requests; just
+        // silently ignore them
+        if (this.isVersion2()) {
+            for (Iterator iter = entries.iterator(); iter.hasNext();) {
+                String key = (String) iter.next();
+                int period = key.indexOf('.');
+                if (period != -1) {
+                    key = key.substring(0, period);
+                }
+                if (!namespaces.contains(key)) {
+                    throw new OpenIdException("No such namespace: " + key);
+                }
+            }
+        }
 	}
 
 	private void checkTrustRoot() throws OpenIdException {

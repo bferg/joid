@@ -1058,4 +1058,44 @@ public class AllTests extends TestCase
                        validParams.contains(tmp[0]));
         }
     }
+
+    public void testAuthenticate1xWithInvalidParam () throws Exception
+    {
+        // Some RPs have been using the post_grant parameter that was
+        // eliminated in 2005; for 1.x requests we should just ignore
+        // unrecognized parameters
+        String s = "openid.identity=http%3A%2F%2Fhans.beta.abtain.com%2F"
+            +"&openid.mode=checkid_setup"
+            +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
+            +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_no"
+            +"nce%3D2006-12-"
+            +"06T04%253A54%253A51ZQvGYW3"
+            +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
+            +"&openid.post_grant=return";
+        try {
+            Request req = RequestFactory.parse(s);
+            assertTrue(req instanceof AuthenticationRequest);
+        } catch (OpenIdException unexpected){
+            assertTrue("Should not throw an exception on unrecognized parameter", false);
+        }
+    }
+
+    public void testAuthenticate2xWithInvalidParam () throws Exception
+    {
+        String s = "openid.identity="
+            +"http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            +"&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            +"&openid.mode=checkid_setup"
+            +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
+            +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_no"
+            +"nce%3D2006-12-"
+            +"06T04%253A54%253A51ZQvGYW3"
+            +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
+            +"&openid.foo=trycke%20e%20for%20mycke";
+        try {
+            Request req = RequestFactory.parse(s);
+            assertTrue("Should throw an exception on unrecognized parameter", false);
+            assertTrue(req instanceof AuthenticationRequest);
+        } catch (OpenIdException expected) {}
+    }
 }

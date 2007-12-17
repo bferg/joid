@@ -1098,4 +1098,23 @@ public class AllTests extends TestCase
             assertTrue(req instanceof AuthenticationRequest);
         } catch (OpenIdException expected) {}
     }
+
+    // Check that the trust_root/realm gets set to the return_to
+    // parameter if it is unspecified
+    public void testAuthenticate2xDumbModeWithNoRealm () throws Exception
+    {
+        String s = "openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.claimed_id=http%3A%2F%2Ffoo.pip.verisignlabs.com%2F"
+            + "&openid.identity=http%3A%2F%2Ffoo.pip.verisignlabs.com%2F"
+            + "&openid.return_to=http%3A%2F%2Fbar.com%2Fadmin%2FLogin"
+            + "&openid.mode=checkid_setup";
+        try {
+            Request req = RequestFactory.parse(s);
+            assertTrue(req instanceof AuthenticationRequest);
+            AuthenticationRequest areq = (AuthenticationRequest) req;
+            assertEquals("trust_root should be equal to return_to", areq.getTrustRoot(), "http://bar.com/admin/Login");
+        } catch (OpenIdException unexpected) {
+            assertTrue("Should not throw an exception, threw '" + unexpected.getMessage() + "'", false);
+        }
+    }
 }

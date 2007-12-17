@@ -190,7 +190,7 @@ public class AuthenticationRequest extends Request {
 			throw new OpenIdException("claimed_id not valid in version 1.x");
 		}
 		if (trustRoot == null) {
-            if (!this.isVersion2() && returnTo != null) {
+            if (returnTo != null) {
                 trustRoot = returnTo;
             }
             else {

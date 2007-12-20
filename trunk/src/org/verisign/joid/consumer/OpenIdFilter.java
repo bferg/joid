@@ -3,6 +3,7 @@ package org.verisign.joid.consumer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.verisign.joid.OpenIdRuntimeException;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -36,11 +37,12 @@ public class OpenIdFilter implements Filter {
 	public static final String OPENID_ATTRIBUTE = "openid.identity"; // todo: remove one of these
 	public static final String OPENID_IDENTITY = OPENID_ATTRIBUTE;
 	boolean saveIdentityUrlAsCookie = false;
-	private String cookieDomain;
+    private String cookieDomain;
     private List ignorePaths = new ArrayList();
+    private static boolean configuredProperly = false;
 
     public void init(FilterConfig filterConfig) throws ServletException {
-		log.debug("init OpenIdFilter");
+		log.info("init OpenIdFilter");
 		String saveInCookie = filterConfig.getInitParameter("saveInCookie");
 		if(saveInCookie != null){
 			saveIdentityUrlAsCookie = Boolean.parseBoolean(saveInCookie);
@@ -56,10 +58,23 @@ public class OpenIdFilter implements Filter {
                 this.ignorePaths.add(path);
             }
         }
+        configuredProperly = true;
         log.debug("end init OpenIdFilter");
 	}
 
-	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
+    /**
+     * This is to check to make sure the OpenIdFilter is setup propertly in the
+     * web.xml.
+     */
+    private static void ensureFilterConfiguredProperly()
+    {
+        if(!configuredProperly){
+//            log.warn("OpenIdFilter Not Configured Properly!");
+            throw new OpenIdRuntimeException("OpenIdFilter Not Configured Properly! Check your web.xml for OpenIdFilter.");
+        }
+    }
+
+    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse,
                          FilterChain filterChain) throws IOException, ServletException {
 		// basically just check for openId parameters
         HttpServletRequest request = (HttpServletRequest) servletRequest;
@@ -121,15 +136,16 @@ public class OpenIdFilter implements Filter {
 		return ret;
 	}
 
-	public void destroy() {
+    public void destroy() {
 
 	}
 
-	public static JoidConsumer joid() {
+    public static JoidConsumer joid() {
 		return joid;
 	}
 
-	public static String getCurrentUser(HttpSession session) {
-		return (String) session.getAttribute(OpenIdFilter.OPENID_ATTRIBUTE);
+    public static String getCurrentUser(HttpSession session) {
+        ensureFilterConfiguredProperly();
+        return (String) session.getAttribute(OpenIdFilter.OPENID_ATTRIBUTE);
 	}
 }

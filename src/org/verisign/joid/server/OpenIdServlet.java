@@ -112,7 +112,7 @@ public class OpenIdServlet extends HttpServlet
             boolean isAuth = openId.isAuthenticationRequest(query);
             HttpSession session = request.getSession(true);
             String user = getLoggedIn(request);
-            System.out.println("[OpenIdServlet] Logged in as: " + user);
+            log.debug("[OpenIdServlet] Logged in as: " + user);
             if (isAuth && user == null) {
                 // todo: should ask user to accept realm even if logged in, but only once
                 // ask user to accept this realm

@@ -110,7 +110,8 @@
            value="<%=getParam(request, "openid.realm")%>"/>
 
     <p>
-        Allow access to: <%=getParam(request, "openid.realm")%>?
+        Allow access to: <a href="<%=getParam(request, "openid.realm")%>"
+                    target="_blank"><%=getParam(request, "openid.realm")%></a>?
     </p>
     <table border="0">
         <tr>

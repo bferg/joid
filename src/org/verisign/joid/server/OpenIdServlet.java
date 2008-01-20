@@ -113,23 +113,39 @@ public class OpenIdServlet extends HttpServlet
             HttpSession session = request.getSession(true);
             String user = getLoggedIn(request);
             log.debug("[OpenIdServlet] Logged in as: " + user);
+
+            if (request.getParameter(AuthenticationRequest.OPENID_TRUST_ROOT ) != null){
+                session.setAttribute (
+                    AuthenticationRequest.OPENID_TRUST_ROOT,
+                    request.getParameter(AuthenticationRequest.OPENID_TRUST_ROOT));
+            }
+            if (request.getParameter(AuthenticationRequest.OPENID_RETURN_TO ) != null){
+                session.setAttribute(
+                    AuthenticationRequest.OPENID_RETURN_TO,
+                    request.getParameter(AuthenticationRequest.OPENID_RETURN_TO));
+            }
+            
             if (isAuth && user == null) {
                 // todo: should ask user to accept realm even if logged in, but only once
                 // ask user to accept this realm
                 RequestDispatcher rd = request.getRequestDispatcher(loginPage);
                 request.setAttribute(QUERY, query);
                 request.setAttribute(AuthenticationRequest.OPENID_REALM, request.getParameter(AuthenticationRequest.OPENID_REALM));
-                // would it be better to store these in the session? Much better for ajaxy apps
                 session.setAttribute(QUERY, query);
-                session.setAttribute(
+                //if claimed_id is null then use identity instead (because of diffs between v2 & v1 of spec)
+                if ( request.getParameter(AuthenticationRequest.OPENID_CLAIMED_ID) == null){
+                    session.setAttribute(
                         AuthenticationRequest.OPENID_CLAIMED_ID,
-                        request.getParameter(AuthenticationRequest.OPENID_CLAIMED_ID));
+                        request.getParameter (AuthenticationRequest.OPENID_IDENTITY));
+                } else {
+                    session.setAttribute(
+                         AuthenticationRequest.OPENID_CLAIMED_ID,
+                         request.getParameter (AuthenticationRequest.OPENID_CLAIMED_ID));
+                }
                 session.setAttribute(
                         AuthenticationRequest.OPENID_REALM,
                         request.getParameter(AuthenticationRequest.OPENID_REALM));
-                session.setAttribute(
-                        AuthenticationRequest.OPENID_RETURN_TO,
-                        request.getParameter(AuthenticationRequest.OPENID_RETURN_TO));
+               
 //                rd.forward(request, response);
                 response.sendRedirect(loginPage);
                 return;
@@ -142,10 +158,18 @@ public class OpenIdServlet extends HttpServlet
 //                String claimedId = (String) session.getAttribute(ID_CLAIMED);
                 /* Ensure that the previously claimed id is the same as the just
                 passed in claimed id. */
+                String identity;
+                if ( request.getParameter(AuthenticationRequest.OPENID_CLAIMED_ID) == null){
+                    identity = request.getParameter(AuthenticationRequest.OPENID_IDENTITY);
+                } else {
+                    identity = authReq.getClaimedIdentity();
+                }
                 if (getUserManager().canClaim(user, authReq.getClaimedIdentity())) {
-                    String returnTo = authReq.getReturnTo();
+                    //String returnTo = authReq.getReturnTo();
+                    String returnTo = (String) session.getAttribute(AuthenticationRequest.OPENID_RETURN_TO );
                     String delim = (returnTo.indexOf('?') >= 0) ? "&" : "?";
                     s = response.encodeRedirectURL(returnTo + delim + s);
+                    log.debug("sending redirect to: " + s);
                     response.sendRedirect(s);
                 } else {
                     throw new OpenIdException("User cannot claim this id.");

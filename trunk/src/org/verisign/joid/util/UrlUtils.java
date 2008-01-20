@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 public class UrlUtils {
 
     public static String getFullUrl(HttpServletRequest request){
-        StringBuilder b = getServletUrl(request);
+        StringBuffer b = getServletUrl(request);
         String queryString = request.getQueryString();
         if(queryString != null) {
             b.append("?").append(queryString);
@@ -18,9 +18,9 @@ public class UrlUtils {
         return b.toString();
     }
 
-    public static StringBuilder getServletUrl(HttpServletRequest request)
+    public static StringBuffer getServletUrl(HttpServletRequest request)
     {
-        StringBuilder b = new StringBuilder(getBaseUrl(request));
+        StringBuffer b = new StringBuffer(getBaseUrl(request));
         String servletPath = request.getServletPath();
         if(servletPath != null){
             b.append(servletPath);
@@ -32,10 +32,10 @@ public class UrlUtils {
 	 *
 	 * @param request
 	 * @return the url of the local host including the context, not including a trailing "/"
-     * // todo: make these return StringBuilder instead
+     * // todo: make these return StringBuffer instead
 	 */
 	public static String getBaseUrl(HttpServletRequest request) {
-        StringBuilder b = new StringBuilder();
+        StringBuffer b = new StringBuffer();
         b.append(getHostUrl(request));
         String context = request.getContextPath();
         if(context != null) {
@@ -48,7 +48,7 @@ public class UrlUtils {
      *
      * @param request
      * @return the host url without the context
-     * // todo: make these return StringBuilder instead
+     * // todo: make these return StringBuffer instead
      */
     public static String getHostUrl(HttpServletRequest request)
     {

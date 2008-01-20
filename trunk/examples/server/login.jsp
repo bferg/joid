@@ -18,6 +18,11 @@
         if (ret == null) {
             ret = request.getParameter(s);
         }
+        // then try session
+        if(ret == null){
+            HttpSession session = request.getSession(true);
+            ret = (String) session.getAttribute(s);
+        }
         return ret;
     }
 

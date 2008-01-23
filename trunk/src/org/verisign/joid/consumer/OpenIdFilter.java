@@ -45,7 +45,8 @@ public class OpenIdFilter implements Filter {
 		log.info("init OpenIdFilter");
 		String saveInCookie = filterConfig.getInitParameter("saveInCookie");
 		if(saveInCookie != null){
-			saveIdentityUrlAsCookie = Boolean.parseBoolean(saveInCookie);
+			saveIdentityUrlAsCookie = org.verisign.joid.util.Boolean.parseBoolean(saveInCookie);
+			//saveIdentityUrlAsCookie = Boolean.parseBoolean(saveInCookie);
 			log.debug("saving identities in cookie: " + saveIdentityUrlAsCookie);
 		}
 		cookieDomain = filterConfig.getInitParameter("cookieDomain");

@@ -36,7 +36,7 @@ public class Discoverer {
 				if(serverAndDelegate.getDelegate() == null) {
 					serverAndDelegate.setDelegate(findLinkTag(str, "openid.delegate", in));
 				}
-				if(str.contains("</head>")){
+				if(str.indexOf("</head>") >= 0){
 					break;
 				}
 			}

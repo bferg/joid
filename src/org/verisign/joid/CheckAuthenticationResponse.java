@@ -55,7 +55,8 @@ public class CheckAuthenticationResponse extends Response
 	    if (AuthenticationResponse.OPENID_MODE.equals(key)) {
 		    mode = value;
 	    } else if (OPENID_IS_VALID.equals(key)) {
-		    isValid = Boolean.parseBoolean(value);
+		    isValid = org.verisign.joid.util.Boolean.parseBoolean(value);
+		    //isValid = Boolean.parseBoolean(value);
         } else if(OPENID_INVALIDATE_HANDLE.equals(key)) {
             invalidateHandle = value;
         }

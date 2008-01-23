@@ -20,6 +20,8 @@ public class Util
 	
 	BufferedReader in = null;
 	try {
+// TODO: See reply/patch of Sergey: http://groups.google.com/group/joid-dev/browse_thread/thread/962cf46501ea660d
+
 	    URL url = new URL(dest+"?"+toSend);
 	    HttpURLConnection.setFollowRedirects(true);
 	    HttpURLConnection connection = (HttpURLConnection) url.openConnection();

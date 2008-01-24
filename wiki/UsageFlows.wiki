@@ -1,4 +1,4 @@
-#summary The JPID usage flows.
+#summary The JOID usage flows.
 #labels Featured
 
 The incoming OpenID request is handled by an _OpenID_ object, which has an associated _Store _and a _Crypto_ engine. Using these and a !RequestFactory, a proper _Request_ is instantiated. 
@@ -9,8 +9,6 @@ Note that the flow can be reversed, with a _Response_ as input. This makes it po
 
 
 http://joid.googlecode.com/svn/trunk/src/flows.png
-
-
 
 
 

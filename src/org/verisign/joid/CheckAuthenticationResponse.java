@@ -32,6 +32,9 @@ public class CheckAuthenticationResponse extends Response
 
     private boolean isValid;
 
+    static String OPENID_MODE = "openid.mode"; // for 1.1 messages
+    static String OPENID_NS = "ns";
+    static String OPENID_ERROR = "error";
     public static String OPENID_IS_VALID = "is_valid";
     public final static String OPENID_INVALIDATE_HANDLE = "invalidate_handle";
 
@@ -52,15 +55,17 @@ public class CheckAuthenticationResponse extends Response
 	    String key = (String) mapEntry.getKey();
 	    String value = (String) mapEntry.getValue();
 
-	    if (AuthenticationResponse.OPENID_MODE.equals(key)) {
-		    mode = value;
+	    if (OPENID_MODE.equals(key)) {
+                mode = value;
 	    } else if (OPENID_IS_VALID.equals(key)) {
-		    isValid = org.verisign.joid.util.Boolean.parseBoolean(value);
-		    //isValid = Boolean.parseBoolean(value);
-        } else if(OPENID_INVALIDATE_HANDLE.equals(key)) {
-            invalidateHandle = value;
+                isValid = org.verisign.joid.util.Boolean.parseBoolean(value);
+                //isValid = Boolean.parseBoolean(value);
+            } else if (OPENID_INVALIDATE_HANDLE.equals(key)) {
+                invalidateHandle = value;
+            } else if (OPENID_NS.equals(key)) {
+                ns = value;
+            }
         }
-    }
     }
 
     /**
@@ -99,21 +104,27 @@ public class CheckAuthenticationResponse extends Response
 	this.ar = ar;
 	this.ns = ar.getNamespace();
 
-	if (a != null) {
-	    String sig = ar.sign(a.getAssociationType(),
-				 a.getMacKey(), ar.getSignedList());
-	    isValid = sig.equals(ar.getSignature());
-	} else {
-	    isValid = false;
-	}
-	map = new HashMap();
-	map.put("mode", "id_res");
-	map.put(CheckAuthenticationResponse.OPENID_IS_VALID,
-		isValid ? "true":"false");
-	if (invalidateHandle != null) {
-	    map.put(CheckAuthenticationResponse.OPENID_INVALIDATE_HANDLE,
-		    invalidateHandle);
-	}
+        map = new HashMap();
+        if (isVersion2()) {
+            map.put(OPENID_NS, OPENID_20_NAMESPACE);
+        }
+
+        if (a != null) {
+            String sig = ar.sign(a.getAssociationType(),
+                                 a.getMacKey(), ar.getSignedList());
+            isValid = sig.equals(ar.getSignature());
+        } else {
+            isValid = false;
+        }
+        if (!isVersion2()) {
+            map.put(OPENID_MODE, "id_res");
+        }
+        map.put(CheckAuthenticationResponse.OPENID_IS_VALID,
+                isValid ? "true":"false");
+        if (invalidateHandle != null) {
+            map.put(CheckAuthenticationResponse.OPENID_INVALIDATE_HANDLE,
+                    invalidateHandle);
+        }
     }
 
     public String toString()

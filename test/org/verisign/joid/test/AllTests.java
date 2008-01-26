@@ -41,6 +41,8 @@ import org.verisign.joid.server.MemoryStore;
 
 import java.math.BigInteger;
 import java.net.URLEncoder;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -1117,4 +1119,93 @@ public class AllTests extends TestCase
             assertTrue("Should not throw an exception, threw '" + unexpected.getMessage() + "'", false);
         }
     }
+
+    // Make sure that check authentication responses follow the 1.1 spec
+    public void testSignatureValidation1xDumbMode () throws Exception
+    {
+        String s = "openid.identity=http%3A%2F%2Fidentity.bar.baz%2F"
+            +"&openid.mode=checkid_setup"
+            +"&openid.return_to=http%3A%2F%2Fwww.foo.bar%2F";
+        try {
+            // First get the stateless authentication request
+            Request req = RequestFactory.parse(s);
+            assertFalse(req.isVersion2());
+            assertTrue(req instanceof AuthenticationRequest);
+            AuthenticationRequest areq = (AuthenticationRequest) req;
+            // Now construct the response
+            Response resp = areq.processUsing(serverInfo);
+            assertFalse(resp.isVersion2());
+            assertTrue(resp instanceof AuthenticationResponse);
+            AuthenticationResponse aresp = (AuthenticationResponse) resp;
+            // Build the check authentication request from the auth response
+            CheckAuthenticationRequest carq = new CheckAuthenticationRequest(aresp.toMap(), "check_authentication");
+            assertFalse(carq.isVersion2());
+            // Now get the check authentication response
+            resp = carq.processUsing(serverInfo);
+            assertFalse(resp.isVersion2());
+            assertTrue(resp instanceof CheckAuthenticationResponse);
+            CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
+            assertTrue(carp.isValid());
+            // Verify that the POST string for check auth response matches spec
+            String respStr = carp.toPostString();
+            System.out.println(respStr);
+            Matcher m = Pattern.compile("^openid.mode:", Pattern.MULTILINE).matcher(respStr);
+            assertTrue("Mode parameter 'openid.mode' must be in 1.x check auth responses", m.find());
+            m = Pattern.compile("^is_valid:true$", Pattern.MULTILINE).matcher(respStr);
+            assertTrue("Must have is_valid parameter in check auth response", m.find());
+            m = Pattern.compile("^ns:", Pattern.MULTILINE).matcher(respStr);
+            assertFalse("Must not have an ns parameter in 1.x check auth responses", m.find());
+            // Parse the response string
+            resp = ResponseFactory.parse(respStr);
+            assertFalse(resp.isVersion2());
+            assertTrue(resp instanceof CheckAuthenticationResponse);
+        } catch (OpenIdException unexpected) {
+            assertTrue("Should not throw an exception, threw '" + unexpected.getMessage() + "'", false);
+        }
+    }
+
+    // Make sure that check authentication responses follow the 2.0 spec
+    public void testSignatureValidation2xDumbMode () throws Exception
+    {
+        String s = "openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            +"&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            +"&openid.mode=checkid_setup"
+            +"&openid.return_to=http%3A%2F%2Fwww.foo.bar%2F";
+        try {
+            // First get the stateless authentication request
+            Request req = RequestFactory.parse(s);
+            assertTrue(req.isVersion2());
+            assertTrue(req instanceof AuthenticationRequest);
+            AuthenticationRequest areq = (AuthenticationRequest) req;
+            // Now construct the response
+            Response resp = areq.processUsing(serverInfo);
+            assertTrue(resp.isVersion2());
+            assertTrue(resp instanceof AuthenticationResponse);
+            AuthenticationResponse aresp = (AuthenticationResponse) resp;
+            // Build the check authentication request from the auth response
+            CheckAuthenticationRequest carq = new CheckAuthenticationRequest(aresp.toMap(), "check_authentication");
+            assertTrue(carq.isVersion2());
+            // Now get the check authentication response
+            resp = carq.processUsing(serverInfo);
+            assertTrue(resp.isVersion2());
+            assertTrue(resp instanceof CheckAuthenticationResponse);
+            CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
+            assertTrue(carp.isValid());
+            // Verify that the POST string for check auth response matches spec
+            String respStr = carp.toPostString();
+            Matcher m = Pattern.compile("^(mode|openid.mode):", Pattern.MULTILINE).matcher(respStr);
+            assertTrue("No mode value allowed in 2.x check auth responses", !m.find());
+            m = Pattern.compile("^is_valid:true$", Pattern.MULTILINE).matcher(respStr);
+            assertTrue("Must have is_valid parameter in check auth response", m.find());
+            m = Pattern.compile("^ns:", Pattern.MULTILINE).matcher(respStr);
+            assertTrue("Must have an ns parameter in 2.x check auth responses", m.find());
+            // Parse the response string
+            resp = ResponseFactory.parse(respStr);
+            assertTrue(resp.isVersion2());
+            assertTrue(resp instanceof CheckAuthenticationResponse);
+        } catch (OpenIdException unexpected) {
+            assertTrue("Should not throw an exception, threw '" + unexpected.getMessage() + "'", false);
+        }
+    }
+
 }

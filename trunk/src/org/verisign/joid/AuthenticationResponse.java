@@ -304,11 +304,20 @@ public class AuthenticationResponse extends Response
 		signature = value;
 	    } else if (OPENID_OP_ENDPOINT.equals(key)) {
 		urlEndPoint = value;
+                // we get op_endpoint without a 2.0 ns for some
+                // check_auth requests
+                // since we use this class to recalculate the
+                // signature we need to set version 2 explicitly or we
+                // won't include the op_endpoint in the map
+                // (op_endpoint isn't allowed in 1.x responses)
+                if (ns == null) {
+                    ns = OPENID_20_NAMESPACE;
+                }
 	    }
 	}
 	this.sreg = SimpleRegistration.parseFromResponse(map);
 	log.debug("authn resp constr sreg="+sreg);
-  }
+    }
 
     public String toString()
     {

@@ -69,7 +69,7 @@ public class OpenId
 	    RequestFactory.parse(query);
 	    return true;
 	} catch (Exception e){
-	    log.info(e);
+	    log.info(e, e);
 	    return false;
 	}
     }
@@ -103,10 +103,10 @@ public class OpenId
 	    Request req = RequestFactory.parse(query);
 	    return (req instanceof AssociationRequest);
 	} catch (OpenIdException e) {
-	    log.info(e);
+	    log.info(e, e);
 	    return false;
 	} catch (UnsupportedEncodingException e) {
-	    log.info(e);
+	    log.info(e, e);
 	    return false;
 	}
     }
@@ -124,10 +124,10 @@ public class OpenId
 	    Request req = RequestFactory.parse(query);
 	    return (req instanceof AuthenticationRequest);
 	} catch (OpenIdException e) {
-	    log.info(e);
+	    log.info(e, e);
 	    return false;
 	} catch (UnsupportedEncodingException e) {
-	    log.info(e);
+	    log.info(e, e);
 	    return false;
 	}
     }
@@ -145,10 +145,10 @@ public class OpenId
 	    Request req = RequestFactory.parse(query);
 	    return (req instanceof CheckAuthenticationRequest);
 	} catch (OpenIdException e) {
-	    log.info(e);
+	    log.info(e, e);
 	    return false;
 	} catch (UnsupportedEncodingException e) {
-	    log.info(e);
+	    log.info(e, e);
 	    return false;
 	}
     }

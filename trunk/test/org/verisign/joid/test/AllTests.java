@@ -16,6 +16,7 @@ package org.verisign.joid.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 import org.verisign.joid.Association;
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.AssociationResponse;
@@ -36,23 +37,28 @@ import org.verisign.joid.ServerInfo;
 import org.verisign.joid.SimpleRegistration;
 import org.verisign.joid.Store;
 import org.verisign.joid.StoreFactory;
+import org.verisign.joid.extension.PapeRequest;
+import org.verisign.joid.extension.PapeResponse;
 import org.verisign.joid.server.AssociationImpl;
 import org.verisign.joid.server.MemoryStore;
 
 import java.math.BigInteger;
 import java.net.URLEncoder;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 
 public class AllTests extends TestCase
@@ -1208,4 +1214,207 @@ public class AllTests extends TestCase
         }
     }
 
+
+    void validatePapeRequest (PapeRequest pr) throws Exception
+    {
+        assertTrue(pr.isValid());
+        assertNotNull(pr.getMaxAuthAge());
+        assertEquals(pr.getMaxAuthAge().intValue(), 3600);
+        Collection policies = pr.getPreferredAuthPolicies();
+        String[] pArray = { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
+                            "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
+                            "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" };
+        Iterator it = policies.iterator();
+        while (it.hasNext()) {
+            String pStr = (String)it.next();
+            int i = 0;
+            for (i = 0; i < pArray.length; i++) {
+                if (pStr.equals(pArray[i])) {
+                    break;
+                }
+            }
+            assertTrue(i < pArray.length);
+        }
+    }
+
+    public void testPapeRequestFromQuery () throws Exception
+    {
+        String s = "openid.identity="
+            +"http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            +"&openid.mode=checkid_setup"
+            +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
+            +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_no"
+            +"nce%3D2006-12-"
+            +"06T04%253A54%253A51ZQvGYW3"
+            +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
+            +"&openid.ns.foo=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0"
+            +"&openid.foo.max_auth_age=3600"
+            +"&openid.foo.preferred_auth_policies=http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fphishing-resistant+http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fmulti-factor+http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fmulti-factor-physical";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        AuthenticationRequest ar = (AuthenticationRequest) req;
+        assertTrue(ar.isIdentifierSelect());
+
+        PapeRequest pr = new PapeRequest(ar.getExtensions());
+        System.out.println(pr.toString());
+        validatePapeRequest(pr);
+        assertEquals(pr.getPreferredAuthPolicies().size(), 3);
+    }
+
+    public void testPapeRequestWithEmptyAuthPoliciesFromQuery () throws Exception
+    {
+        String s = "openid.identity="
+            +"http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            +"&openid.mode=checkid_setup"
+            +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
+            +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_nonce%3D2006-12-06T04%253A54%253A51ZQvGYW3"
+            +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
+            +"&openid.ns.foo=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0"
+            +"&openid.foo.max_auth_age=3600"
+            +"&openid.foo.preferred_auth_policies=";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        AuthenticationRequest ar = (AuthenticationRequest) req;
+        assertTrue(ar.isIdentifierSelect());
+
+        PapeRequest pr = new PapeRequest(ar.getExtensions());
+        System.out.println(pr.toString());
+        validatePapeRequest(pr);
+        assertEquals(pr.getPreferredAuthPolicies().size(), 0);
+    }
+
+    public void testPapeRequestGenerate () throws Exception
+    {
+        String identity = "http://specs.openid.net/auth/2.0/identifier_select";
+        String returnTo = "http://www.schtuff.com/?action=openid_return&dest=&stay_logged_in=False&response_nonce=2006-12-06t04%3A54%3A51ZQvGYW3";
+        String trustRoot = "http://*.schtuff.com/";
+        String assocHandle = "ahandle";
+        AuthenticationRequest ar = AuthenticationRequest.create(identity,
+                                                                returnTo,
+                                                                trustRoot,
+                                                                assocHandle);
+        assertTrue(ar.isIdentifierSelect());
+        PapeRequest pr = new PapeRequest();
+        pr.setMaxAuthAge(3600);
+        pr.setPreferredAuthPolicies(new String[] 
+            { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
+              "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
+              "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" });
+        ar.addExtension(pr);
+        PapeRequest pr1 = new PapeRequest(ar.getExtensions());
+        validatePapeRequest(pr1);
+
+        String s = ar.toUrlString();
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        AuthenticationRequest ar2 = (AuthenticationRequest) req;
+        assertTrue(ar2.isIdentifierSelect());
+
+        PapeRequest pr2 = new PapeRequest(ar2.getExtensions());
+        System.out.println(pr2.toString());
+        validatePapeRequest(pr2);
+    }
+
+    void validatePapeResponse (PapeResponse pr) throws Exception
+    {
+        assertTrue(pr.isValid());
+        assertNotNull(pr.getAuthTime());
+        assertEquals(pr.getAuthTime().getTime(), 1196510400000L);
+        Collection policies = pr.getAuthPolicies();
+        assertEquals(policies.size(), 3);
+        String[] pArray = { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
+                            "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
+                            "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" };
+        Iterator it = policies.iterator();
+        while (it.hasNext()) {
+            String pStr = (String)it.next();
+            int i = 0;
+            for (i = 0; i < pArray.length; i++) {
+                if (pStr.equals(pArray[i])) {
+                    break;
+                }
+            }
+            assertTrue(i < pArray.length);
+        }
+        assertNotNull(pr.getNistAuthLevel());
+        assertEquals(pr.getNistAuthLevel().intValue(), 4);
+    }
+
+    public void testPapeResponseFromQuery () throws Exception
+    {
+        String s = "openid.op_endpoint=http%3A%2F%2Fexample.com"
+            + "&openid.pape.auth_policies=http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fphishing-resistant+http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fmulti-factor+http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fmulti-factor-physical"
+            + "&openid.pape.auth_time=2007-12-01T12%3A00%3A00Z"
+            + "&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dopenid_return%26dest%3D%26stay_logged_in%3DFalse%26response_nonce%3D2006-12-06t04%253A54%253A51ZQvGYW3"
+            + "&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.response_nonce=2007-10-15T17%3A38%3A16ZZvI%3D"
+            + "&openid.pape.nist_auth_level=4"
+            + "&openid.assoc_handle=694d5d70-7b45-11dc-8e68-bbf7f7e8a280"
+            + "&openid.signed=assoc_handle%2Cidentity%2Cresponse_nonce%2Creturn_to%2Cclaimed_id%2Cop_endpoint"
+            + "&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            + "&openid.ns.pape=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0"
+            + "&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            + "&openid.mode=id_res"
+            + "&openid.invalidate_handle=ahandle"
+            + "&openid.sig=iqoAqcoyYK3XX9%2BOdxmdjUYLUJs%3D";
+
+        Response resp = ResponseFactory.parse(s);
+        assertTrue(resp instanceof AuthenticationResponse);
+        AuthenticationResponse ar = (AuthenticationResponse) resp;
+        assertTrue(ar.isVersion2());
+
+        PapeResponse pr = new PapeResponse(ar.getExtensions());
+        System.out.println(pr.toString());
+        validatePapeResponse(pr);
+    }
+    
+    public void testPapeResponseGenerate () throws Exception
+    {
+        String identity = "http://specs.openid.net/auth/2.0/identifier_select";
+        String returnTo = "http://www.schtuff.com/?action=openid_return&dest=&stay_logged_in=False&response_nonce=2006-12-06t04%3A54%3A51ZQvGYW3";
+        String trustRoot = "http://*.schtuff.com/";
+        String assocHandle = "ahandle";
+        AuthenticationRequest request = AuthenticationRequest.create(identity,
+                                                                     returnTo,
+                                                                     trustRoot,
+                                                                     assocHandle);
+        Response resp = request.processUsing(serverInfo);
+        assertTrue(resp instanceof AuthenticationResponse);
+        assertTrue(resp.isVersion2());
+        AuthenticationResponse ar = (AuthenticationResponse)resp;
+        PapeResponse pr = new PapeResponse();
+        pr.setAuthTime(new Date(1196510400000L));
+        pr.setAuthPolicies(new String[]{});
+        assertTrue(pr.getParam("auth_policies").equals("none"));
+        pr.setAuthPolicies(new String[] 
+            { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
+              "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
+              "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" });
+        pr.setNistAuthLevel(4);
+        ar.addExtension(pr);
+        System.out.println(ar.toUrlString());
+        String[] signed = ar.getSignedList().split(",");
+        Set signSet = new HashSet();
+        signSet.addAll(Arrays.asList(signed));
+        assertTrue(signSet.contains("ns.pape"));
+        assertTrue(signSet.contains("pape.auth_policies"));
+        assertTrue(signSet.contains("pape.auth_time"));
+        assertTrue(signSet.contains("pape.nist_auth_level"));
+
+        PapeResponse pr1 = new PapeResponse(ar.getExtensions());
+        validatePapeResponse(pr1);
+
+        String s = ar.toUrlString();
+        System.out.println(s);
+        Response req = ResponseFactory.parse(s);
+        assertTrue(req instanceof AuthenticationResponse);
+        AuthenticationResponse ar2 = (AuthenticationResponse) req;
+        assertTrue(ar2.isVersion2());
+
+        PapeResponse pr2 = new PapeResponse(ar2.getExtensions());
+        System.out.println(pr2.toString());
+        validatePapeResponse(pr2);
+    }
 }

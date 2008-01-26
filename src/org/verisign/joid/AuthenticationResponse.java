@@ -13,6 +13,8 @@
 
 package org.verisign.joid;
 
+import org.verisign.joid.extension.Extension;
+
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -33,6 +35,7 @@ public class AuthenticationResponse extends Response
 {
     private static Log log = LogFactory.getLog(AuthenticationResponse.class);
 
+    public static String OPENID_PREFIX = "openid.";
     public static String OPENID_RETURN_TO = "openid.return_to";
     public static String OPENID_OP_ENDPOINT = "openid.op_endpoint";
     public static String OPENID_IDENTITY = "openid.identity";
@@ -43,6 +46,8 @@ public class AuthenticationResponse extends Response
     public static String OPENID_SIGNED = "openid.signed";
     // package scope so that ResponseFactory can trigger on this key
     public static String OPENID_SIG = "openid.sig";
+
+	private Map extendedMap;
 
 	private String claimed_id;
     private String identity;
@@ -55,6 +60,7 @@ public class AuthenticationResponse extends Response
     private String signature;
     private SimpleRegistration sreg;
     private String urlEndPoint;
+    private byte[] key;
 
     /** 
      * Returns the signature in this response.
@@ -122,6 +128,16 @@ public class AuthenticationResponse extends Response
 	}
     if (!set.isEmpty() && isVersion2()) {
         map.put(Message.OPENID_NS + ".sreg", SimpleRegistration.OPENID_SREG_NAMESPACE);
+    }
+
+    if (extendedMap != null && !extendedMap.isEmpty()) {
+        set = extendedMap.entrySet();
+        for (Iterator iter = set.iterator(); iter.hasNext();){
+            Map.Entry mapEntry = (Map.Entry) iter.next();
+            String key = (String) mapEntry.getKey();
+            String value = (String) mapEntry.getValue();
+            map.put(OPENID_PREFIX + key, value);
+        }
     }
 
 	return map;
@@ -269,9 +285,10 @@ public class AuthenticationResponse extends Response
 		signed += ",sreg." + key;
 	    }
 	}
-	byte[] key = a.getMacKey();
+	key = a.getMacKey();
 	this.algo = a.getAssociationType();
 	signature = sign(key, signed);
+	extendedMap = new HashMap();
     }
 
 
@@ -279,6 +296,7 @@ public class AuthenticationResponse extends Response
     {
 	super(map);
 	Set set = map.entrySet();
+	extendedMap = new HashMap();
 	for (Iterator iter = set.iterator(); iter.hasNext();){
 	    Map.Entry mapEntry = (Map.Entry) iter.next();
 	    String key = (String) mapEntry.getKey();
@@ -313,10 +331,52 @@ public class AuthenticationResponse extends Response
                 if (ns == null) {
                     ns = OPENID_20_NAMESPACE;
                 }
-	    }
+        } else if (key != null && key.startsWith("openid.")) {
+            String foo = key.substring(7);  // remove "openid."
+            if ((!(OPENID_RESERVED_WORDS.contains(foo)))
+                && (!foo.startsWith("sreg."))) {
+                extendedMap.put(foo, value);
+            }
+        }
 	}
 	this.sreg = SimpleRegistration.parseFromResponse(map);
 	log.debug("authn resp constr sreg="+sreg);
+    }
+
+	/**
+	 * Returns the extensions in this authentication request.
+	 *
+	 * @return the extensions; empty if none.
+	 */
+	public Map getExtensions() {
+		return extendedMap;
+	}
+
+    /**
+     * Add the extension map to the internal extensions map.
+     * 
+     * @param map Map<String, String> of name value pairs
+     */
+    public void addExtensions (Map map) throws OpenIdException {
+        Iterator it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry mapEntry = (Map.Entry)it.next();
+            String key = (String)mapEntry.getKey();
+            String value = (String)mapEntry.getValue();
+            extendedMap.put(key, value);
+            // add items to signature
+            // signed should already contain a list of base params to sign
+            signed += "," + key;
+        }
+        // recalculate signature
+        signature = sign(key, signed);
+    }
+
+    /**
+     * Add extension object's parameters to the extensions map.
+     */
+    public void addExtension (Extension ext) throws OpenIdException {
+        addExtensions(ext.getParamMap());
     }
 
     public String toString()

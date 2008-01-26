@@ -13,15 +13,17 @@
 
 package org.verisign.joid;
 
+import org.verisign.joid.extension.Extension;
+
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.Arrays;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
@@ -42,7 +44,6 @@ public class AuthenticationRequest extends Request {
 	private String trustRoot;
 	private SimpleRegistration sreg;
 
-	private static Set reservedWords;
 	public final static String OPENID_CLAIMED_ID = "openid.claimed_id";
 	public final static String OPENID_IDENTITY = "openid.identity";
 	public final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
@@ -83,14 +84,6 @@ public class AuthenticationRequest extends Request {
 			//
 			throw new RuntimeException(e);
 		}
-
-		// from section 12 in spec
-		reservedWords = new HashSet(Arrays.asList(new String[]
-				{"assoc_handle", "assoc_type", "claimed_id", "contact", "delegate",
-						"dh_consumer_public", "dh_gen", "dh_modulus", "error", "identity",
-						"invalidate_handle", "mode", "ns", "op_endpoint", "openid", "realm",
-						"reference", "response_nonce", "return_to", "server", "session_type",
-						"sig", "signed", "trust_root"}));
 	}
 
 	/**
@@ -143,7 +136,7 @@ public class AuthenticationRequest extends Request {
 				this.trustRoot = value;
 			} else if (key != null && key.startsWith("openid.")) {
 				String foo = key.substring(7);  // remove "openid."
-				if ((!(AuthenticationRequest.reservedWords.contains(foo)))
+				if ((!(OPENID_RESERVED_WORDS.contains(foo)))
 						&& (!foo.startsWith("sreg."))) {
 					extendedMap.put(foo, value);
 				}
@@ -164,6 +157,20 @@ public class AuthenticationRequest extends Request {
 		map.put(AuthenticationRequest.OPENID_RETURN_TO, returnTo);
 		map.put(AuthenticationRequest.OPENID_TRUST_ROOT, trustRoot);
 		map.put(AuthenticationRequest.OPENID_REALM, trustRoot);
+
+        if (extendedMap != null && !extendedMap.isEmpty()) {
+            for (Iterator iter = extendedMap.entrySet().iterator(); 
+                 iter.hasNext();) {
+                Map.Entry mapEntry = (Map.Entry) iter.next();
+                String key = (String) mapEntry.getKey();
+                String value = (String) mapEntry.getValue();
+                if (value == null) {
+                    continue;
+                }
+                // all keys start "openid." in the set
+                map.put("openid." + key, value);
+            }
+        }
 
 		return map;
 	}
@@ -211,7 +218,7 @@ public class AuthenticationRequest extends Request {
 
 			if (key.startsWith("ns.")) {
 				key = key.substring(3);
-				if (AuthenticationRequest.reservedWords.contains(key)) {
+				if (OPENID_RESERVED_WORDS.contains(key)) {
 					throw new OpenIdException("Cannot redefine: " + key);
 				}
 				if (namespaces.contains(key)) {
@@ -354,6 +361,28 @@ public class AuthenticationRequest extends Request {
 	public Map getExtensions() {
 		return extendedMap;
 	}
+
+    /**
+     * Add the extension map to the internal extensions map.
+     * 
+     * @param map Map<String, String> of name value pairs
+     */
+    public void addExtensions (Map map) {
+        Iterator it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry mapEntry = (Map.Entry)it.next();
+            String key = (String)mapEntry.getKey();
+            String value = (String)mapEntry.getValue();
+            extendedMap.put(key, value);
+        }
+    }
+
+    /**
+     * Add extension object's parameters to the extensions map.
+     */
+    public void addExtension (Extension ext) {
+        addExtensions(ext.getParamMap());
+    }
 
 	/**
 	 * Returns whether the given identity equals {@link #ID_SELECT}.

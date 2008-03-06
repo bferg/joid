@@ -92,13 +92,13 @@ public class PapeResponse extends Extension implements PapeConstants {
     /**
      * Creates a new <code>PapeResponse</code> instance with the
      * correct namespace and an empty set of
-     * attributes. <code>auth_policies</code> is initialized to an
-     * empty string.
+     * attributes. <code>auth_policies</code> is initialized to the
+     * empty value.
      */
     public PapeResponse () {
         super(PAPE_NAMESPACE, PAPE_IDENTIFIER);
         // AUTH_POLICIES is a mandatory parameter
-        setParam(AUTH_POLICIES, "");
+        setParam(AUTH_POLICIES, EMPTY_AUTH_POLICIES);
     }
 
     /**

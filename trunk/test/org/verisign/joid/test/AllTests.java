@@ -1386,6 +1386,7 @@ public class AllTests extends TestCase
         AuthenticationResponse ar = (AuthenticationResponse)resp;
         PapeResponse pr = new PapeResponse();
         pr.setAuthTime(new Date(1196510400000L));
+        assertTrue(pr.getParam("auth_policies").equals("none"));
         pr.setAuthPolicies(new String[]{});
         assertTrue(pr.getParam("auth_policies").equals("none"));
         pr.setAuthPolicies(new String[] 

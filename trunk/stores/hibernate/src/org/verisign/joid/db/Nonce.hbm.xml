@@ -6,7 +6,7 @@
 <hibernate-mapping>
   <class name="org.verisign.joid.db.Nonce" table="Nonce">
     <id name="id">
-      <generator class="increment"/>
+      <generator class="native"/>
     </id>
     <property name="nonce" type="string"/>
     <property name="checkedDate" type="timestamp"/>

@@ -6,7 +6,7 @@
 <hibernate-mapping>
   <class name="org.verisign.joid.db.Association" table="Association">
     <id name="id">
-      <generator class="increment"/>
+      <generator class="native"/>
     </id>
     <property name="mode" type="string"/>
     <property name="handle" type="string"/>

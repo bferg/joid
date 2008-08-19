@@ -43,7 +43,10 @@ public class SimpleRegistration
     private String policyUrl;
 
     /** The <code>openid.sreg</code> value */
-    public final static String OPENID_SREG = "openid.sreg";    
+    public final static String OPENID_SREG = "openid.sreg"; 
+
+    /** The <code>openid.ns.sreg</code> value */
+    public final static String OPENID_SREG_NSDEF = "openid.ns.sreg";
 
     /** The <code>openid.sreg.required</code> value */
     public final static String OPENID_SREG_REQUIRED 
@@ -57,7 +60,11 @@ public class SimpleRegistration
     public final static String OPENID_SREG_POLICY_URL 
 	= OPENID_SREG + ".policy_url";
 
-    public final static String OPENID_SREG_NAMESPACE = "http://openid.net/extensions/sreg/1.1";
+    /** Invalid namespace for sreg (from XRDS) seen in the wild */
+    public final static String OPENID_SREG_NAMESPACE_10 = "http://openid.net/sreg/1.0";
+    
+    /** Standard namespace value for sreg */
+    public final static String OPENID_SREG_NAMESPACE_11 = "http://openid.net/extensions/sreg/1.1";
 
     private final static String SREG_NICKNAME = "nickname";
     private final static String SREG_EMAIL = "email";
@@ -69,6 +76,7 @@ public class SimpleRegistration
     private final static String SREG_LANGUAGE = "language";
     private final static String SREG_TIMEZONE = "timezone";
 
+    private String namespace;
     private String nickName;
     private String email;
     private String fullName;
@@ -104,7 +112,22 @@ public class SimpleRegistration
 	this.required = required;
 	this.optional = optional;
 	this.supplied = supplied;
-	this.policyUrl = policyUrl; 
+	this.policyUrl = policyUrl;
+    this.namespace = OPENID_SREG_NAMESPACE_11;
+    }
+    
+
+    /**
+     * Creates a simple registration. TODO: public for unit tests only.
+     */
+    public SimpleRegistration(Set required, Set optional, Map supplied,
+                              String policyUrl, String namespace)
+    {
+	this.required = required;
+	this.optional = optional;
+	this.supplied = supplied;
+	this.policyUrl = policyUrl;
+    this.namespace = namespace;
     }
     
 
@@ -113,6 +136,7 @@ public class SimpleRegistration
 	required = new HashSet();
 	optional = new HashSet();
 	supplied = new HashMap();
+    namespace = OPENID_SREG_NAMESPACE_11;
 
 	Set set = map.entrySet();
 	for (Iterator iter = set.iterator(); iter.hasNext();){
@@ -126,7 +150,12 @@ public class SimpleRegistration
 		addToSetFromList(optional, value);
 	    } else if (OPENID_SREG_POLICY_URL.equals(key)){
 		policyUrl = value; 
-	    }
+	    } else if (OPENID_SREG_NSDEF.equals(key)){
+            if (OPENID_SREG_NAMESPACE_10.equals(value)
+                || OPENID_SREG_NAMESPACE_11.equals(value)) {
+                namespace = value; 
+            }
+        }
 	}
     }
 
@@ -144,6 +173,7 @@ public class SimpleRegistration
 	Set req = new HashSet();
 	Set opt = new HashSet();
 	Map sup = new HashMap();
+    String ns = OPENID_SREG_NAMESPACE_11;
 
 	String trigger = OPENID_SREG + ".";
 	int triggerLength = trigger.length();
@@ -155,9 +185,14 @@ public class SimpleRegistration
 	    
 	    if (key.startsWith(trigger)){
 		sup.put(key.substring(triggerLength), value);
-	    }
+	    } else if (OPENID_SREG_NSDEF.equals(key)){
+            if (OPENID_SREG_NAMESPACE_10.equals(value)
+                || OPENID_SREG_NAMESPACE_11.equals(value)) {
+                ns = value; 
+            }
+        }
 	}
-	return new SimpleRegistration(req, opt, sup, "");
+	return new SimpleRegistration(req, opt, sup, "", ns);
     }
 
     private void addToSetFromList(Set set, String value)
@@ -179,6 +214,8 @@ public class SimpleRegistration
 
     public void setRequired(Set set){required = set;}
     public void setOptional(Set set){optional = set;}  
+
+    public String getNamespace () { return namespace; }
 
     //public Map getSuppliedValues(){return supplied;}
 
@@ -206,6 +243,7 @@ public class SimpleRegistration
     {
 	return "[SimpleRegistration required="+required
 	    +", optional="+optional+", supplied="+supplied
-	    +", policy url="+policyUrl+"]";
+	    +", policy url="+policyUrl
+        +", namespace="+namespace+"]";
     }
 }

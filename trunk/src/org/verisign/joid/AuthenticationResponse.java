@@ -127,7 +127,7 @@ public class AuthenticationResponse extends Response
 	    map.put(SimpleRegistration.OPENID_SREG +"."+ key, value);
 	}
     if (!set.isEmpty() && isVersion2()) {
-        map.put(Message.OPENID_NS + ".sreg", SimpleRegistration.OPENID_SREG_NAMESPACE);
+        map.put(Message.OPENID_NS + ".sreg", sreg.getNamespace());
     }
 
     if (extendedMap != null && !extendedMap.isEmpty()) {

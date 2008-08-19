@@ -525,7 +525,7 @@ public class AllTests extends TestCase
     // Check for sreg namespace
     if (resp.isVersion2()) {
         assertEquals((String)map.get("openid.ns.sreg"), 
-                     SimpleRegistration.OPENID_SREG_NAMESPACE);
+                     SimpleRegistration.OPENID_SREG_NAMESPACE_11);
     }
 
 	resp = carq.processUsing(serverInfo);
@@ -1417,5 +1417,135 @@ public class AllTests extends TestCase
         PapeResponse pr2 = new PapeResponse(ar2.getExtensions());
         System.out.println(pr2.toString());
         validatePapeResponse(pr2);
+    }
+
+    /*
+     * Some RPs (*cough* blogger *cough*) have been known to use the
+     * (invalid) http://openid.net/sreg/1.0 namespace for sreg in 2.0
+     * requests.  If this happens we should return the same namespace
+     * for interoperability reasons.
+     */
+    public void testSreg10 () throws Exception
+    {
+        String s = "openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.claimed_id=http%3A%2F%2Fhans.pip.verisignlabs.com%2F"
+            + "&openid.identity=http%3A%2F%2Fhans.pip.verisignlabs.com%2F"
+            + "&openid.return_to=https%3A%2F%2Fwww.blogger.com%2Fcomment.do%3FloginRedirect%3Dlm6phc1udus9"
+            + "&openid.realm=https%3A%2F%2Fwww.blogger.com"
+            + "&openid.mode=checkid_setup"
+            + "&openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fsreg%2F1.0"
+            + "&openid.sreg.optional=nickname%2Cfullname";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        AuthenticationRequest areq = (AuthenticationRequest) req;
+
+        SimpleRegistration sreg = areq.getSimpleRegistration();
+        assertTrue(sreg.isRequested());
+        Set set = sreg.getOptional();
+        Map supplied = new HashMap();
+        for (Iterator iter = set.iterator(); iter.hasNext();){
+            s = (String) iter.next();
+            supplied.put(s, "blahblah");
+        } 
+        sreg = new SimpleRegistration(Collections.EMPTY_SET, set, supplied, "", sreg.getNamespace());
+        areq.setSimpleRegistration(sreg);
+
+        Response resp = req.processUsing(serverInfo);  
+        assertTrue(resp instanceof AuthenticationResponse);
+        AuthenticationResponse aresp = (AuthenticationResponse) resp;
+        assertTrue(aresp.isVersion2());
+
+        Map map = aresp.toMap();
+        // Check for sreg namespace
+        if (resp.isVersion2()) {
+            assertEquals((String)map.get("openid.ns.sreg"), 
+                         SimpleRegistration.OPENID_SREG_NAMESPACE_10);
+        }
+    }
+
+    /* 
+     * Check that normal sreg ns works
+     */
+    public void testSreg11 () throws Exception
+    {
+        String s = "openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.claimed_id=http%3A%2F%2Fhans.pip.verisignlabs.com%2F"
+            + "&openid.identity=http%3A%2F%2Fhans.pip.verisignlabs.com%2F"
+            + "&openid.return_to=https%3A%2F%2Fwww.blogger.com%2Fcomment.do%3FloginRedirect%3Dlm6phc1udus9"
+            + "&openid.realm=https%3A%2F%2Fwww.blogger.com"
+            + "&openid.mode=checkid_setup"
+            + "&openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2F1.1"
+            + "&openid.sreg.optional=nickname%2Cfullname";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        AuthenticationRequest areq = (AuthenticationRequest) req;
+
+        SimpleRegistration sreg = areq.getSimpleRegistration();
+        assertTrue(sreg.isRequested());
+        Set set = sreg.getOptional();
+        Map supplied = new HashMap();
+        for (Iterator iter = set.iterator(); iter.hasNext();){
+            s = (String) iter.next();
+            supplied.put(s, "blahblah");
+        } 
+        sreg = new SimpleRegistration(Collections.EMPTY_SET, set, supplied, "", sreg.getNamespace());
+        areq.setSimpleRegistration(sreg);
+
+        Response resp = req.processUsing(serverInfo);  
+        assertTrue(resp instanceof AuthenticationResponse);
+        AuthenticationResponse aresp = (AuthenticationResponse) resp;
+        assertTrue(aresp.isVersion2());
+
+        Map map = aresp.toMap();
+        // Check for sreg namespace
+        if (resp.isVersion2()) {
+            assertEquals((String)map.get("openid.ns.sreg"), 
+                         SimpleRegistration.OPENID_SREG_NAMESPACE_11);
+        }
+    }
+
+    /*
+     * Any bad sreg ns gets converted to the proper 
+     * http://openid.net/extensions/sreg/1.1
+     */
+    public void testSregBadNS () throws Exception
+    {
+        String s = "openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.claimed_id=http%3A%2F%2Fhans.pip.verisignlabs.com%2F"
+            + "&openid.identity=http%3A%2F%2Fhans.pip.verisignlabs.com%2F"
+            + "&openid.return_to=https%3A%2F%2Fwww.blogger.com%2Fcomment.do%3FloginRedirect%3Dlm6phc1udus9"
+            + "&openid.realm=https%3A%2F%2Fwww.blogger.com"
+            + "&openid.mode=checkid_setup"
+            + "&openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2Ffoo"
+            + "&openid.sreg.optional=nickname%2Cfullname";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        AuthenticationRequest areq = (AuthenticationRequest) req;
+
+        SimpleRegistration sreg = areq.getSimpleRegistration();
+        assertTrue(sreg.isRequested());
+        Set set = sreg.getOptional();
+        Map supplied = new HashMap();
+        for (Iterator iter = set.iterator(); iter.hasNext();){
+            s = (String) iter.next();
+            supplied.put(s, "blahblah");
+        } 
+        sreg = new SimpleRegistration(Collections.EMPTY_SET, set, supplied, "", sreg.getNamespace());
+        areq.setSimpleRegistration(sreg);
+
+        Response resp = req.processUsing(serverInfo);  
+        assertTrue(resp instanceof AuthenticationResponse);
+        AuthenticationResponse aresp = (AuthenticationResponse) resp;
+        assertTrue(aresp.isVersion2());
+
+        Map map = aresp.toMap();
+        // Check for sreg namespace
+        if (resp.isVersion2()) {
+            assertEquals((String)map.get("openid.ns.sreg"), 
+                         SimpleRegistration.OPENID_SREG_NAMESPACE_11);
+        }
     }
 }

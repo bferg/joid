@@ -1548,4 +1548,42 @@ public class AllTests extends TestCase
                          SimpleRegistration.OPENID_SREG_NAMESPACE_11);
         }
     }
+
+    public void testMessageMapToUrlStringOk () throws Exception
+    {
+        HashMap testMap = new HashMap ();
+        testMap.put(CheckAuthenticationRequest.OPENID_ASSOC_HANDLE, "adfasdf");
+        testMap.put("openid.mode", "check_authentication");
+        testMap.put(AuthenticationResponse.OPENID_IDENTITY, "http://foo");
+        testMap.put(AuthenticationResponse.OPENID_RETURN_TO, "http://bar");
+        testMap.put(AuthenticationResponse.OPENID_NONCE, "42");
+        testMap.put(AuthenticationResponse.OPENID_SIG, "siggy");
+
+        CheckAuthenticationRequest testMessage = new CheckAuthenticationRequest(testMap, "check_authentication");
+        String urlStr = testMessage.toUrlString();
+        System.out.println("urlstr:\'" + urlStr + "'");
+        String compareStr = "openid.assoc_handle=adfasdf&openid.identity=http%3A%2F%2Ffoo&openid.return_to=http%3A%2F%2Fbar&openid.sig=siggy&openid.mode=check_authentication&openid.response_nonce=42";
+        assertTrue(compareStr.equals(testMessage.toUrlString()));
+    }
+
+    public void testMessageMapToUrlStringNullParam () throws Exception
+    {
+        HashMap testMap = new HashMap ();
+        testMap.put(CheckAuthenticationRequest.OPENID_ASSOC_HANDLE, "adfasdf");
+        testMap.put("openid.mode", "check_authentication");
+        testMap.put(AuthenticationResponse.OPENID_IDENTITY, "http://foo");
+        testMap.put(AuthenticationResponse.OPENID_RETURN_TO, "http://bar");
+        testMap.put(AuthenticationResponse.OPENID_NONCE, null);
+        testMap.put(AuthenticationResponse.OPENID_SIG, "siggy");
+
+        boolean caught = false;
+        try {
+            CheckAuthenticationRequest testMessage = new CheckAuthenticationRequest(testMap, "check_authentication");
+            String urlStr = testMessage.toUrlString();
+        }
+        catch (OpenIdException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
 }

@@ -44,7 +44,7 @@ public class MessageParser
      *
      * @return the message as a string.
      */
-    static String toPostString(Message message) 
+    static String toPostString(Message message) throws OpenIdException
     {
         return toStringDelimitedBy(message, ":", newline);
     }
@@ -55,13 +55,13 @@ public class MessageParser
      *
      * @return the message as a string.
      */
-    static String toUrlString(Message message) 
+    static String toUrlString(Message message) throws OpenIdException
     {
         return toStringDelimitedBy(message, "=", '&');
     }
  
     private static String toStringDelimitedBy(Message message,
-					      String kvDelim, char lineDelim) 
+					      String kvDelim, char lineDelim) throws OpenIdException
     {
 	Map map = message.toMap();
 	Set set = map.entrySet();
@@ -76,11 +76,16 @@ public class MessageParser
 		    sb.append(key+kvDelim+value);
 		    sb.append(lineDelim);
 		} else {
-		    sb.append(URLEncoder.encode(key, "UTF-8")+kvDelim
-			      +URLEncoder.encode(value, "UTF-8"));
-		    if (iter.hasNext()) {
-			sb.append(lineDelim);
-		    }
+            if (value != null) {
+                sb.append(URLEncoder.encode(key, "UTF-8")+kvDelim
+                          +URLEncoder.encode(value, "UTF-8"));
+                if (iter.hasNext()) {
+                    sb.append(lineDelim);
+                }
+            }
+            else {
+                throw new OpenIdException("Value for key '" + key + "' is null in message map");
+            }
 		}
 
 	    }

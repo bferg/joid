@@ -1,7 +1,5 @@
 package org.verisign.joid.util;
 
-import org.verisign.joid.Store;
-
 /**
  * User: treeder
  * Date: Aug 9, 2007

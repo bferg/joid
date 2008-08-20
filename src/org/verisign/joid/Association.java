@@ -14,7 +14,6 @@
 package org.verisign.joid;
 
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**

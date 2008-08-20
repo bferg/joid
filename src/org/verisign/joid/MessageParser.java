@@ -149,7 +149,6 @@ public class MessageParser
 	    return map;
 	}
 	BufferedReader br = new BufferedReader(new StringReader(query));
-	int n = 0;
 	String s = br.readLine();
 	while (s != null) {
 	    int index = s.indexOf(":");

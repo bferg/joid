@@ -13,20 +13,11 @@
 
 package org.verisign.joid;
 
-import org.apache.log4j.Logger;
-
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-import java.io.UnsupportedEncodingException;
 
 /**
  * Represents an OpenID message. 

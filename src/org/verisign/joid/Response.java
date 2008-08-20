@@ -13,12 +13,7 @@
 
 package org.verisign.joid;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 

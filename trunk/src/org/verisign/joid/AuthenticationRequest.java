@@ -213,7 +213,6 @@ public class AuthenticationRequest extends Request {
 		for (Iterator iter = set.iterator(); iter.hasNext();) {
 			Map.Entry mapEntry = (Map.Entry) iter.next();
 			String key = (String) mapEntry.getKey();
-			String value = (String) mapEntry.getValue();
 			// all keys start "openid." in the set
 
 			if (key.startsWith("ns.")) {

@@ -13,21 +13,6 @@
 
 package org.verisign.joid;
 
-// import java.math.BigInteger;
-// import java.security.InvalidKeyException;
-// import java.security.MessageDigest;
-// import java.security.NoSuchAlgorithmException;
-// import java.security.SecureRandom;
-// import javax.crypto.Mac;
-// import javax.crypto.SecretKey;
-// import javax.crypto.spec.SecretKeySpec;
-// import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-// import org.apache.tsik.datatypes.Base64;
-// import org.apache.tsik.uuid.UUID;
-// import org.verisign.joid.AssociationRequest;
-// import org.verisign.joid.Crypto;
-
 /**
  * Information about this server.
  */

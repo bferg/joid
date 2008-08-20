@@ -13,13 +13,11 @@
 
 package org.verisign.joid;
 
-import org.apache.tsik.uuid.UUID;
 import java.security.SecureRandom;
 import java.math.BigInteger;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import java.security.NoSuchAlgorithmException;
-import org.apache.tsik.datatypes.Base64;
 
 /**
  * Implements the underlying Diffie-Hellman cryptography.

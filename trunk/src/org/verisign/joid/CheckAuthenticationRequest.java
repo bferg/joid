@@ -66,15 +66,18 @@ public class CheckAuthenticationRequest extends Request
     {
 	String invalidate = null;
 	Store store = si.getStore();
-	Nonce n = store.findNonce(handle);
-	if (n != null) {
-	    String s = "Nonce has already been checked";
-	    log.debug(s);
-	    throw new OpenIdException(s);
-	} else {
-	    n = store.generateNonce(handle);
-	    store.saveNonce(n);
-	}
+        String nonceStr = ar.getNonce();
+        if (nonceStr != null) {
+            Nonce n = store.findNonce(nonceStr);
+            if (n != null) {
+                String s = "Nonce has already been checked";
+                log.debug(s);
+                throw new OpenIdException(s);
+            } else {
+                n = store.generateNonce(nonceStr);
+                store.saveNonce(n);
+            }
+        }
 	Association assoc = store.findAssociation(handle);
 	if ((assoc == null) || (assoc.hasExpired())){
 	    invalidate = handle;

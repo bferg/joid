@@ -126,11 +126,11 @@ public class Crypto
     /**
      * Generates a random 'crumb' value.
      *
-     * @return a two-byte random string.
+     * @return a four-byte random string.
      */
     public static String generateCrumb()
     {
-        byte[] b = new byte[2];
+        byte[] b = new byte[4];
         random.nextBytes(b);
 	return convertToString(b);
     }

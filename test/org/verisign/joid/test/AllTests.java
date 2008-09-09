@@ -1586,4 +1586,113 @@ public class AllTests extends TestCase
         }
         assertTrue(caught);
     }
+
+    public void testCheckAuthNonceOk () throws Exception
+    {
+        // first establish association
+        String s = "openid.dh_consumer_public=GXmne0vGvF%2Fw9RHrk4McrUgxq3dmwURoKPhkrVdtBVNZtRlulFau2SBf%2FFT7JRo5LEcqY5CrctJlk%2B7YFcAyOX9VGd%2BmPfIE6cGPCTxy26USiJgjMEFPtkIRzT1y8lC7ypXvjZ5p0Q1hSg%2FuKdz1v0RAPICrVUrZ%2FgASGuqIpvQ%3D"
+            + "&openid.assoc_type=HMAC-SHA1"
+            + "&openid.session_type=DH-SHA1"
+            + "&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.mode=associate";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AssociationRequest);
+        AssociationRequest areq = (AssociationRequest) req;
+        assertTrue(areq.isVersion2());
+
+        Response resp = req.processUsing(serverInfo);  
+        assertTrue(resp instanceof AssociationResponse);
+        AssociationResponse aresp = (AssociationResponse) resp;
+        assertTrue(aresp.isVersion2());
+
+        // now do an auth req
+        String areqStr = "openid.identity="
+            +"http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            +"&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            +"&openid.mode=checkid_setup"
+            +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
+            +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_no"
+            +"nce%3D2006-12-06T04%253A54%253A51ZQvGYW3"
+            +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
+            +"&openid.assoc_handle=" + aresp.getAssociationHandle();
+        req = RequestFactory.parse(areqStr);
+        assertTrue(req instanceof AuthenticationRequest);
+        resp = req.processUsing(serverInfo);
+        assertTrue(resp instanceof AuthenticationResponse);
+        AuthenticationResponse authResp = (AuthenticationResponse) resp;
+        String nonce = authResp.getNonce();
+
+        // and check the response
+        CheckAuthenticationRequest checkReq = new CheckAuthenticationRequest(authResp.toMap(), "check_authentication");
+        resp = checkReq.processUsing(serverInfo);
+
+        // do it again, using same assoc handle
+        req = RequestFactory.parse(areqStr);
+        assertTrue(req instanceof AuthenticationRequest);
+        resp = req.processUsing(serverInfo);
+        assertTrue(resp instanceof AuthenticationResponse);
+        authResp = (AuthenticationResponse) resp;
+        // make sure we didn't get the same nonce
+        assertFalse(nonce.equals(authResp.getNonce()));
+
+        // and check the 2nd response
+        // since we didn't get the same nonce in the 2nd response we
+        // shouldn't receive an exception claiming this is the case
+        checkReq = new CheckAuthenticationRequest(authResp.toMap(), "check_authentication");
+        resp = checkReq.processUsing(serverInfo);
+    }
+
+    public void testCheckAuthNonceDuplicate () throws Exception
+    {
+        // first establish association
+        String s = "openid.dh_consumer_public=GXmne0vGvF%2Fw9RHrk4McrUgxq3dmwURoKPhkrVdtBVNZtRlulFau2SBf%2FFT7JRo5LEcqY5CrctJlk%2B7YFcAyOX9VGd%2BmPfIE6cGPCTxy26USiJgjMEFPtkIRzT1y8lC7ypXvjZ5p0Q1hSg%2FuKdz1v0RAPICrVUrZ%2FgASGuqIpvQ%3D"
+            + "&openid.assoc_type=HMAC-SHA1"
+            + "&openid.session_type=DH-SHA1"
+            + "&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.mode=associate";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AssociationRequest);
+        AssociationRequest areq = (AssociationRequest) req;
+        assertTrue(areq.isVersion2());
+
+        Response resp = req.processUsing(serverInfo);  
+        assertTrue(resp instanceof AssociationResponse);
+        AssociationResponse aresp = (AssociationResponse) resp;
+        assertTrue(aresp.isVersion2());
+
+        // now do an auth req
+        String areqStr = "openid.identity="
+            +"http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            +"&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            +"&openid.mode=checkid_setup"
+            +"&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dope"
+            +"nid_return%26dest%3D%26stay_logged_in%3DFalse%26response_no"
+            +"nce%3D2006-12-06T04%253A54%253A51ZQvGYW3"
+            +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
+            +"&openid.assoc_handle=" + aresp.getAssociationHandle();
+        req = RequestFactory.parse(areqStr);
+        assertTrue(req instanceof AuthenticationRequest);
+        resp = req.processUsing(serverInfo);
+        assertTrue(resp instanceof AuthenticationResponse);
+        AuthenticationResponse authResp = (AuthenticationResponse) resp;
+        String nonce = authResp.getNonce();
+
+        // and check the response
+        CheckAuthenticationRequest checkReq = new CheckAuthenticationRequest(authResp.toMap(), "check_authentication");
+        Response newResp = checkReq.processUsing(serverInfo);
+
+        // now try checking it again, using the same response
+        // should get an exception indicating nonce reuse
+        boolean caught = false;
+        try {
+            checkReq = new CheckAuthenticationRequest(authResp.toMap(), "check_authentication");
+            newResp = checkReq.processUsing(serverInfo);
+        }
+        catch (OpenIdException e) {
+            caught = true;
+        }
+        assertTrue(caught);
+    }
 }

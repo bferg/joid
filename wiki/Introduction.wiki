@@ -49,7 +49,7 @@ Response resp = req.processUsing(store, crypto);
 
 ==JOID Enabling Your Application==
 
-OpenIDConsumer
+[OpenIDConsumer]
 
 ==Setting Up A JOID Server==
 
@@ -61,5 +61,3 @@ JOID has two mailing lists, both public to join:
 || *Type* || *URL* ||
 || General || http://groups.google.com/group/joid-general ||
 || Developer || http://groups.google.com/group/joid-dev ||
-
-

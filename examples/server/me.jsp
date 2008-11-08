@@ -1,3 +1,7 @@
+<%--
+This page is for people running an OpenID server. It is an identity page that
+ a user can use to login to OpenID enabled sites.
+--%>
 <%@ page import="org.verisign.joid.util.UrlUtils" %>
 <%
 	String baseUrl = UrlUtils.getBaseUrl(request);

@@ -1,3 +1,6 @@
+<%--
+This page is a sample login page for OpenID SERVERS. You only need this if you are an OpenID provider. Consumers do NOT need this page.
+--%>
 <%@ page import="org.apache.commons.lang.RandomStringUtils" %>
 <%@ page import="org.verisign.joid.AuthenticationRequest" %>
 <%@ page import="org.verisign.joid.server.MemoryUserManager" %>

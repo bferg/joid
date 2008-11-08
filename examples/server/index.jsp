@@ -9,7 +9,7 @@ This page is a sample for consumers to use, but also serves as a testing page fo
     if (request.getParameter("signin") != null) {
 		try {
 			String id = request.getParameter("openid_url");
-			if (!id.startsWith("http:")) {
+			if (!id.startsWith("http")) {
 				id = "http://" + id;
 			}
 			String trustRoot = returnTo;
@@ -42,16 +42,26 @@ An error occurred! Please press back and try again.
 <%
     }
 %>
-
-<div style='margin: 1em 0 1em 2em; border-left: 2px solid black; padding-left: 1em;'>
-    <form action="index.jsp" method="post">
+<script type="text/javascript">
+    function submitForm(url){
+        document.getElementById("openid_url").value = url;
+        document.getElementById("openid_form").submit();
+    }
+</script>
+<div>
+    <form action="index.jsp" method="post" id="openid_form">
         <input type="hidden" name="signin" value="true"/>
-        <b>Login with your OpenID URL:</b> <input type="text" size="30" value="<%=returnTo+"/user/austinpowers"%>"
-                                                  name="openid_url"/>
+        <b>Login with your OpenID URL:</b>
+        <input type="text" size="30" value="<%=returnTo+"/user/austinpowers"%>" name="openid_url" id="openid_url"/>
         <input type="submit" value="Login"/><br/>
         <i>For example: <tt>someone.bloghost.com</tt></i>
     </form>
 </div>
+
+<br/><br/>
+    <img src="http://l.yimg.com/us.yimg.com/i/ydn/openid-signin-yellow.png" alt="Sign in with Yahoo" onclick="submitForm('http://www.yahoo.com');"/>
+    <br/><br/>
+    <img src="http://buttons.googlesyndication.com/fusion/add.gif" alt="Sign in with Google" onclick="submitForm('https://www.google.com/accounts/o8/id');"/>
 
 <p>
     <strong>Don't have an OpenID?</strong> <a href="https://pip.verisignlabs.com/" target="_blank">Go</a>

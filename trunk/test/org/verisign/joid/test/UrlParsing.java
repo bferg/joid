@@ -27,4 +27,13 @@ public class UrlParsing extends TestCase{
 		Assert.assertEquals("https://www.myopenid.com/server", serverAndDelegate.getServer());
 		Assert.assertEquals("http://windley.myopenid.com", serverAndDelegate.getDelegate());
 	}
+
+    public void testYadisDiscovery() throws Exception
+    {
+        Discoverer discoverer = new Discoverer();
+        ServerAndDelegate serverAndDelegate = new ServerAndDelegate();
+//        discoverer.findWithYadis("http://www.yahoo.com", serverAndDelegate);
+        discoverer.findWithYadis("https://www.google.com/accounts/o8/id", serverAndDelegate);
+        System.out.println(serverAndDelegate);
+    }
 }

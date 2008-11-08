@@ -40,6 +40,7 @@ public class OpenIdFilter implements Filter {
     private String cookieDomain;
     private List ignorePaths = new ArrayList();
     private static boolean configuredProperly = false;
+    private Integer cookieMaxAge;
 
     public void init(FilterConfig filterConfig) throws ServletException {
 		log.info("init OpenIdFilter");
@@ -50,6 +51,10 @@ public class OpenIdFilter implements Filter {
 			log.debug("saving identities in cookie: " + saveIdentityUrlAsCookie);
 		}
 		cookieDomain = filterConfig.getInitParameter("cookieDomain");
+        String cookieMaxAgeString = filterConfig.getInitParameter("cookieMaxAge");
+        if(cookieMaxAgeString != null){
+            cookieMaxAge = Integer.valueOf(cookieMaxAgeString);
+        }
         String ignorePaths = filterConfig.getInitParameter("ignorePaths");
         if(ignorePaths != null){
             String paths[] = ignorePaths.split(",");
@@ -91,7 +96,10 @@ public class OpenIdFilter implements Filter {
 					if(cookieDomain != null){
 						cookie.setDomain(cookieDomain);
 					}
-					resp.addCookie(cookie);
+                    if(cookieMaxAge != null){
+                        cookie.setMaxAge(cookieMaxAge);
+                    }
+                    resp.addCookie(cookie);
                     // redirect to get rid of the long url
                     resp.sendRedirect(result.getResponse().getReturnTo());
                     return;
@@ -147,6 +155,11 @@ public class OpenIdFilter implements Filter {
 
     public static String getCurrentUser(HttpSession session) {
         ensureFilterConfiguredProperly();
-        return (String) session.getAttribute(OpenIdFilter.OPENID_ATTRIBUTE);
-	}
+        String openid = (String) session.getAttribute(OpenIdFilter.OPENID_ATTRIBUTE);
+        if(openid != null){
+            return openid;
+        }
+        // todo: THIS COOKIE THING CAN'T WORK BECAUSE SOMEONE COULD FAKE IT, NEEDS AN AUTH TOKEN ALONG WITH IT
+        return openid;
+    }
 }

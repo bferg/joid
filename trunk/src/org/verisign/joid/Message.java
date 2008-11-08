@@ -91,7 +91,7 @@ public abstract class Message
      *
      * @return the message as a string.
      */
-    public String toPostString() 
+    public String toPostString() throws OpenIdException
     {
         return MessageParser.toPostString(this);
     }
@@ -102,7 +102,7 @@ public abstract class Message
      *
      * @return the message as a string.
      */
-    public String toUrlString() 
+    public String toUrlString() throws OpenIdException
     {
         return MessageParser.toUrlString(this);
     }

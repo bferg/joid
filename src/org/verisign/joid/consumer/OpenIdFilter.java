@@ -97,7 +97,7 @@ public class OpenIdFilter implements Filter {
 						cookie.setDomain(cookieDomain);
 					}
                     if(cookieMaxAge != null){
-                        cookie.setMaxAge(cookieMaxAge);
+                        cookie.setMaxAge(cookieMaxAge.intValue());
                     }
                     resp.addCookie(cookie);
                     // redirect to get rid of the long url

@@ -1235,6 +1235,15 @@ public class AllTests extends TestCase
             }
             assertTrue(i < pArray.length);
         }
+
+        String[] alnameArray = {
+            "http://www.jisa.or.jp/spec/auth_level.html",
+            "http://csrc.nist.gov/publications/nistpubs/800-63/SP800-63V1_0_2.pdf" };
+        List prefAuthLevels = pr.getPreferredAuthLevels();
+        assertEquals(alnameArray.length, prefAuthLevels.size());
+        for (int i = 0; i < alnameArray.length; i++) {
+            assertTrue(alnameArray[i].equals((String) prefAuthLevels.get(i)));
+        }
     }
 
     public void testPapeRequestFromQuery () throws Exception
@@ -1249,7 +1258,10 @@ public class AllTests extends TestCase
             +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
             +"&openid.ns.foo=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0"
             +"&openid.foo.max_auth_age=3600"
-            +"&openid.foo.preferred_auth_policies=http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fphishing-resistant+http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fmulti-factor+http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fmulti-factor-physical";
+            +"&openid.foo.preferred_auth_policies=http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fphishing-resistant+http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fmulti-factor+http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fmulti-factor-physical"
+            +"&openid.foo.auth_level.ns.nist=http%3A%2F%2Fcsrc.nist.gov%2Fpublications%2Fnistpubs%2F800-63%2FSP800-63V1_0_2.pdf"
+            +"&openid.foo.auth_level.ns.jisa=http%3A%2F%2Fwww.jisa.or.jp%2Fspec%2Fauth_level.html"
+            +"&openid.foo.preferred_auth_level_types=jisa nist";
 
         Request req = RequestFactory.parse(s);
         assertTrue(req instanceof AuthenticationRequest);
@@ -1272,7 +1284,10 @@ public class AllTests extends TestCase
             +"&openid.trust_root=http%3A%2F%2F%2A.schtuff.com%2F"
             +"&openid.ns.foo=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fpape%2F1.0"
             +"&openid.foo.max_auth_age=3600"
-            +"&openid.foo.preferred_auth_policies=";
+            +"&openid.foo.preferred_auth_policies="
+            +"&openid.foo.auth_level.ns.nist=http%3A%2F%2Fcsrc.nist.gov%2Fpublications%2Fnistpubs%2F800-63%2FSP800-63V1_0_2.pdf"
+            +"&openid.foo.auth_level.ns.jisa=http%3A%2F%2Fwww.jisa.or.jp%2Fspec%2Fauth_level.html"
+            +"&openid.foo.preferred_auth_level_types=jisa nist";
 
         Request req = RequestFactory.parse(s);
         assertTrue(req instanceof AuthenticationRequest);
@@ -1302,6 +1317,9 @@ public class AllTests extends TestCase
             { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
               "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
               "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" });
+        pr.setPreferredAuthLevels(new String []
+            { "http://www.jisa.or.jp/spec/auth_level.html",
+              "http://csrc.nist.gov/publications/nistpubs/800-63/SP800-63V1_0_2.pdf" });
         ar.addExtension(pr);
         PapeRequest pr1 = new PapeRequest(ar.getExtensions());
         validatePapeRequest(pr1);
@@ -1338,8 +1356,16 @@ public class AllTests extends TestCase
             }
             assertTrue(i < pArray.length);
         }
-        assertNotNull(pr.getNistAuthLevel());
-        assertEquals(pr.getNistAuthLevel().intValue(), 4);
+        String[] alnameArray = {
+            "http://www.jisa.or.jp/spec/auth_level.html",
+            "http://csrc.nist.gov/publications/nistpubs/800-63/SP800-63V1_0_2.pdf" };
+        Set assuranceLevelSet = pr.getAuthAssuranceLevelSet();
+        assertEquals(alnameArray.length, assuranceLevelSet.size());
+        for (int i = 0; i < alnameArray.length; i++) {
+            assertTrue(assuranceLevelSet.contains(alnameArray[i]));
+        }
+        assertTrue("2".equals(pr.getAuthAssuranceLevel("http://www.jisa.or.jp/spec/auth_level.html")));
+        assertTrue("1".equals(pr.getAuthAssuranceLevel("http://csrc.nist.gov/publications/nistpubs/800-63/SP800-63V1_0_2.pdf")));
     }
 
     public void testPapeResponseFromQuery () throws Exception
@@ -1350,7 +1376,10 @@ public class AllTests extends TestCase
             + "&openid.return_to=http%3A%2F%2Fwww.schtuff.com%2F%3Faction%3Dopenid_return%26dest%3D%26stay_logged_in%3DFalse%26response_nonce%3D2006-12-06t04%253A54%253A51ZQvGYW3"
             + "&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
             + "&openid.response_nonce=2007-10-15T17%3A38%3A16ZZvI%3D"
-            + "&openid.pape.nist_auth_level=4"
+            + "&openid.pape.auth_level.ns.nist=http%3A%2F%2Fcsrc.nist.gov%2Fpublications%2Fnistpubs%2F800-63%2FSP800-63V1_0_2.pdf"
+            + "&openid.pape.auth_level.ns.jisa=http%3A%2F%2Fwww.jisa.or.jp%2Fspec%2Fauth_level.html"
+            + "&openid.pape.auth_level.nist=1"
+            + "&openid.pape.auth_level.jisa=2"
             + "&openid.assoc_handle=694d5d70-7b45-11dc-8e68-bbf7f7e8a280"
             + "&openid.signed=assoc_handle%2Cidentity%2Cresponse_nonce%2Creturn_to%2Cclaimed_id%2Cop_endpoint"
             + "&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
@@ -1386,14 +1415,15 @@ public class AllTests extends TestCase
         AuthenticationResponse ar = (AuthenticationResponse)resp;
         PapeResponse pr = new PapeResponse();
         pr.setAuthTime(new Date(1196510400000L));
-        assertTrue(pr.getParam("auth_policies").equals("none"));
+        assertTrue(pr.getParam("auth_policies").equals("http://schemas.openid.net/pape/policies/2007/06/none"));
         pr.setAuthPolicies(new String[]{});
-        assertTrue(pr.getParam("auth_policies").equals("none"));
+        assertTrue(pr.getParam("auth_policies").equals("http://schemas.openid.net/pape/policies/2007/06/none"));
         pr.setAuthPolicies(new String[] 
             { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
               "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
               "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" });
-        pr.setNistAuthLevel(4);
+        pr.setAuthAssuranceLevel("http://www.jisa.or.jp/spec/auth_level.html", "2");
+        pr.setAuthAssuranceLevel("http://csrc.nist.gov/publications/nistpubs/800-63/SP800-63V1_0_2.pdf", "1");
         ar.addExtension(pr);
         System.out.println(ar.toUrlString());
         String[] signed = ar.getSignedList().split(",");
@@ -1402,7 +1432,6 @@ public class AllTests extends TestCase
         assertTrue(signSet.contains("ns.pape"));
         assertTrue(signSet.contains("pape.auth_policies"));
         assertTrue(signSet.contains("pape.auth_time"));
-        assertTrue(signSet.contains("pape.nist_auth_level"));
 
         PapeResponse pr1 = new PapeResponse(ar.getExtensions());
         validatePapeResponse(pr1);

@@ -15,15 +15,18 @@ package org.verisign.joid.extension;
 
 import org.verisign.joid.OpenIdException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Provider Authentication Policy Extension request message. See the
- * <a href="http://openid.net/specs/openid-provider-authentication-policy-extension-1_0-02.html">specification</a>.
+ * <a href="http://openid.net/specs/openid-provider-authentication-policy-extension-1_0.html">specification</a>.
  * <p>
  * Example of parsing incoming requests:
  * <pre>
@@ -66,6 +69,19 @@ public class PapeRequest extends Extension implements PapeConstants {
      * as it can.
      */
     static String PREFERRED_AUTH_POLICIES = "preferred_auth_policies";
+    /**
+     * The name space for the custom Assurance Level. Assurance levels
+     * and their name spaces are defined by various parties, such as
+     * country or industry specific standards bodies, or other groups
+     * or individuals.
+     */
+    static String AUTH_LEVEL_NS = "auth_level.ns.";
+    /**
+     * A list of the name space aliases for the custom Assurance Level
+     * name spaces that the RP requests be present in the response, in
+     * the order of its preference.
+     */
+    static String PREFERRED_AUTH_LEVELS = "preferred_auth_level_types";
 
     /**
      * Construct <code>PapeRequest</code> object with the correct
@@ -170,5 +186,148 @@ public class PapeRequest extends Extension implements PapeConstants {
      */
     public void setPreferredAuthPolicies (Set policies) {
         setListParam(PREFERRED_AUTH_POLICIES, policies, " ");
+    }
+
+    /**
+     * Retrieve the <code>auth_level_ns</code> namespaces and values.
+     *
+     * @return namespaces as a <code>Map<String, String></code>
+     * @see #AUTH_LEVEL_NS
+     */
+    Map getAuthLevelNS () {
+        Map map = new HashMap();
+        Iterator iter = getParamMap().keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            int i = key.indexOf(AUTH_LEVEL_NS);
+            if (i >= 0) {
+                key = key.substring(i);
+                map.put(key.substring(AUTH_LEVEL_NS.length()), getParam(key));
+            }
+        }
+        return map;
+    }
+
+    /**
+     * Retrieve the <code>auth_level_ns</code> namespaces and values.
+     *
+     * @param namespace name of namespace
+     * @return namespace value
+     * @see #AUTH_LEVEL_NS
+     */
+    String getAuthLevelNS (String namespace) {
+        return getParam(AUTH_LEVEL_NS + namespace);
+    }
+
+    /**
+     * Set the <code>auth_level_ns</code> namespaces and values.
+     *
+     * @param authLevels a set of auth level namespaces as a <code>Map<String, String></code>
+     * @see #AUTH_LEVEL_NS
+     */
+    void setAuthLevelNS (Map authLevels) {
+        Iterator iter = authLevels.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            addAuthLevelNS(key, (String) authLevels.get(key));
+        }
+    }
+
+    /**
+     * Add an <code>auth_level_ns</code> namespace.
+     *
+     * @param namespace the name of the namespace
+     * @param value the value of the namespace's URL identifier
+     * @see #AUTH_LEVEL_NS
+     */
+    void addAuthLevelNS (String namespace, String value) {
+        setParam(AUTH_LEVEL_NS + namespace, value);
+    }
+
+    /**
+     * Retrieve the <code>preferred_auth_levels</code> parameter
+     * values.
+     *
+     * @return preferred authentication levels as a <code>List<String></code> value
+     * @see #PREFERRED_AUTH_LEVELS
+     */
+    List getPreferredAuthLevelNSs () {
+        return getListParam(PREFERRED_AUTH_LEVELS, " ");
+    }
+
+    /**
+     * Set the <code>preferred_auth_levels</code> parameter with the
+     * given array of policy URI strings.  Duplicate URIs will be
+     * discarded.
+     *
+     * @param levels a set of policy URIs as a <code>String[]</code> value
+     * @see #PREFERRED_AUTH_LEVELS
+     */
+    void setPreferredAuthLevelNSs (String[] levels) {
+        setPreferredAuthLevels(new ArrayList(Arrays.asList(levels)));
+    }
+
+    /**
+     * Set the <code>preferred_auth_levels</code> parameter with the
+     * given set of policy URI strings.
+     *
+     * @param levels a list of policy namespaces ordered by preference as a <code>List<String></code> value
+     * @see #PREFERRED_AUTH_LEVELS
+     */
+    void setPreferredAuthLevelNSs (List levels) {
+        setListParam(PREFERRED_AUTH_LEVELS, levels, " ");
+    }
+
+    /**
+     * Retrieve the <code>preferred_auth_levels</code> parameter
+     * values, translated to the values in
+     * <code>auth_level.ns.*</code>.
+     *
+     * @return preferred authentication levels as a <code>List<String></code> value
+     * @see #PREFERRED_AUTH_LEVELS
+     * @see #AUTH_LEVEL_NS
+     */
+    public List getPreferredAuthLevels () {
+        Iterator it = getPreferredAuthLevelNSs().iterator();
+        List levels = new ArrayList();
+        while (it.hasNext()) {
+            levels.add(getAuthLevelNS((String) it.next()));
+        }
+        return levels;
+    }
+
+    /**
+     * Set the <code>preferred_auth_levels</code> and
+     * <code>auth_level.ns.*</code> parameter with the given array of
+     * policy URI strings.  Duplicate URIs will be discarded.
+     *
+     * @param levels a set of policy URIs as a <code>String[]</code> value
+     * @see #PREFERRED_AUTH_LEVELS
+     * @see #AUTH_LEVEL_NS
+     */
+    public void setPreferredAuthLevels (String[] levels) {
+        setPreferredAuthLevels(new ArrayList(Arrays.asList(levels)));
+    }
+
+    /**
+     * Set the <code>preferred_auth_levels</code> and
+     * <code>auth_level.ns.*</code> parameter with the given ordered
+     * list of policy URI strings.
+     *
+     * @param levels a list of policy namespaces ordered by preference as a <code>List<String></code> value
+     * @see #PREFERRED_AUTH_LEVELS
+     * @see #AUTH_LEVEL_NS
+     */
+    public void setPreferredAuthLevels (List levels) {
+        int i = 0;
+        List prefNS = new ArrayList();
+        Iterator it = levels.iterator();
+        while (it.hasNext()) {
+            String level = (String) it.next();
+            String ns = "ns" + Integer.toString(i++, 16);
+            addAuthLevelNS(ns, level);
+            prefNS.add(ns);
+        }
+        setPreferredAuthLevelNSs(prefNS);
     }
 }

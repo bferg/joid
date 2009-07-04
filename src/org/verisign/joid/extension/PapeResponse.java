@@ -16,15 +16,18 @@ package org.verisign.joid.extension;
 import org.verisign.joid.OpenIdException;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Iterator;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Provider Authentication Policy Extension response message. See the
- * <a href="http://openid.net/specs/openid-provider-authentication-policy-extension-1_0-02.html">specification</a>.
+ * <a href="http://openid.net/specs/openid-provider-authentication-policy-extension-1_0.html">specification</a>.
  * <p>
  * Example of parsing incoming responses:
  * <pre>
@@ -66,7 +69,7 @@ public class PapeResponse extends Extension implements PapeConstants {
      * with the value of "none".
      */
     static String AUTH_POLICIES = "auth_policies";
-    static String EMPTY_AUTH_POLICIES = "none";
+    static String EMPTY_AUTH_POLICIES = "http://schemas.openid.net/pape/policies/2007/06/none";
     /**
      * PAPE response parameter: The most recent timestamp when the End
      * User has actively authenticated to the OP in a manner fitting
@@ -78,16 +81,18 @@ public class PapeResponse extends Extension implements PapeConstants {
      */
     static String AUTH_TIME = "auth_time";
     /**
-     * PAPE response parameter: The Assurance Level as defined by the
-     * National Institute of Standards and Technology (NIST) in
-     * Special Publication 800-63 corresponding to the authentication
-     * method and policies employed by the OP when authenticating the
-     * End User. Level 0 is not an assurance level defined by NIST,
-     * but rather SHOULD be used to signify that the OP recognizes the
-     * parameter and the End User authentication did not meet the
-     * requirements of Level 1.
+     * The name space for the custom Assurance Level defined by
+     * various parties, such as a country or industry specific
+     * standards body, or other groups or individuals.
      */
-    static String NIST_AUTH_LEVEL = "nist_auth_level";
+    static String AUTH_LEVEL_NS = "auth_level.ns.";
+    /**
+     * The Assurance Level as defined by the above standards body,
+     * group, or individual that corresponds to the authentication
+     * method and policies employed by the OP when authenticating the
+     * End User.
+     */
+    static String AUTH_LEVEL_ASSURANCE = "auth_level.";
 
     /**
      * Creates a new <code>PapeResponse</code> instance with the
@@ -196,53 +201,230 @@ public class PapeResponse extends Extension implements PapeConstants {
         }
     }
 
+
     /**
-     * Retrieve the <code>nist_auth_level</code> parameter.
+     * Retrieve the <code>auth_level_ns</code> namespaces and values.
      *
-     * @return the NIST assurance level as an <code>Integer</code> value
-     * @exception OpenIdException if the parameter didn't parse to an integer
-     * @see #NIST_AUTH_LEVEL
+     * @return namespaces as a <code>Map<String, String></code>
+     * @see #AUTH_LEVEL_NS
      */
-    public Integer getNistAuthLevel () throws OpenIdException {
-        return getIntParam(NIST_AUTH_LEVEL);
+    Map getAuthLevelNS () {
+        Map map = new HashMap();
+        Iterator iter = getParamMap().keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            int i = key.indexOf(AUTH_LEVEL_NS);
+            if (i >= 0) {
+                key = key.substring(i);
+                map.put(key.substring(AUTH_LEVEL_NS.length()), getParam(key));
+            }
+        }
+        return map;
     }
 
     /**
-     * Set the <code>nist_auth_level</code> parameter with the given
-     * value.
+     * Retrieve the <code>auth_level_ns</code> namespaces and values.
      *
-     * @param nistAuthLevel NIST assurance level as an <code>int</code> value, must be any of 0 through 4 inclusive
-     * @see #NIST_AUTH_LEVEL
+     * @param namespace name of namespace
+     * @return namespace value
+     * @see #AUTH_LEVEL_NS
      */
-    public void setNistAuthLevel (int nistAuthLevel) {
-        setNistAuthLevel(new Integer(nistAuthLevel));
-    }        
+    String getAuthLevelNS (String namespace) {
+        return getParam(AUTH_LEVEL_NS + namespace);
+    }
 
     /**
-     * Set the <code>nist_auth_level</code> parameter with the given
-     * value.  If <code>null</code> is specified as the value, the
-     * parameter will be removed.
+     * Set the <code>auth_level_ns</code> namespaces and values.
      *
-     * @param nistAuthLevel NIST assurance level as an <code>int</code> value, must be any of 0 through 4 inclusive
-     * @see #NIST_AUTH_LEVEL
+     * @param authLevels a set of auth level namespaces as a <code>Map<String, String></code>
+     * @see #AUTH_LEVEL_NS
      */
-    public void setNistAuthLevel (Integer nistAuthLevel) {
-        if (nistAuthLevel == null) {
-            // nist_auth_level is optional, remove it if set to null
-            clearParam(NIST_AUTH_LEVEL);
+    void setAuthLevelNS (Map authLevels) throws OpenIdException {
+        Iterator iter = authLevels.keySet().iterator();
+        while (iter.hasNext()) {
+            String key = (String) iter.next();
+            addAuthLevelNS(key, (String) authLevels.get(key));
         }
-        else {
-            Integer minVal = new Integer(0);
-            Integer maxVal = new Integer(4);
-            if (nistAuthLevel.compareTo(minVal) < 0) {
-                setIntParam(NIST_AUTH_LEVEL, minVal);
-            }
-            else if (nistAuthLevel.compareTo(maxVal) > 0) {
-                setIntParam(NIST_AUTH_LEVEL, maxVal);
-            }
-            else {
-                setIntParam(NIST_AUTH_LEVEL, nistAuthLevel);
+    }
+
+    /**
+     * Add an <code>auth_level_ns</code> namespace.
+     *
+     * @param namespace the name of the namespace
+     * @param value the value of the namespace's URL identifier
+     * @see #AUTH_LEVEL_NS
+     */
+    void addAuthLevelNS (String namespace, String value) throws OpenIdException {
+        if ("ns".equals(namespace)) {
+            throw new OpenIdException("Invalid " + AUTH_LEVEL_NS + " parameter; \"ns\" not allowed");
+        }
+        setParam(AUTH_LEVEL_NS + namespace, value);
+    }
+
+    /**
+     * Gets the base assurance level value for the given assurance
+     * level namespace alias.  The base assurance level parameter is
+     * defined in section 5.2 as
+     * <code>openid.pape.auth_level.<cust></code>.
+     * 
+     * @param namespace assurance level URL namespace alias
+     * @return string value of the parameter
+     * @see #AUTH_LEVEL_ASSURANCE
+     */
+    String getAuthNSAssuranceLevel (String namespace) {
+        return getAuthNSAssuranceLevel(namespace, null);
+    }
+
+    /**
+     * Gets an additional assurance level parameter value for the
+     * given assurance level namespace alias.  Additional assurance
+     * level parameters are defined in section 5.2 as
+     * <code>openid.pape.auth_level.<cust>.<parameter name></code>.
+     * 
+     * @param namespace assurance level URL namespace alias
+     * @param param the parameter name (if null, default to base parameter)
+     * @return string value of the parameter
+     * @see #AUTH_LEVEL_ASSURANCE
+     */
+    String getAuthNSAssuranceLevel (String namespace, String param) {
+        String paramName = new String(AUTH_LEVEL_ASSURANCE + namespace);
+        if (param != null) {
+            paramName += "." + param;
+        }
+        return getParam(paramName);
+    }
+
+    /**
+     * Set the base assurance level value for the given assurance
+     * level namespace alias.  The base assurance level parameter is
+     * defined in section 5.2 as
+     * <code>openid.pape.auth_level.<cust></code>.
+     * 
+     * @param namespace assurance level URL
+     * @param value string defined according to this assurance level
+     * @see #AUTH_LEVEL_ASSURANCE
+     */
+    void setAuthNSAssuranceLevel (String namespace, String value) throws OpenIdException {
+        setAuthNSAssuranceLevel(namespace, null, value);
+    }
+
+    /**
+     * Sets an additional assurance level parameter value for the
+     * given assurance level namespace alias.  Additional assurance
+     * level parameters are defined in section 5.2 as
+     * <code>openid.pape.auth_level.<cust>.<parameter name></code>.
+     * 
+     * @param namespace assurance level URL
+     * @param param the parameter name (if null, default to base parameter)
+     * @param value string defined according to this assurance level
+     * @see #AUTH_LEVEL_ASSURANCE
+     */
+    void setAuthNSAssuranceLevel (String namespace, String param, String value) throws OpenIdException {
+        if ("ns".equals(namespace)) {
+            throw new OpenIdException("Invalid " + AUTH_LEVEL_NS + " parameter; \"ns\" not allowed");
+        }
+        String paramName = new String(AUTH_LEVEL_ASSURANCE + namespace);
+        if (param != null) {
+            paramName += "." + param;
+        }
+        setParam(paramName, value);
+    }
+
+    /**
+     * Gets the base assurance level value for the given assurance
+     * level namespace URL.  The base assurance level parameter is
+     * defined in section 5.2 as
+     * <code>openid.pape.auth_level.<cust></code>.
+     * 
+     * @param namespace assurance level URL
+     * @return string value of the parameter
+     * @see #AUTH_LEVEL_ASSURANCE
+     */
+    public String getAuthAssuranceLevel (String namespace) {
+        return getAuthAssuranceLevel(namespace, null);
+    }
+
+    /**
+     * Gets an additional assurance level parameter value for the
+     * given assurance level namespace URL.  Additional assurance
+     * level parameters are defined in section 5.2 as
+     * <code>openid.pape.auth_level.<cust>.<parameter name></code>.
+     * 
+     * @param namespace assurance level URL
+     * @param param the parameter name (if null, default to base parameter)
+     * @return string value of the parameter
+     * @see #AUTH_LEVEL_ASSURANCE
+     */
+    public String getAuthAssuranceLevel (String namespace, String param) {
+        Map nsmap = getAuthLevelNS();
+        Iterator it = nsmap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            if (namespace.equals((String) entry.getValue())) {
+                return getAuthNSAssuranceLevel((String) entry.getKey(), param);
             }
         }
+        return null;
+    }
+
+    /**
+     * Set the base assurance level value for the given assurance
+     * level namespace URL.  The base assurance level parameter is
+     * defined in section 5.2 as
+     * <code>openid.pape.auth_level.<cust></code>.  This method will
+     * define a namespace alias for the URL if one is not already
+     * defined.
+     * 
+     * @param namespace assurance level URL
+     * @param value string defined according to this assurance level
+     * @see #AUTH_LEVEL_ASSURANCE
+     */
+    public void setAuthAssuranceLevel (String namespace, String value) throws OpenIdException {
+        setAuthAssuranceLevel(namespace, null, value);
+    }
+
+    /**
+     * Sets an additional assurance level parameter value for the
+     * given assurance level namespace URL.  Additional assurance
+     * level parameters are defined in section 5.2 as
+     * <code>openid.pape.auth_level.<cust>.<parameter name></code>.
+     * This method will define a namespace alias for the URL if one is
+     * not already defined.
+     * 
+     * @param namespace assurance level URL
+     * @param param the parameter name (if null, default to base parameter)
+     * @param value string defined according to this assurance level
+     * @see #AUTH_LEVEL_ASSURANCE
+     */
+    public void setAuthAssuranceLevel (String namespace, String param, String value) throws OpenIdException {
+        Map nsmap = getAuthLevelNS();
+        Iterator it = nsmap.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry entry = (Map.Entry) it.next();
+            if (namespace.equals((String) entry.getValue())) {
+                setAuthNSAssuranceLevel((String) entry.getKey(), param, value);
+                return;
+            }
+        }
+        int i = 0;
+        String ns;
+        do {
+            ns = "ns" + Integer.toString(i++, 16);
+        } while (nsmap.keySet().contains(ns) && (i < Integer.MAX_VALUE));
+        if (i == Integer.MAX_VALUE) {
+            throw new OpenIdException("Couldn't find a free namespace");
+        }
+        addAuthLevelNS(ns, namespace);
+        setAuthNSAssuranceLevel(ns, param, value);
+    }
+
+    /**
+     * Retrieve a set containing all of the defined assurance level
+     * namespace URLs.
+     *
+     * @return assurance level URLs as a <code>Set<String></code> value
+     */
+    public Set getAuthAssuranceLevelSet () {
+        return new LinkedHashSet((Collection) getAuthLevelNS().values());
     }
 }

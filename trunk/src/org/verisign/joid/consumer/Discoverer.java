@@ -14,6 +14,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -101,17 +102,20 @@ public class Discoverer
 
     private void handleXrdsDocument(ServerAndDelegate serverAndDelegate, XRDSDocument xrdsDocument)
     {
-        List<XRDSService> services = xrdsDocument.getServiceList();
-        for (XRDSService service : services) {
+        List services = xrdsDocument.getServiceList();
+        Iterator it = services.iterator();
+        while (it.hasNext()) {
+            XRDSService service = (XRDSService) it.next();
             System.out.println("service=" + service.getUri());
             serverAndDelegate.setServer(service.getUri());
-            //  todo: also sset delegate after we get it
+            //  todo: also set delegate after we get it
         }
     }
 
     private void dumpHeaders(Header[] responseHeaders)
     {
-        for (Header responseHeader : responseHeaders) {
+        for (int i = 0; i < responseHeaders.length; i++) {
+            Header responseHeader = responseHeaders[i];
             System.out.println(responseHeader.getName() + "=" + responseHeader.getValue());
         }
     }

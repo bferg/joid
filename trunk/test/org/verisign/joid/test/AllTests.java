@@ -1398,6 +1398,35 @@ public class AllTests extends TestCase
         System.out.println(pr.toString());
         validatePapeResponse(pr);
     }
+
+
+    public void testPapeResponseGenerateFromQuery () throws Exception
+    {
+        /* FIXME: incorrect authentication request
+        String s = "openid.sig=fyhhhRZd4FFGDwpbAsQbj4yvhPI%3D"
+            +"&openid.signed=assoc_handle%2Cidentity%2Cresponse_nonce%2Creturn_to%2Cclaimed_id%2Cop_endpoint%2Cpape.auth_time%2Cns.pape%2Cpape.auth_policies"
+            +"&openid.assoc_handle=e40458d0-6a58-11de-b8a9-377e5854621a"
+            +"&openid.op_endpoint=http%3A%2F%2Fbinkley.lan%2Fserver"
+            +"&openid.pape.auth_time=2009-07-06T18%3A13%3A30Z"
+            +"&openid.return_to=http%3A%2F%2Flocalhost%3A8001%2Fprocess%3Fjanrain_nonce%3D2009-07-06T18%253A14%253A37ZzJCvX2"
+            +"&openid.identity=http%3A%2F%2Ftest01.binkley.lan%2F"
+            +"&openid.pape.auth_policies=http%3A%2F%2Fschemas.openid.net%2Fpape%2Fpolicies%2F2007%2F06%2Fnone"
+            +"&openid.claimed_id=http%3A%2F%2Fbinkley.lan%2Fuser%2Ftest01"
+            +"&openid.response_nonce=2009-07-06T18%3A14%3A48Z7QyjDg%3D%3D"
+            +"&openid.mode=check_authentication";
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        
+        Response resp = req.processUsing(serverInfo);
+        assertTrue(resp instanceof AuthenticationResponse);
+        AuthenticationResponse ar = (AuthenticationResponse) resp;
+        assertTrue(ar.isVersion2());
+
+        PapeResponse pr = new PapeResponse(ar.getExtensions());
+        System.out.println(pr.toString());
+        validatePapeResponse(pr);
+        */
+    }
     
     public void testPapeResponseGenerate () throws Exception
     {
@@ -1590,9 +1619,12 @@ public class AllTests extends TestCase
 
         CheckAuthenticationRequest testMessage = new CheckAuthenticationRequest(testMap, "check_authentication");
         String urlStr = testMessage.toUrlString();
-        System.out.println("urlstr:\'" + urlStr + "'");
         String compareStr = "openid.assoc_handle=adfasdf&openid.identity=http%3A%2F%2Ffoo&openid.return_to=http%3A%2F%2Fbar&openid.sig=siggy&openid.mode=check_authentication&openid.response_nonce=42";
-        assertTrue(compareStr.equals(testMessage.toUrlString()));
+        String[] origParams = urlStr.split("&");
+        Arrays.sort(origParams);
+        String[] compareParams = urlStr.split("&");
+        Arrays.sort(compareParams);
+        assertTrue(Arrays.equals(origParams, compareParams));
     }
 
     public void testMessageMapToUrlStringNullParam () throws Exception
@@ -1613,7 +1645,7 @@ public class AllTests extends TestCase
         catch (OpenIdException e) {
             caught = true;
         }
-        assertTrue(caught);
+        assertTrue("null nonce not caught", caught);
     }
 
     public void testCheckAuthNonceOk () throws Exception
@@ -1723,5 +1755,37 @@ public class AllTests extends TestCase
             caught = true;
         }
         assertTrue(caught);
+    }
+
+    public void testFBLogin () throws Exception {
+        DiffieHellman dh = new DiffieHellman(p, g);
+        AssociationResponse ar = associate(dh);
+        String s = "openid.assoc_handle=" + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8")
+            + "&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            + "&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select"
+            + "&openid.mode=checkid_immediate"
+            + "&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.ns.ui=http%3A%2F%2Fspecs.openid.net%2Fextensions%2Fui%2F1.0"
+            + "&openid.realm=https%3A%2F%2Fwww.facebook.com%2F"
+            + "&openid.return_to=https%3A%2F%2Fwww.facebook.com%2Fopenid%2Freceiver.php%3Fprovider_id%3D1044427205536%26protocol%3Dhttp%26context%3Dbackground_login%26request_id%3D0"
+            + "&openid.ui.mode=popup";
+        Request req = RequestFactory.parse(s);
+        assertTrue(req.isVersion2());
+    }
+
+    public void testSetupUrl () throws Exception {
+        String identity = "foo";
+        String returnTo = "http://relyingparty.com/";
+        String trustRoot = "http://relyingparty.com/";
+        AuthenticationRequest req = 
+            AuthenticationRequest.create(identity, returnTo, trustRoot, null);
+        String origStr = req.toUrlString();
+        String compareStr = "openid.trust_root=http%3A%2F%2Frelyingparty.com%2F&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.identity=foo&openid.claimed_id=foo&openid.mode=checkid_setup&openid.realm=http%3A%2F%2Frelyingparty.com%2F&openid.return_to=http%3A%2F%2Frelyingparty.com%2F";
+        assertTrue(origStr != null);
+        String[] origParams = origStr.split("&");
+        Arrays.sort(origParams);
+        String[] compareParams = compareStr.split("&");
+        Arrays.sort(compareParams);
+        assertTrue(Arrays.equals(origParams, compareParams));
     }
 }

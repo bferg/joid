@@ -153,7 +153,9 @@ public class AuthenticationRequest extends Request {
 			map.put(AuthenticationRequest.OPENID_CLAIMED_ID, claimed_id);
 		}
 		map.put(AuthenticationRequest.OPENID_IDENTITY, identity);
-		map.put(AuthenticationRequest.OPENID_ASSOC_HANDLE, handle);
+		if (handle != null) {
+			map.put(AuthenticationRequest.OPENID_ASSOC_HANDLE, handle);
+		}
 		map.put(AuthenticationRequest.OPENID_RETURN_TO, returnTo);
 		map.put(AuthenticationRequest.OPENID_TRUST_ROOT, trustRoot);
 		map.put(AuthenticationRequest.OPENID_REALM, trustRoot);

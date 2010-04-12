@@ -526,6 +526,9 @@ public class AllTests extends TestCase
     if (resp.isVersion2()) {
         assertEquals((String)map.get("openid.ns.sreg"), 
                      SimpleRegistration.OPENID_SREG_NAMESPACE_11);
+        // make sure that ns.sreg is signed
+        String[] signed = sigList.split(",");
+        assertTrue(Arrays.asList(signed).contains("ns.sreg"));
     }
 
 	resp = carq.processUsing(serverInfo);

@@ -279,6 +279,9 @@ public class AuthenticationResponse extends Response
 	    Map map = sreg.getSuppliedValues();
 	    log.debug("sreg supplied values="+map);
 	    Set set = map.entrySet();
+	    if (!set.isEmpty() && isVersion2()) {
+		signed += ",ns.sreg";
+	    }
 	    for (Iterator iter = set.iterator(); iter.hasNext();){
 		Map.Entry mapEntry = (Map.Entry) iter.next();
 		String key = (String) mapEntry.getKey();

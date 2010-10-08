@@ -40,7 +40,7 @@ public class Utils
 		String value 
 		    = URLEncoder.encode(line.substring(n+1, line.length()),
 					"UTF-8");
-		contents.append(name+"="+value+"?");		
+		contents.append(name+"="+value+"&");		
 	    }
 	    String s = contents.toString();
 	    return s.substring(0, s.length());

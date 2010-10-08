@@ -106,7 +106,9 @@ public class MessageParser
     }
 
     /**
-     * Translate a query string to a Map.  
+     * Translate a query string to a Map. Duplicate values are
+     * overwritten, so don't use this routine for general query string
+     * parsing.
      *
      * TODO: Made public only for unit tests. Do not use.
      */
@@ -117,24 +119,16 @@ public class MessageParser
 	if (query == null) {
 	    return map;
 	}
-	StringTokenizer st = new StringTokenizer(query, "?&=;", true);
-	String previous = null;
-	while (st.hasMoreTokens()) {
-	    String current = st.nextToken();
-	    if ("?".equals(current) || "&".equals(current) || ";".equals(current)) {
-		//ignore
-	    } else if ("=".equals(current)) {
-		String name = URLDecoder.decode(previous, "UTF-8");
-		if (st.hasMoreTokens()){
-		    String value = URLDecoder.decode(st.nextToken(), "UTF-8");
-		    if (isGoodValue(value)){
-			map.put(name, value);
-		    }
-		}
-	    } else {
-		previous = current;
-	    }
-	}
+        String[] parts = query.split("[&;]");
+        for (int i = 0; i < parts.length; i++) {
+            String [] nameval = parts[i].split("=");
+            String name = URLDecoder.decode(nameval[0], "UTF-8");
+            String value = null;
+            if (nameval.length > 1) {
+                value = URLDecoder.decode(nameval[1], "UTF-8");
+            }
+            map.put(name, value);
+        }
 	return map;
     }
 

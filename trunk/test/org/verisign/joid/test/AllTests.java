@@ -147,15 +147,21 @@ public class AllTests extends TestCase
     
     public void testUrlToMap() throws Exception
     {
-        String testStr = "path?foo=bar&baz=qux";
+        String testStr = "foo=bar&baz=qux";
         Map map = MessageParser.urlEncodedToMap(testStr);
+
         assertTrue(map.size() == 2);
         assertTrue(((String)map.get("foo")).equals("bar"));
         assertTrue(((String)map.get("baz")).equals("qux"));
-        testStr = "path?foo=bar;baz=qux";
+        testStr = "foo=bar;baz=qux";
         map = MessageParser.urlEncodedToMap(testStr);
         assertTrue(map.size() == 2);
         assertTrue(((String)map.get("foo")).equals("bar"));
+        assertTrue(((String)map.get("baz")).equals("qux"));
+        testStr = "foo=bar?baz&baz=qux";
+        map = MessageParser.urlEncodedToMap(testStr);
+        assertTrue(map.size() == 2);
+        assertTrue(((String)map.get("foo")).equals("bar?baz"));
         assertTrue(((String)map.get("baz")).equals("qux"));
     }
 
@@ -350,7 +356,7 @@ public class AllTests extends TestCase
 
 	// authenticate
 	String s = Utils.readFileAsString("3bv1.txt");
-	s += "?openid.assoc_handle="
+	s += "&openid.assoc_handle="
 	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
 
 	Request req = RequestFactory.parse(s);
@@ -366,7 +372,7 @@ public class AllTests extends TestCase
 	assertTrue(resp2 instanceof AuthenticationResponse);
 	AuthenticationResponse authr = (AuthenticationResponse) resp2;
 	assertFalse(authr.isVersion2());
-    assertTrue(null == authr.getUrlEndPoint());
+        assertTrue(null == authr.getUrlEndPoint());
     
 	String sigList = authr.getSignedList();
 	assertTrue(sigList != null);
@@ -415,7 +421,7 @@ public class AllTests extends TestCase
 
 	// authenticate
 	String s = Utils.readFileAsString("3bv1.txt");
-	s += "?openid.assoc_handle="
+	s += "&openid.assoc_handle="
 	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
 
 	Request req = RequestFactory.parse(s);
@@ -480,7 +486,7 @@ public class AllTests extends TestCase
 
 	// authenticate
 	String s = Utils.readFileAsString("sreg.txt");
-	s += "?openid.assoc_handle="
+	s += "&openid.assoc_handle="
 	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
 
 	Request req = RequestFactory.parse(s);
@@ -593,8 +599,8 @@ public class AllTests extends TestCase
 
 	// authenticate
 	String s = Utils.readFileAsString("3b.txt");
-	s += "?openid.ns="+v2
-	    + "?openid.assoc_handle="
+	s += "&openid.ns="+v2
+	    + "&openid.assoc_handle="
 	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
 
 	Request req = RequestFactory.parse(s);
@@ -663,8 +669,8 @@ public class AllTests extends TestCase
 
 	// authenticate
 	String s = Utils.readFileAsString("3b.txt");
-	s += "?openid.ns="+v2
-	    + "?openid.assoc_handle="
+	s += "&openid.ns="+v2
+	    + "&openid.assoc_handle="
 	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
 
 	Request req = RequestFactory.parse(s);
@@ -736,8 +742,8 @@ public class AllTests extends TestCase
 
 	// authenticate
 	String s = Utils.readFileAsString("3c.txt");
-	s += "?openid.ns="+v2
-	    + "?openid.assoc_handle="
+	s += "&openid.ns="+v2
+	    + "&openid.assoc_handle="
 	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
 
 	Request req = RequestFactory.parse(s);
@@ -804,13 +810,9 @@ public class AllTests extends TestCase
 	    +"qyqPiwW&openid.sreg.optional=email%2Cfullname"
 	    +"&openid.trust_root=";
 
-	try {
-	    // no longer throws an exception because an unspecified
-	    // trust_root is assumed to be the return_to url
-	    Request req = RequestFactory.parse(s);
-	} catch (OpenIdException unexpected){
-        assertTrue(false);
-	}
+        // no longer throws an exception because an unspecified
+        // trust_root is assumed to be the return_to url
+        Request req = RequestFactory.parse(s);
     }
 
     public void testEmptyIdentity() throws Exception
@@ -1791,4 +1793,23 @@ public class AllTests extends TestCase
         Arrays.sort(compareParams);
         assertTrue(Arrays.equals(origParams, compareParams));
     }
+
+
+    public void testQuestionMarkInReturntoUrl () throws Exception {
+        String s = "openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0"
+            + "&openid.claimed_id=http%3A%2F%2Fhans.pip.verisignlabs.com%2F"
+            + "&openid.identity=http%3A%2F%2Fhans.pip.verisignlabs.com%2F"
+            + "&openid.return_to=https%3A%2F%2Fwww.blogger.com%2Fcomment.do?loginRedirect%3Dlm6phc1udus9"
+            + "&openid.realm=https%3A%2F%2Fwww.blogger.com"
+            + "&openid.mode=checkid_setup";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        AuthenticationRequest areq = (AuthenticationRequest) req;
+
+        Map map = areq.toMap();
+        System.out.println((String)map.get("openid.return_to"));
+        assertEquals("https://www.blogger.com/comment.do?loginRedirect=lm6phc1udus9", (String)map.get("openid.return_to"));
+    }
+
 }

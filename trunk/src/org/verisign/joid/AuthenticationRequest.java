@@ -146,7 +146,8 @@ public class AuthenticationRequest extends Request {
 		checkInvariants();
 	}
 
-	Map toMap() {
+    // public for unit tests
+	public Map toMap() {
 		Map map = super.toMap();
 
 		if (claimed_id != null) {

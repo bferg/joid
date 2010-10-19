@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 

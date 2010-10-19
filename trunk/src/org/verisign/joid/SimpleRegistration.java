@@ -173,7 +173,7 @@ public class SimpleRegistration
 	Set req = new HashSet();
 	Set opt = new HashSet();
 	Map sup = new HashMap();
-    String ns = OPENID_SREG_NAMESPACE_11;
+        String ns = OPENID_SREG_NAMESPACE_11;
 
 	String trigger = OPENID_SREG + ".";
 	int triggerLength = trigger.length();
@@ -197,6 +197,9 @@ public class SimpleRegistration
 
     private void addToSetFromList(Set set, String value)
     {
+        if (value == null) {
+            return;
+        }
 	StringTokenizer st = new StringTokenizer(value, ",");
 	while (st.hasMoreTokens()) {
 	    String token = st.nextToken().trim();
@@ -244,6 +247,6 @@ public class SimpleRegistration
 	return "[SimpleRegistration required="+required
 	    +", optional="+optional+", supplied="+supplied
 	    +", policy url="+policyUrl
-        +", namespace="+namespace+"]";
+            +", namespace="+namespace+"]";
     }
 }

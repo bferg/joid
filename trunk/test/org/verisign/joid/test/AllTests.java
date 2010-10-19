@@ -1812,4 +1812,16 @@ public class AllTests extends TestCase
         assertEquals("https://www.blogger.com/comment.do?loginRedirect=lm6phc1udus9", (String)map.get("openid.return_to"));
     }
 
+    
+    public void testEmptySregSet () throws Exception {
+        String s = "openid.claimed_id=http%3A%2F%2Ffoo.pip.verisignlabs.com%2F&openid.identity=http%3A%2F%2Ffoo.pip.verisignlabs.com%2F&openid.assoc_handle=0b691530-d6f2-11df-a01b-5fe375d9cbb7&openid.return_to=http%3A%2F%2Fsentimnt.com%2FUser%2FAuthenticate%3Fdnoa.userSuppliedIdentifier%3Dhttp%253A%252F%252Ffoo.pip.verisignlabs.com&openid.realm=http%3A%2F%2Fsentimnt.com%2F&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.ns.sreg=http%3A%2F%2Fopenid.net%2Fextensions%2Fsreg%2F1.1&openid.sreg.required=email&openid.sreg.optional=";
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        AuthenticationRequest areq = (AuthenticationRequest) req;
+	SimpleRegistration sreg = ((AuthenticationRequest) req)
+	    .getSimpleRegistration();
+	Set set = sreg.getOptional();
+        assertEquals(set.size(), 0);
+    }
 }

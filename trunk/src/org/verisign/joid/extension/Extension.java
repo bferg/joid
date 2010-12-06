@@ -15,6 +15,7 @@ package org.verisign.joid.extension;
 
 import org.verisign.joid.OpenIdException;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import java.util.TimeZone;
  * Base class for OpenID extension information classes, with utility
  * functions for getting and setting different parameter types.
  */
-public class Extension {
+public class Extension implements Serializable {
     /**
      * RFC3339 date format
      */

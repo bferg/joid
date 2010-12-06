@@ -42,6 +42,8 @@ import org.verisign.joid.extension.PapeResponse;
 import org.verisign.joid.server.AssociationImpl;
 import org.verisign.joid.server.MemoryStore;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
 import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.NoSuchAlgorithmException;
@@ -1823,5 +1825,20 @@ public class AllTests extends TestCase
 	    .getSimpleRegistration();
 	Set set = sreg.getOptional();
         assertEquals(set.size(), 0);
+    }
+
+    public void testSerializable () throws Exception {
+        PapeRequest papeReq = new PapeRequest();
+        papeReq.setMaxAuthAge(1000);
+        papeReq.setPreferredAuthPolicies(new String[] 
+            { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
+              "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
+              "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" });
+        
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        ObjectOutputStream objOutStream = new ObjectOutputStream(outStream);
+        objOutStream.writeObject(papeReq);
+        objOutStream.close();
+        
     }
 }

@@ -13,16 +13,16 @@ import java.util.ArrayList;
 public class XRDSDocument
 {
     // List<XRDSService>
-    private List serviceList = new ArrayList();
+    private List<XRDSService> serviceList = new ArrayList<XRDSService>();
 
 
-    public List getServiceList()
+    public List<XRDSService> getServiceList()
     {
         return serviceList;
     }
 
 
-    public void setServiceList( List serviceList )
+    public void setServiceList( List<XRDSService> serviceList )
     {
         this.serviceList = serviceList;
     }

@@ -14,9 +14,6 @@
 package org.verisign.joid;
 
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;

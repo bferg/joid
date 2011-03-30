@@ -36,11 +36,11 @@ public class OpenIdFilter implements Filter
 {
     private static Log log = LogFactory.getLog( OpenIdFilter.class );
     private static JoidConsumer joid = new JoidConsumer();
-    public static final String OPENID_ATTRIBUTE = "openid.identity"; // todo: remove one of these
+    public static final String OPENID_ATTRIBUTE = "openid.identity"; // @TODO: remove one of these
     public static final String OPENID_IDENTITY = OPENID_ATTRIBUTE;
     boolean saveIdentityUrlAsCookie = false;
     private String cookieDomain;
-    private List ignorePaths = new ArrayList();
+    private List<String> ignorePaths = new ArrayList<String>();
     private static boolean configuredProperly = false;
     private Integer cookieMaxAge;
 
@@ -100,6 +100,7 @@ public class OpenIdFilter implements Filter
         {
             try
             {
+                @SuppressWarnings("unchecked")
                 AuthenticationResult result = joid.authenticate( convertToStringValueMap( servletRequest
                     .getParameterMap() ) );
                 String identity = result.getIdentity();
@@ -143,7 +144,7 @@ public class OpenIdFilter implements Filter
         String servletPath = request.getServletPath();
         for ( int i = 0; i < ignorePaths.size(); i++ )
         {
-            String s = ( String ) ignorePaths.get( i );
+            String s = ignorePaths.get( i );
             if ( servletPath.startsWith( s ) )
             {
                 //                System.out.println("IGNORING: " + servletPath);
@@ -160,15 +161,15 @@ public class OpenIdFilter implements Filter
     }
 
 
-    private Map/*<String, String>*/convertToStringValueMap( Map/*<String, String[]>*/parameterMap )
+    private Map<String, String> convertToStringValueMap( Map<String, String[]> parameterMap )
     {
-        Map/*<String,String>*/ret = new HashMap();
-        Set set = parameterMap.entrySet();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Map<String,String> ret = new HashMap<String, String>();
+        Set<Map.Entry<String, String[]>> set = parameterMap.entrySet();
+        for ( Iterator<Map.Entry<String, String[]>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
-            String key = ( String ) mapEntry.getKey();
-            String[] value = ( String[] ) mapEntry.getValue();
+            Map.Entry<String,String[]> mapEntry = iter.next();
+            String key = mapEntry.getKey();
+            String[] value = mapEntry.getValue();
             ret.put( key, value[0] );
         }
         return ret;
@@ -195,7 +196,7 @@ public class OpenIdFilter implements Filter
         {
             return openid;
         }
-        // todo: THIS COOKIE THING CAN'T WORK BECAUSE SOMEONE COULD FAKE IT, NEEDS AN AUTH TOKEN ALONG WITH IT
+        // @TODO: THIS COOKIE THING CAN'T WORK BECAUSE SOMEONE COULD FAKE IT, NEEDS AN AUTH TOKEN ALONG WITH IT
         return openid;
     }
 }

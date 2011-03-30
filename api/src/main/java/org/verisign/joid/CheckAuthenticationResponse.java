@@ -14,9 +14,6 @@
 package org.verisign.joid;
 
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +26,6 @@ import java.util.Iterator;
  */
 public class CheckAuthenticationResponse extends Response
 {
-    private final static Log log = LogFactory.getLog( CheckAuthenticationResponse.class );
-
     private boolean isValid;
 
     static String OPENID_MODE = "openid.mode"; // for 1.1 messages
@@ -40,7 +35,7 @@ public class CheckAuthenticationResponse extends Response
     public final static String OPENID_INVALIDATE_HANDLE = "invalidate_handle";
 
     private AuthenticationResponse ar;
-    private Map map;
+    private Map<String,String> map;
     private String invalidateHandle;
 
 
@@ -48,15 +43,15 @@ public class CheckAuthenticationResponse extends Response
      * This constructor is for a Consumer side response received from the server.
      * @param map
      */
-    public CheckAuthenticationResponse( Map map )
+    public CheckAuthenticationResponse( Map<String,String> map )
     {
         super( map );
-        Set set = map.entrySet();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<Map.Entry<String,String>> set = map.entrySet();
+        for ( Iterator<Map.Entry<String,String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = iter.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
 
             if ( OPENID_MODE.equals( key ) )
             {
@@ -65,7 +60,6 @@ public class CheckAuthenticationResponse extends Response
             else if ( OPENID_IS_VALID.equals( key ) )
             {
                 isValid = org.verisign.joid.util.Boolean.parseBoolean( value );
-                //isValid = Boolean.parseBoolean(value);
             }
             else if ( OPENID_INVALIDATE_HANDLE.equals( key ) )
             {
@@ -102,7 +96,7 @@ public class CheckAuthenticationResponse extends Response
      * @return a map with all internal values mapped to their specification
      * keys.
      */
-    public Map toMap()
+    public Map<String,String> toMap()
     {
         return map;
     }
@@ -116,11 +110,11 @@ public class CheckAuthenticationResponse extends Response
                 String invalidateHandle )
         throws OpenIdException
     {
-        super( Collections.EMPTY_MAP );
+        super( Collections.<String,String>emptyMap() );
         this.ar = ar;
         this.ns = ar.getNamespace();
 
-        map = new HashMap();
+        map = new HashMap<String,String>();
         if ( isVersion2() )
         {
             map.put( OPENID_NS, OPENID_20_NAMESPACE );

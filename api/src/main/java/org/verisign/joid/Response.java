@@ -10,13 +10,10 @@
 // Distributed under an Apache License
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-
 package org.verisign.joid;
 
 
 import java.util.Map;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 
 /**
@@ -24,7 +21,6 @@ import org.apache.commons.logging.Log;
  */
 public abstract class Response extends Message
 {
-    private final static Log log = LogFactory.getLog( Response.class );
     static String OPENID_ERROR = "error";
 
     String error;
@@ -36,13 +32,13 @@ public abstract class Response extends Message
     }
 
 
-    Map toMap()
+    Map<String,String> toMap()
     {
         return super.toMap();
     }
 
 
-    Response( Map map )
+    Response( Map<String,String> map )
     {
         if ( map != null )
         {
@@ -66,5 +62,4 @@ public abstract class Response extends Message
         }
         return s;
     }
-
 }

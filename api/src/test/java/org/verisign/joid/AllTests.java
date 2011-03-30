@@ -126,21 +126,21 @@ public class AllTests extends TestCase
     public void testUrlToMap() throws Exception
     {
         String testStr = "foo=bar&baz=qux";
-        Map map = MessageParser.urlEncodedToMap( testStr );
+        Map<String, String> map = MessageParser.urlEncodedToMap( testStr );
 
         assertTrue( map.size() == 2 );
-        assertTrue( ( ( String ) map.get( "foo" ) ).equals( "bar" ) );
-        assertTrue( ( ( String ) map.get( "baz" ) ).equals( "qux" ) );
+        assertTrue( ( map.get( "foo" ) ).equals( "bar" ) );
+        assertTrue( ( map.get( "baz" ) ).equals( "qux" ) );
         testStr = "foo=bar;baz=qux";
         map = MessageParser.urlEncodedToMap( testStr );
         assertTrue( map.size() == 2 );
-        assertTrue( ( ( String ) map.get( "foo" ) ).equals( "bar" ) );
-        assertTrue( ( ( String ) map.get( "baz" ) ).equals( "qux" ) );
+        assertTrue( ( map.get( "foo" ) ).equals( "bar" ) );
+        assertTrue( ( map.get( "baz" ) ).equals( "qux" ) );
         testStr = "foo=bar?baz&baz=qux";
         map = MessageParser.urlEncodedToMap( testStr );
         assertTrue( map.size() == 2 );
-        assertTrue( ( ( String ) map.get( "foo" ) ).equals( "bar?baz" ) );
-        assertTrue( ( ( String ) map.get( "baz" ) ).equals( "qux" ) );
+        assertTrue( ( map.get( "foo" ) ).equals( "bar?baz" ) );
+        assertTrue( ( map.get( "baz" ) ).equals( "qux" ) );
     }
 
 
@@ -381,7 +381,7 @@ public class AllTests extends TestCase
 
         // check that we can authenticate the signature
         //
-        Map map = authr.toMap();
+        Map<String,String> map = authr.toMap();
         CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
         assertFalse( carq.isVersion2() );
 
@@ -442,7 +442,7 @@ public class AllTests extends TestCase
 
         // check that the wrong signature doesn't authenticate
         //
-        Map map = authr.toMap();
+        Map<String, String> map = authr.toMap();
         map.put( "openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=" );
         CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
 
@@ -483,14 +483,14 @@ public class AllTests extends TestCase
         assertTrue( req instanceof AuthenticationRequest );
         SimpleRegistration sreg = ( ( AuthenticationRequest ) req )
             .getSimpleRegistration();
-        Set set = sreg.getRequired();
-        Map supplied = new HashMap();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<String> set = sreg.getRequired();
+        Map<String,String> supplied = new HashMap<String, String>();
+        for ( Iterator<String> iter = set.iterator(); iter.hasNext(); )
         {
-            s = ( String ) iter.next();
+            s = iter.next();
             supplied.put( s, "blahblah" );
         }
-        sreg = new SimpleRegistration( set, Collections.EMPTY_SET, supplied, "" );
+        sreg = new SimpleRegistration( set, Collections.<String>emptySet(), supplied, "" );
         ( ( AuthenticationRequest ) req ).setSimpleRegistration( sreg );
 
         Response resp = req.processUsing( serverInfo );
@@ -514,7 +514,7 @@ public class AllTests extends TestCase
 
         // check that we can authenticate the signaure
         //
-        Map map = authr.toMap();
+        Map<String,String> map = authr.toMap();
         CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
 
         // Check for sreg namespace
@@ -619,9 +619,9 @@ public class AllTests extends TestCase
         String reSigned = authr.sign( "HMAC-SHA1", clearKey, sigList );
         assertEquals( reSigned, signature );
 
-        // check that we can authenticate the signaure
+        // check that we can authenticate the signature
         //
-        Map map = authr.toMap();
+        Map<String,String> map = authr.toMap();
         CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
 
         resp = carq.processUsing( serverInfo );
@@ -688,7 +688,7 @@ public class AllTests extends TestCase
 
         // Check that the wrong signature doesn't authenticate
         //
-        Map map = authr.toMap();
+        Map<String,String> map = authr.toMap();
         map.put( "openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=" );
         CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
         assertTrue( carq.isVersion2() );
@@ -755,7 +755,7 @@ public class AllTests extends TestCase
 
         // check that we can authenticate the signaure
         //
-        Map map = authr.toMap();
+        Map<String,String> map = authr.toMap();
         CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
 
         resp = carq.processUsing( serverInfo );
@@ -792,6 +792,7 @@ public class AllTests extends TestCase
 
         // no longer throws an exception because an unspecified
         // trust_root is assumed to be the return_to url
+        @SuppressWarnings("unused")
         Request req = RequestFactory.parse( s );
     }
 
@@ -805,6 +806,7 @@ public class AllTests extends TestCase
         try
         {
             Request req = RequestFactory.parse( s );
+            @SuppressWarnings("unused")
             Response resp = req.processUsing( serverInfo );
             assertTrue( false );
         }
@@ -822,6 +824,7 @@ public class AllTests extends TestCase
 
         try
         {
+            @SuppressWarnings("unused")
             Request req = RequestFactory.parse( s );
             assertTrue( false );
         }
@@ -846,6 +849,7 @@ public class AllTests extends TestCase
             + "nid.assoc_handle=" + ar.getAssociationHandle();
 
         Request req = RequestFactory.parse( s );
+        @SuppressWarnings("unused")
         Response resp = req.processUsing( serverInfo );
     }
 
@@ -865,6 +869,7 @@ public class AllTests extends TestCase
         try
         {
             Request req = RequestFactory.parse( s );
+            @SuppressWarnings("unused")
             Response resp = req.processUsing( serverInfo );
             assertTrue( false );
         }
@@ -937,6 +942,7 @@ public class AllTests extends TestCase
 
         try
         {
+            @SuppressWarnings("unused")
             Request req = RequestFactory.parse( s );
             assertTrue( false );
         }
@@ -968,7 +974,7 @@ public class AllTests extends TestCase
         AuthenticationRequest ar = ( AuthenticationRequest ) req;
         assertTrue( ar.isIdentifierSelect() );
 
-        Map map = ar.getExtensions();
+        Map<String,String> map = ar.getExtensions();
         assertTrue( map.containsKey( "ns.foo" ) );
         assertTrue( map.containsKey( "foo" ) );
         assertTrue( map.containsKey( "foo.bar" ) );
@@ -1016,7 +1022,7 @@ public class AllTests extends TestCase
         assertTrue( aresp.isVersion2() );
 
         // validate 2.0 association response
-        Set validParams = new HashSet( Arrays.asList( new String[]
+        Set<String> validParams = new HashSet<String>( Arrays.asList( new String[]
             {
                     "assoc_handle",
                     "assoc_type",
@@ -1061,7 +1067,7 @@ public class AllTests extends TestCase
         assertFalse( aresp.isVersion2() );
 
         // validate 1.1 association response
-        Set validParams = new HashSet( Arrays.asList( new String[]
+        Set<String> validParams = new HashSet<String>( Arrays.asList( new String[]
             {
                     "assoc_handle",
                     "assoc_type",
@@ -1254,15 +1260,15 @@ public class AllTests extends TestCase
         assertTrue( pr.isValid() );
         assertNotNull( pr.getMaxAuthAge() );
         assertEquals( pr.getMaxAuthAge().intValue(), 3600 );
-        Collection policies = pr.getPreferredAuthPolicies();
+        Collection<String> policies = pr.getPreferredAuthPolicies();
         String[] pArray =
             { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
                             "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
                             "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" };
-        Iterator it = policies.iterator();
+        Iterator<String> it = policies.iterator();
         while ( it.hasNext() )
         {
-            String pStr = ( String ) it.next();
+            String pStr = it.next();
             int i = 0;
             for ( i = 0; i < pArray.length; i++ )
             {
@@ -1278,11 +1284,11 @@ public class AllTests extends TestCase
             {
                 "http://www.jisa.or.jp/spec/auth_level.html",
                 "http://csrc.nist.gov/publications/nistpubs/800-63/SP800-63V1_0_2.pdf" };
-        List prefAuthLevels = pr.getPreferredAuthLevels();
+        List<String> prefAuthLevels = pr.getPreferredAuthLevels();
         assertEquals( alnameArray.length, prefAuthLevels.size() );
         for ( int i = 0; i < alnameArray.length; i++ )
         {
-            assertTrue( alnameArray[i].equals( ( String ) prefAuthLevels.get( i ) ) );
+            assertTrue( alnameArray[i].equals( prefAuthLevels.get( i ) ) );
         }
     }
 
@@ -1384,16 +1390,16 @@ public class AllTests extends TestCase
         assertTrue( pr.isValid() );
         assertNotNull( pr.getAuthTime() );
         assertEquals( pr.getAuthTime().getTime(), 1196510400000L );
-        Collection policies = pr.getAuthPolicies();
+        Collection<String> policies = pr.getAuthPolicies();
         assertEquals( policies.size(), 3 );
         String[] pArray =
             { "http://schemas.openid.net/pape/policies/2007/06/phishing-resistant",
                             "http://schemas.openid.net/pape/policies/2007/06/multi-factor",
                             "http://schemas.openid.net/pape/policies/2007/06/multi-factor-physical" };
-        Iterator it = policies.iterator();
+        Iterator<String> it = policies.iterator();
         while ( it.hasNext() )
         {
-            String pStr = ( String ) it.next();
+            String pStr = it.next();
             int i = 0;
             for ( i = 0; i < pArray.length; i++ )
             {
@@ -1408,7 +1414,7 @@ public class AllTests extends TestCase
             {
                 "http://www.jisa.or.jp/spec/auth_level.html",
                 "http://csrc.nist.gov/publications/nistpubs/800-63/SP800-63V1_0_2.pdf" };
-        Set assuranceLevelSet = pr.getAuthAssuranceLevelSet();
+        Set<String> assuranceLevelSet = pr.getAuthAssuranceLevelSet();
         assertEquals( alnameArray.length, assuranceLevelSet.size() );
         for ( int i = 0; i < alnameArray.length; i++ )
         {
@@ -1510,7 +1516,7 @@ public class AllTests extends TestCase
         ar.addExtension( pr );
         System.out.println( ar.toUrlString() );
         String[] signed = ar.getSignedList().split( "," );
-        Set signSet = new HashSet();
+        Set<String> signSet = new HashSet<String>();
         signSet.addAll( Arrays.asList( signed ) );
         assertTrue( signSet.contains( "ns.pape" ) );
         assertTrue( signSet.contains( "pape.auth_policies" ) );
@@ -1555,14 +1561,14 @@ public class AllTests extends TestCase
 
         SimpleRegistration sreg = areq.getSimpleRegistration();
         assertTrue( sreg.isRequested() );
-        Set set = sreg.getOptional();
-        Map supplied = new HashMap();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<String> set = sreg.getOptional();
+        Map<String,String> supplied = new HashMap<String,String>();
+        for ( Iterator<String> iter = set.iterator(); iter.hasNext(); )
         {
             s = ( String ) iter.next();
             supplied.put( s, "blahblah" );
         }
-        sreg = new SimpleRegistration( Collections.EMPTY_SET, set, supplied, "", sreg.getNamespace() );
+        sreg = new SimpleRegistration( Collections.<String>emptySet(), set, supplied, "", sreg.getNamespace() );
         areq.setSimpleRegistration( sreg );
 
         Response resp = req.processUsing( serverInfo );

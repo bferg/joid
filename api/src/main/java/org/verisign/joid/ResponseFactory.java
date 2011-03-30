@@ -14,15 +14,9 @@
 package org.verisign.joid;
 
 
-import java.io.UnsupportedEncodingException;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 
 /**
@@ -30,15 +24,9 @@ import org.apache.commons.logging.Log;
  */
 public class ResponseFactory
 {
-    private final static Log log = LogFactory.getLog( ResponseFactory.class );
-
-
     private ResponseFactory()
     {
     }
-
-    private static String OPENID_MODE = "openid.mode";
-    private static String ASSOCIATE_MODE = "associate";
 
 
     /**
@@ -51,7 +39,7 @@ public class ResponseFactory
      */
     public static Response parse( String query ) throws OpenIdException
     {
-        Map map;
+        Map<String,String> map;
         try
         {
             if ( MessageParser.numberOfNewlines( query ) == 1 )
@@ -69,7 +57,7 @@ public class ResponseFactory
                       + e.toString() );
         }
 
-        Set set = map.keySet();
+        Set<String> set = map.keySet();
         if ( ( set.contains( AssociationResponse.OPENID_SESSION_TYPE ) &&
             set.contains( AssociationResponse.OPENID_ENC_MAC_KEY ) ) ||
             set.contains( AssociationResponse.OPENID_ASSOCIATION_TYPE ) )

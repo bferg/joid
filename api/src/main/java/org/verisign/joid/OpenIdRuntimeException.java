@@ -10,6 +10,9 @@ package org.verisign.joid;
  */
 public class OpenIdRuntimeException extends RuntimeException
 {
+    private static final long serialVersionUID = 9171669934119626199L;
+
+    
     public OpenIdRuntimeException( String s )
     {
         super( s );

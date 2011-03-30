@@ -14,7 +14,6 @@ import org.verisign.joid.StoreFactory;
 import org.verisign.joid.util.CookieUtils;
 import org.verisign.joid.util.DependencyUtils;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -81,7 +80,7 @@ public class OpenIdServlet extends HttpServlet
             throws ServletException, IOException
     {
         StringBuffer sb = new StringBuffer();
-        Enumeration e = request.getParameterNames();
+        Enumeration<?> e = request.getParameterNames();
         while ( e.hasMoreElements() )
         {
             String name = ( String ) e.nextElement();
@@ -141,9 +140,8 @@ public class OpenIdServlet extends HttpServlet
 
             if ( isAuth && user == null )
             {
-                // todo: should ask user to accept realm even if logged in, but only once
+                // @TODO: should ask user to accept realm even if logged in, but only once
                 // ask user to accept this realm
-                RequestDispatcher rd = request.getRequestDispatcher( loginPage );
                 request.setAttribute( QUERY, query );
                 request.setAttribute( AuthenticationRequest.OPENID_REALM,
                     request.getParameter( AuthenticationRequest.OPENID_REALM ) );
@@ -178,6 +176,7 @@ public class OpenIdServlet extends HttpServlet
                 //                String claimedId = (String) session.getAttribute(ID_CLAIMED);
                 /* Ensure that the previously claimed id is the same as the just
                 passed in claimed id. */
+                @SuppressWarnings("unused")
                 String identity;
                 if ( request.getParameter( AuthenticationRequest.OPENID_CLAIMED_ID ) == null )
                 {
@@ -268,11 +267,12 @@ public class OpenIdServlet extends HttpServlet
     private void returnError( String query, HttpServletResponse response )
             throws ServletException, IOException
     {
-        Map map = RequestFactory.parseQuery( query );
+        Map<String,String> map = RequestFactory.parseQuery( query );
         String returnTo = ( String ) map.get( "openid.return_to" );
         boolean goodReturnTo = false;
         try
         {
+            @SuppressWarnings("unused")
             URL url = new URL( returnTo );
             goodReturnTo = true;
         }
@@ -307,7 +307,7 @@ public class OpenIdServlet extends HttpServlet
 
     public void log( String s )
     {
-        // todo: resolve issue with non-prime servlet container + log4j/commons and replace
+        // @TODO: resolve issue with non-prime servlet container + log4j/commons and replace
         System.out.println( s );
     }
 

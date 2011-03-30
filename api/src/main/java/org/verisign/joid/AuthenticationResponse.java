@@ -49,7 +49,7 @@ public class AuthenticationResponse extends Response
     // package scope so that ResponseFactory can trigger on this key
     public static String OPENID_SIG = "openid.sig";
 
-    private Map extendedMap;
+    private Map<String,String> extendedMap;
 
     private String claimed_id;
     private String identity;
@@ -106,9 +106,9 @@ public class AuthenticationResponse extends Response
      * @return a map with all internal values mapped to their specification
      * keys.
      */
-    public Map toMap()
+    public Map<String,String> toMap()
     {
-        Map map = super.toMap();
+        Map<String,String> map = super.toMap();
 
         if ( isVersion2() )
         {
@@ -118,31 +118,33 @@ public class AuthenticationResponse extends Response
         map.put( AuthenticationResponse.OPENID_IDENTITY, identity );
         map.put( AuthenticationResponse.OPENID_RETURN_TO, returnTo );
         map.put( AuthenticationResponse.OPENID_NONCE, nonce );
+        
         if ( claimed_id != null )
         {
             map.put( AuthenticationRequest.OPENID_CLAIMED_ID, claimed_id );
         }
+        
         if ( invalidateHandle != null )
         {
             map.put( AuthenticationResponse.OPENID_INVALIDATE_HANDLE,
                 invalidateHandle );
         }
-        map.put( AuthenticationResponse.OPENID_ASSOCIATION_HANDLE,
-            associationHandle );
+        map.put( AuthenticationResponse.OPENID_ASSOCIATION_HANDLE, associationHandle );
+        
         if ( signed != null )
         {
             map.put( AuthenticationResponse.OPENID_SIGNED, signed );
         }
         map.put( AuthenticationResponse.OPENID_SIG, signature );
 
-        Map sregMap = sreg.getSuppliedValues();
+        Map<String,String> sregMap = sreg.getSuppliedValues();
         log.debug( "sreg in authnresp = " + sreg );
-        Set set = sregMap.entrySet();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<Map.Entry<String, String>> set = sregMap.entrySet();
+        for ( Iterator<Map.Entry<String, String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = iter.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
             map.put( SimpleRegistration.OPENID_SREG + "." + key, value );
         }
         if ( !set.isEmpty() && isVersion2() )
@@ -153,9 +155,9 @@ public class AuthenticationResponse extends Response
         if ( extendedMap != null && !extendedMap.isEmpty() )
         {
             set = extendedMap.entrySet();
-            for ( Iterator iter = set.iterator(); iter.hasNext(); )
+            for ( Iterator<Map.Entry<String,String>> iter = set.iterator(); iter.hasNext(); )
             {
-                Map.Entry mapEntry = ( Map.Entry ) iter.next();
+                Map.Entry<String,String> mapEntry = iter.next();
                 String key = ( String ) mapEntry.getKey();
                 String value = ( String ) mapEntry.getValue();
                 map.put( OPENID_PREFIX + key, value );
@@ -186,7 +188,7 @@ public class AuthenticationResponse extends Response
      */
     public static String toUrlStringResponse( Request req, OpenIdException e )
     {
-        Map map = new HashMap();
+        Map<String,String> map = new HashMap<String,String>();
         map.put( AuthenticationResponse.OPENID_MODE, "error" );
         if ( req != null )
         {
@@ -198,8 +200,7 @@ public class AuthenticationResponse extends Response
         }
         else
         {
-            map.put( AuthenticationResponse.OPENID_ERROR,
-                "OpenID request error" );
+            map.put( AuthenticationResponse.OPENID_ERROR, "OpenID request error" );
         }
         try
         {
@@ -217,8 +218,7 @@ public class AuthenticationResponse extends Response
     /**
      * Only public for unit tests. Do not use.
      */
-    public String sign( byte[] key, String signed )
-        throws OpenIdException
+    public String sign( byte[] key, String signed ) throws OpenIdException
     {
         return sign( this.algo, key, signed );
     }
@@ -236,10 +236,9 @@ public class AuthenticationResponse extends Response
      * @throws OpenIdException at signature errors, or if the signed list 
      * points to elements that are not mapped.
      */
-    public String sign( String algorithm, byte[] key, String signed )
-        throws OpenIdException
+    public String sign( String algorithm, byte[] key, String signed ) throws OpenIdException
     {
-        Map map = toMap();
+        Map<String,String> map = toMap();
         log.debug( "in sign() map=" + map );
         log.debug( "in sign() signed=" + signed );
         StringTokenizer st = new StringTokenizer( signed, "," );
@@ -327,35 +326,35 @@ public class AuthenticationResponse extends Response
         log.debug( "sreg=" + sreg );
         if ( sreg != null )
         {
-            Map map = sreg.getSuppliedValues();
+            Map<String,String> map = sreg.getSuppliedValues();
             log.debug( "sreg supplied values=" + map );
-            Set set = map.entrySet();
+            Set<Map.Entry<String,String>> set = map.entrySet();
             if ( !set.isEmpty() && isVersion2() )
             {
                 signed += ",ns.sreg";
             }
-            for ( Iterator iter = set.iterator(); iter.hasNext(); )
+            for ( Iterator<Map.Entry<String,String>> iter = set.iterator(); iter.hasNext(); )
             {
-                Map.Entry mapEntry = ( Map.Entry ) iter.next();
-                String key = ( String ) mapEntry.getKey();
+                Map.Entry<String,String> mapEntry = iter.next();
+                String key = mapEntry.getKey();
                 signed += ",sreg." + key;
             }
         }
         key = a.getMacKey();
         this.algo = a.getAssociationType();
         signature = sign( key, signed );
-        extendedMap = new HashMap();
+        extendedMap = new HashMap<String,String>();
     }
 
 
-    public AuthenticationResponse( Map map ) throws OpenIdException
+    public AuthenticationResponse( Map<String,String> map ) throws OpenIdException
     {
         super( map );
-        Set set = map.entrySet();
-        extendedMap = new HashMap();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<Map.Entry<String,String>> set = map.entrySet();
+        extendedMap = new HashMap<String,String>();
+        for ( Iterator<Map.Entry<String,String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
+            Map.Entry<String,String> mapEntry = iter.next();
             String key = ( String ) mapEntry.getKey();
             String value = ( String ) mapEntry.getValue();
 
@@ -429,7 +428,7 @@ public class AuthenticationResponse extends Response
      *
      * @return the extensions; empty if none.
      */
-    public Map getExtensions()
+    public Map<String,String> getExtensions()
     {
         return extendedMap;
     }
@@ -440,12 +439,12 @@ public class AuthenticationResponse extends Response
      * 
      * @param map Map<String, String> of name value pairs
      */
-    public void addExtensions( Map map ) throws OpenIdException
+    public void addExtensions( Map<String,String> map ) throws OpenIdException
     {
-        Iterator it = map.entrySet().iterator();
+        Iterator<Map.Entry<String,String>> it = map.entrySet().iterator();
         while ( it.hasNext() )
         {
-            Map.Entry mapEntry = ( Map.Entry ) it.next();
+            Map.Entry<String,String> mapEntry = it.next();
             String key = ( String ) mapEntry.getKey();
             String value = ( String ) mapEntry.getValue();
             extendedMap.put( key, value );

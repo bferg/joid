@@ -56,6 +56,8 @@ import java.util.Set;
  */
 public class PapeRequest extends Extension implements PapeConstants
 {
+    private static final long serialVersionUID = 5360473914710207818L;
+
     /** 
      * PAPE request parameter: If the End User has not actively
      * authenticated to the OP within the number of seconds specified
@@ -110,7 +112,7 @@ public class PapeRequest extends Extension implements PapeConstants
      *
      * @param extensionMap a <code>Map<String, String></code> containing the parameter mappings
      */
-    public PapeRequest( Map extensionMap )
+    public PapeRequest( Map<String,String> extensionMap )
     {
         super( PAPE_NAMESPACE, extensionMap );
     }
@@ -179,7 +181,7 @@ public class PapeRequest extends Extension implements PapeConstants
      * @return preferred authentication policies as a <code>Set<String></code> value
      * @see #PREFERRED_AUTH_POLICIES
      */
-    public Set getPreferredAuthPolicies()
+    public Set<String> getPreferredAuthPolicies()
     {
         return getSetParam( PREFERRED_AUTH_POLICIES, " " );
     }
@@ -195,7 +197,7 @@ public class PapeRequest extends Extension implements PapeConstants
      */
     public void setPreferredAuthPolicies( String[] policies )
     {
-        setPreferredAuthPolicies( new LinkedHashSet( Arrays.asList( policies ) ) );
+        setPreferredAuthPolicies( new LinkedHashSet<String>( Arrays.asList( policies ) ) );
     }
 
 
@@ -206,7 +208,7 @@ public class PapeRequest extends Extension implements PapeConstants
      * @param policies a set of policy URIs as a <code>Set<String></code> value
      * @see #PREFERRED_AUTH_POLICIES
      */
-    public void setPreferredAuthPolicies( Set policies )
+    public void setPreferredAuthPolicies( Set<String> policies )
     {
         setListParam( PREFERRED_AUTH_POLICIES, policies, " " );
     }
@@ -218,13 +220,13 @@ public class PapeRequest extends Extension implements PapeConstants
      * @return namespaces as a <code>Map<String, String></code>
      * @see #AUTH_LEVEL_NS
      */
-    Map getAuthLevelNS()
+    Map<String, String> getAuthLevelNS()
     {
-        Map map = new HashMap();
-        Iterator iter = getParamMap().keySet().iterator();
+        Map<String,String> map = new HashMap<String, String>();
+        Iterator<String> iter = getParamMap().keySet().iterator();
         while ( iter.hasNext() )
         {
-            String key = ( String ) iter.next();
+            String key = iter.next();
             int i = key.indexOf( AUTH_LEVEL_NS );
             if ( i >= 0 )
             {
@@ -255,12 +257,12 @@ public class PapeRequest extends Extension implements PapeConstants
      * @param authLevels a set of auth level namespaces as a <code>Map<String, String></code>
      * @see #AUTH_LEVEL_NS
      */
-    void setAuthLevelNS( Map authLevels )
+    void setAuthLevelNS( Map<String,String> authLevels )
     {
-        Iterator iter = authLevels.keySet().iterator();
+        Iterator<String> iter = authLevels.keySet().iterator();
         while ( iter.hasNext() )
         {
-            String key = ( String ) iter.next();
+            String key = iter.next();
             addAuthLevelNS( key, ( String ) authLevels.get( key ) );
         }
     }
@@ -286,7 +288,7 @@ public class PapeRequest extends Extension implements PapeConstants
      * @return preferred authentication levels as a <code>List<String></code> value
      * @see #PREFERRED_AUTH_LEVELS
      */
-    List getPreferredAuthLevelNSs()
+    List<String> getPreferredAuthLevelNSs()
     {
         return getListParam( PREFERRED_AUTH_LEVELS, " " );
     }
@@ -302,7 +304,7 @@ public class PapeRequest extends Extension implements PapeConstants
      */
     void setPreferredAuthLevelNSs( String[] levels )
     {
-        setPreferredAuthLevels( new ArrayList( Arrays.asList( levels ) ) );
+        setPreferredAuthLevels( new ArrayList<String>( Arrays.asList( levels ) ) );
     }
 
 
@@ -313,7 +315,7 @@ public class PapeRequest extends Extension implements PapeConstants
      * @param levels a list of policy namespaces ordered by preference as a <code>List<String></code> value
      * @see #PREFERRED_AUTH_LEVELS
      */
-    void setPreferredAuthLevelNSs( List levels )
+    void setPreferredAuthLevelNSs( List<String> levels )
     {
         setListParam( PREFERRED_AUTH_LEVELS, levels, " " );
     }
@@ -328,10 +330,10 @@ public class PapeRequest extends Extension implements PapeConstants
      * @see #PREFERRED_AUTH_LEVELS
      * @see #AUTH_LEVEL_NS
      */
-    public List getPreferredAuthLevels()
+    public List<String> getPreferredAuthLevels()
     {
-        Iterator it = getPreferredAuthLevelNSs().iterator();
-        List levels = new ArrayList();
+        Iterator<String> it = getPreferredAuthLevelNSs().iterator();
+        List<String> levels = new ArrayList<String>();
         while ( it.hasNext() )
         {
             levels.add( getAuthLevelNS( ( String ) it.next() ) );
@@ -351,7 +353,7 @@ public class PapeRequest extends Extension implements PapeConstants
      */
     public void setPreferredAuthLevels( String[] levels )
     {
-        setPreferredAuthLevels( new ArrayList( Arrays.asList( levels ) ) );
+        setPreferredAuthLevels( new ArrayList<String>( Arrays.asList( levels ) ) );
     }
 
 
@@ -364,14 +366,14 @@ public class PapeRequest extends Extension implements PapeConstants
      * @see #PREFERRED_AUTH_LEVELS
      * @see #AUTH_LEVEL_NS
      */
-    public void setPreferredAuthLevels( List levels )
+    public void setPreferredAuthLevels( List<String> levels )
     {
         int i = 0;
-        List prefNS = new ArrayList();
-        Iterator it = levels.iterator();
+        List<String> prefNS = new ArrayList<String>();
+        Iterator<String> it = levels.iterator();
         while ( it.hasNext() )
         {
-            String level = ( String ) it.next();
+            String level = it.next();
             String ns = "ns" + Integer.toString( i++, 16 );
             addAuthLevelNS( ns, level );
             prefNS.add( ns );

@@ -37,6 +37,8 @@ import java.util.TimeZone;
  */
 public class Extension implements Serializable
 {
+    private static final long serialVersionUID = 2222867117628997071L;
+
     /**
      * RFC3339 date format
      */
@@ -52,7 +54,7 @@ public class Extension implements Serializable
     /**
      * The list of parameters, in a <code>Map<String, String></code> object.
      */
-    protected Map params;
+    protected Map<String,String> params;
 
 
     /**
@@ -80,7 +82,7 @@ public class Extension implements Serializable
      * @param ns the extension namespace as a <code>String</code> value
      * @param extensionMap extension parameters in <code>Map<String, String></code> form
      */
-    public Extension( String ns, Map extensionMap )
+    public Extension( String ns, Map<String,String> extensionMap )
     {
         this.ns = ns;
         getParams( extensionMap );
@@ -93,7 +95,7 @@ public class Extension implements Serializable
      *
      * @param extensionMap extension parameters in <code>Map<String, String></code> form
      */
-    public void getParams( Map extensionMap )
+    public void getParams( Map<String,String> extensionMap )
     {
         params = null;
         String prefix = getPrefix( extensionMap );
@@ -102,13 +104,13 @@ public class Extension implements Serializable
             return;
         }
         this.prefix = prefix;
-        params = new HashMap();
-        Iterator it = extensionMap.entrySet().iterator();
+        params = new HashMap<String,String>();
+        Iterator<Map.Entry<String,String>> it = extensionMap.entrySet().iterator();
         while ( it.hasNext() )
         {
-            Map.Entry mapEntry = ( Map.Entry ) it.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = it.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
             if ( key.startsWith( prefix ) )
             {
                 params.put( key.substring( prefix.length() + 1 ), value );
@@ -140,7 +142,7 @@ public class Extension implements Serializable
      * @param extensionMap extension parameters in <code>Map<String, String></code> form
      * @return <code>true</code> if there are parameters for this extension in the map
      */
-    public boolean isValid( Map extensionMap )
+    public boolean isValid( Map<String,String> extensionMap )
     {
         return getPrefix( extensionMap ) != null;
     }
@@ -152,16 +154,15 @@ public class Extension implements Serializable
      * @param extensionMap a <code>Map</code> value
      * @return alias <code>String</code>
      */
-    public String getPrefix( Map extensionMap )
+    public String getPrefix( Map<String,String> extensionMap )
     {
-        Iterator it = extensionMap.entrySet().iterator();
+        Iterator<Map.Entry<String,String>> it = extensionMap.entrySet().iterator();
         while ( it.hasNext() )
         {
-            Map.Entry mapEntry = ( Map.Entry ) it.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
-            if ( key.startsWith( "ns." ) &&
-                value.equals( ns ) )
+            Map.Entry<String,String> mapEntry = it.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
+            if ( key.startsWith( "ns." ) && value.equals( ns ) )
             {
                 return key.substring( 3 );
             }
@@ -206,7 +207,7 @@ public class Extension implements Serializable
     {
         if ( params == null )
         {
-            params = new HashMap();
+            params = new HashMap<String,String>();
         }
         params.put( name, value );
     }
@@ -299,9 +300,9 @@ public class Extension implements Serializable
      * @param separator Separation <code>String</code> between list values
      * @return value <code>List</code> of <code>String</code>s
      */
-    public List getListParam( String name, String separator )
+    public List<String> getListParam( String name, String separator )
     {
-        List paramList = new ArrayList();
+        List<String> paramList = new ArrayList<String>();
         String paramStr = getParam( name );
         if ( paramStr != null )
         {
@@ -322,9 +323,9 @@ public class Extension implements Serializable
      * @param separator Separation <code>String</code> between set values
      * @return value <code>Set</code> of <code>String</code>s
      */
-    public Set getSetParam( String name, String separator )
+    public Set<String> getSetParam( String name, String separator )
     {
-        return new LinkedHashSet( getListParam( name, separator ) );
+        return new LinkedHashSet<String>( getListParam( name, separator ) );
     }
 
 
@@ -335,13 +336,13 @@ public class Extension implements Serializable
      * @param paramList a <code>Collection</code> of <code>String</code> values
      * @param separator Separation <code>String</code> between list values
      */
-    public void setListParam( String name, Collection paramList, String separator )
+    public void setListParam( String name, Collection<String> paramList, String separator )
     {
         StringBuffer paramStr = new StringBuffer( "" );
-        Iterator it = paramList.iterator();
+        Iterator<String> it = paramList.iterator();
         while ( it.hasNext() )
         {
-            String param = ( String ) it.next();
+            String param = it.next();
             paramStr.append( param );
             if ( it.hasNext() )
             {
@@ -362,21 +363,21 @@ public class Extension implements Serializable
      * @param nsSuffix the namespace alias for this extension
      * @return a <code>Map<String, String></code> containing all extension parameters
      */
-    public Map getParamMap( String nsSuffix )
+    public Map<String,String> getParamMap( String nsSuffix )
     {
         if ( ( nsSuffix == null ) || ( nsSuffix.length() == 0 ) )
         {
             throw new IllegalArgumentException( "Missing namespace alias for " + ns );
         }
 
-        Map map = new HashMap();
+        Map<String,String> map = new HashMap<String,String>();
         // add all non empty params with the openid.ns prefix
-        Iterator it = params.entrySet().iterator();
+        Iterator<Map.Entry<String,String>> it = params.entrySet().iterator();
         while ( it.hasNext() )
         {
-            Map.Entry mapEntry = ( Map.Entry ) it.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = it.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
             if ( value != null )
             {
                 map.put( nsSuffix + "." + key, value );
@@ -394,7 +395,7 @@ public class Extension implements Serializable
      * @return a <code>Map<String, String></code> containing all extension parameters
      * @see #getParamMap(String)
      */
-    public Map getParamMap()
+    public Map<String,String> getParamMap()
     {
         return getParamMap( prefix );
     }
@@ -416,10 +417,10 @@ public class Extension implements Serializable
         }
         else
         {
-            Iterator it = params.keySet().iterator();
+            Iterator<String> it = params.keySet().iterator();
             while ( it.hasNext() )
             {
-                String key = ( String ) it.next();
+                String key = it.next();
                 sb.append( key ).append( "='" ).append( ( String ) params.get( key ) ).append( "'" );
                 if ( it.hasNext() )
                 {

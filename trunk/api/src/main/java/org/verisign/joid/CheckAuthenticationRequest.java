@@ -14,11 +14,7 @@
 package org.verisign.joid;
 
 
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
@@ -45,8 +41,7 @@ public class CheckAuthenticationRequest extends Request
      * @param map the map of incoming openid parameters
      * @param mode always "check_authentication"
      */
-    public CheckAuthenticationRequest( Map map, String mode )
-        throws OpenIdException
+    public CheckAuthenticationRequest( Map<String,String> map, String mode ) throws OpenIdException
     {
         super( map, mode );
         ar = new AuthenticationResponse( map );
@@ -59,9 +54,7 @@ public class CheckAuthenticationRequest extends Request
     {
         if ( handle == null )
         {
-            throw new OpenIdException( "Missing "
-                      + CheckAuthenticationRequest
-                      .OPENID_ASSOC_HANDLE );
+            throw new OpenIdException( "Missing " + CheckAuthenticationRequest.OPENID_ASSOC_HANDLE );
         }
     }
 
@@ -107,10 +100,10 @@ public class CheckAuthenticationRequest extends Request
     }
 
 
-    Map toMap()
+    Map<String,String> toMap()
     {
         // need to send all values exactly from AuthenticationResponse...
-        Map map = ar.toMap();
+        Map<String,String> map = ar.toMap();
         // ... except mode
         map.putAll( super.toMap() );
 

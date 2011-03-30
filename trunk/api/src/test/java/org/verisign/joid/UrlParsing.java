@@ -6,8 +6,6 @@ import junit.framework.Assert;
 import org.verisign.joid.consumer.ServerAndDelegate;
 import org.verisign.joid.consumer.Discoverer;
 
-import java.io.IOException;
-
 
 /**
  * User: treeder

@@ -19,10 +19,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Set;
-import java.net.URLEncoder;
-import java.io.UnsupportedEncodingException;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 
 /**
@@ -30,8 +26,6 @@ import org.apache.commons.logging.Log;
  */
 public class AssociationRequest extends Request
 {
-    private final static Log log = LogFactory.getLog( AssociationRequest.class );
-
     private String sessionType;
     private String associationType;
     private BigInteger dhModulus;
@@ -87,9 +81,9 @@ public class AssociationRequest extends Request
     }
 
 
-    Map toMap()
+    Map<String,String> toMap()
     {
-        Map map = super.toMap();
+        Map<String,String> map = super.toMap();
 
         map.put( AssociationRequest.OPENID_SESSION_TYPE, sessionType );
         map.put( AssociationRequest.OPENID_ASSOCIATION_TYPE,
@@ -155,7 +149,7 @@ public class AssociationRequest extends Request
         try
         {
             BigInteger pubKey = crypto.getPublicKey();
-            Map map = new HashMap();
+            Map<String,String> map = new HashMap<String,String>();
             map.put( "openid.mode", "associate" );
             map.put( OPENID_ASSOCIATION_TYPE, HMAC_SHA1 );
             map.put( OPENID_SESSION_TYPE, DH_SHA1 );
@@ -170,7 +164,7 @@ public class AssociationRequest extends Request
     }
 
 
-    AssociationRequest( Map map, String mode ) throws OpenIdException
+    AssociationRequest( Map<String,String> map, String mode ) throws OpenIdException
     {
         super( map, mode );
         this.sessionType = NO_ENCRYPTION; //default value
@@ -179,12 +173,12 @@ public class AssociationRequest extends Request
         this.dhModulus = DiffieHellman.DEFAULT_MODULUS;
         this.dhGenerator = DiffieHellman.DEFAULT_GENERATOR;
 
-        Set set = map.entrySet();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<Map.Entry<String, String>> set = map.entrySet();
+        for ( Iterator<Map.Entry<String, String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = iter.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
 
             if ( OPENID_SESSION_TYPE.equals( key ) )
             {

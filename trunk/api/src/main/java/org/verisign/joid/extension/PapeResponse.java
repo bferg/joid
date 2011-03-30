@@ -17,10 +17,9 @@ package org.verisign.joid.extension;
 import org.verisign.joid.OpenIdException;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +63,8 @@ import java.util.Set;
  */
 public class PapeResponse extends Extension implements PapeConstants
 {
+    private static final long serialVersionUID = -4854806350672731345L;
+
     /**
      * PAPE response parameter: One or more authentication policy URIs
      * that the OP conformed to when authenticating the End User.  If
@@ -120,7 +121,7 @@ public class PapeResponse extends Extension implements PapeConstants
      *
      * @param extensionMap a <code>Map<String, String></code> containing the parameter mappings
      */
-    public PapeResponse( Map extensionMap )
+    public PapeResponse( Map<String,String> extensionMap )
     {
         super( PAPE_NAMESPACE, extensionMap );
     }
@@ -183,11 +184,11 @@ public class PapeResponse extends Extension implements PapeConstants
      * @return authentication policies as a <code>Set<String></code> value
      * @see #AUTH_POLICIES
      */
-    public Set getAuthPolicies()
+    public Set<String> getAuthPolicies()
     {
         if ( getParam( AUTH_POLICIES ).equals( EMPTY_AUTH_POLICIES ) )
         {
-            return new LinkedHashSet();
+            return Collections.emptySet();
         }
         return getSetParam( AUTH_POLICIES, " " );
     }
@@ -202,7 +203,7 @@ public class PapeResponse extends Extension implements PapeConstants
      */
     public void setAuthPolicies( String[] policies )
     {
-        setAuthPolicies( new LinkedHashSet( Arrays.asList( policies ) ) );
+        setAuthPolicies( new LinkedHashSet<String>( Arrays.asList( policies ) ) );
     }
 
 
@@ -213,7 +214,7 @@ public class PapeResponse extends Extension implements PapeConstants
      * @param policies a set of policy URIs as a <code>Set<String></code> value
      * @see #AUTH_POLICIES
      */
-    public void setAuthPolicies( Set policies )
+    public void setAuthPolicies( Set<String> policies )
     {
         if ( policies.isEmpty() )
         {
@@ -232,13 +233,13 @@ public class PapeResponse extends Extension implements PapeConstants
      * @return namespaces as a <code>Map<String, String></code>
      * @see #AUTH_LEVEL_NS
      */
-    Map getAuthLevelNS()
+    Map<String,String> getAuthLevelNS()
     {
-        Map map = new HashMap();
-        Iterator iter = getParamMap().keySet().iterator();
+        Map<String,String> map = new HashMap<String, String>();
+        Iterator<String> iter = getParamMap().keySet().iterator();
         while ( iter.hasNext() )
         {
-            String key = ( String ) iter.next();
+            String key = iter.next();
             int i = key.indexOf( AUTH_LEVEL_NS );
             if ( i >= 0 )
             {
@@ -269,13 +270,13 @@ public class PapeResponse extends Extension implements PapeConstants
      * @param authLevels a set of auth level namespaces as a <code>Map<String, String></code>
      * @see #AUTH_LEVEL_NS
      */
-    void setAuthLevelNS( Map authLevels ) throws OpenIdException
+    void setAuthLevelNS( Map<String,String> authLevels ) throws OpenIdException
     {
-        Iterator iter = authLevels.keySet().iterator();
+        Iterator<String> iter = authLevels.keySet().iterator();
         while ( iter.hasNext() )
         {
-            String key = ( String ) iter.next();
-            addAuthLevelNS( key, ( String ) authLevels.get( key ) );
+            String key = iter.next();
+            addAuthLevelNS( key, authLevels.get( key ) );
         }
     }
 
@@ -406,14 +407,14 @@ public class PapeResponse extends Extension implements PapeConstants
      */
     public String getAuthAssuranceLevel( String namespace, String param )
     {
-        Map nsmap = getAuthLevelNS();
-        Iterator it = nsmap.entrySet().iterator();
+        Map<String, String> nsmap = getAuthLevelNS();
+        Iterator<Map.Entry<String, String>> it = nsmap.entrySet().iterator();
         while ( it.hasNext() )
         {
-            Map.Entry entry = ( Map.Entry ) it.next();
-            if ( namespace.equals( ( String ) entry.getValue() ) )
+            Map.Entry<String,String> entry = it.next();
+            if ( namespace.equals( entry.getValue() ) )
             {
-                return getAuthNSAssuranceLevel( ( String ) entry.getKey(), param );
+                return getAuthNSAssuranceLevel( entry.getKey(), param );
             }
         }
         return null;
@@ -453,14 +454,14 @@ public class PapeResponse extends Extension implements PapeConstants
      */
     public void setAuthAssuranceLevel( String namespace, String param, String value ) throws OpenIdException
     {
-        Map nsmap = getAuthLevelNS();
-        Iterator it = nsmap.entrySet().iterator();
+        Map<String, String> nsmap = getAuthLevelNS();
+        Iterator<Map.Entry<String, String>> it = nsmap.entrySet().iterator();
         while ( it.hasNext() )
         {
-            Map.Entry entry = ( Map.Entry ) it.next();
-            if ( namespace.equals( ( String ) entry.getValue() ) )
+            Map.Entry<String,String> entry = it.next();
+            if ( namespace.equals( entry.getValue() ) )
             {
-                setAuthNSAssuranceLevel( ( String ) entry.getKey(), param, value );
+                setAuthNSAssuranceLevel( entry.getKey(), param, value );
                 return;
             }
         }
@@ -486,8 +487,8 @@ public class PapeResponse extends Extension implements PapeConstants
      *
      * @return assurance level URLs as a <code>Set<String></code> value
      */
-    public Set getAuthAssuranceLevelSet()
+    public Set<String> getAuthAssuranceLevelSet()
     {
-        return new LinkedHashSet( ( Collection ) getAuthLevelNS().values() );
+        return new LinkedHashSet<String>( getAuthLevelNS().values() );
     }
 }

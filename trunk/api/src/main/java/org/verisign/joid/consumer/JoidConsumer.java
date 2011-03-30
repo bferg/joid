@@ -38,8 +38,8 @@ public class JoidConsumer
 
     private static Log log = LogFactory.getLog( JoidConsumer.class );
 
-    private Map/*<String, Properties>*/propSingleton;
-    private Map/*<String, String>*/handleToIdServer;
+    private Map<String, Properties> propSingleton;
+    private Map<String, String> handleToIdServer;
     private Discoverer discoverer = new Discoverer();
 
 
@@ -51,15 +51,15 @@ public class JoidConsumer
 
     private synchronized Properties getProps( String idserver )
     {
-        // todo: just store the AssociationResponse instead of converting to props
+        // @TODO: just store the AssociationResponse instead of converting to props
         if ( propSingleton == null )
         {
-            propSingleton = new HashMap();
-            handleToIdServer = new HashMap();
+            propSingleton = new HashMap<String, Properties>();
+            handleToIdServer = new HashMap<String, String>();
         }
         Properties props = ( Properties ) propSingleton.get( idserver );
         if ( props == null )
-        { // todo: also check expires_in time to make sure it's still valid
+        { // @TODO: also check expires_in time to make sure it's still valid
             try
             {
                 props = associate( idserver );
@@ -199,14 +199,14 @@ public class JoidConsumer
      * @throws OpenIdException
      * @throws NoSuchAlgorithmException
      */
-    public AuthenticationResult authenticate( Map map )
+    public AuthenticationResult authenticate( Map<String,String> map )
             throws IOException, OpenIdException, NoSuchAlgorithmException
     {
 
         log.debug( "request map in authenticate: " + map );
         AuthenticationResponse response =
                 new AuthenticationResponse( map );
-        // todo: store nonce's to ensure we never accept the same value again - see sec 11.3 of spec 2.0
+        // @TODO: store nonce's to ensure we never accept the same value again - see sec 11.3 of spec 2.0
         Properties props;
         if ( response.getInvalidateHandle() != null )
         {
@@ -216,7 +216,7 @@ public class JoidConsumer
             props = getPropsByHandle( response.getInvalidateHandle() );
             CheckAuthenticationResponse response2 = ( CheckAuthenticationResponse )
                     Util.send( checkReq, props.getProperty( "idServer" ) );
-            // todo: verify the invalidate_handle in response2 is the same as in response
+            // @TODO: verify the invalidate_handle in response2 is the same as in response
             removeInvalidHandle( response.getInvalidateHandle() );
             if ( response2.isValid() )
             {

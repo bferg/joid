@@ -61,7 +61,6 @@ public class Discoverer
             int status = httpClient.executeMethod( get );
             System.out.println( "status=" + status );
             dumpHeaders( get.getResponseHeaders() );
-            //            System.out.println("body=" + get.getResponseBodyAsString());
 
             Header contentType = get.getResponseHeader( "Content-Type" );
             if ( contentType != null && contentType.getValue().contains( "application/xrds+xml" ) )
@@ -85,7 +84,7 @@ public class Discoverer
             else
             {
                 // try to find it in the HTML, OpenID 1.0 style
-                // todo: should also look for X-XRDS-Location in a meta tag here
+                // @TODO: should also look for X-XRDS-Location in a meta tag here
                 in = new BufferedReader( new InputStreamReader( get.getResponseBodyAsStream() ) );
                 findServerAndDelegate( serverAndDelegate, in );
                 return;
@@ -115,14 +114,14 @@ public class Discoverer
 
     private void handleXrdsDocument( ServerAndDelegate serverAndDelegate, XRDSDocument xrdsDocument )
     {
-        List services = xrdsDocument.getServiceList();
-        Iterator it = services.iterator();
+        List<XRDSService> services = xrdsDocument.getServiceList();
+        Iterator<XRDSService> it = services.iterator();
         while ( it.hasNext() )
         {
-            XRDSService service = ( XRDSService ) it.next();
+            XRDSService service = it.next();
             System.out.println( "service=" + service.getUri() );
             serverAndDelegate.setServer( service.getUri() );
-            //  todo: also set delegate after we get it
+            //  @TODO: also set delegate after we get it
         }
     }
 

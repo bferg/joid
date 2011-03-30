@@ -14,15 +14,10 @@
 package org.verisign.joid;
 
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 
 /**
@@ -30,7 +25,6 @@ import org.apache.commons.logging.Log;
  */
 public class AssociationResponse extends Response
 {
-    private final static Log log = LogFactory.getLog( AssociationResponse.class );
     // package scope so that ResponseFactory can trigger on this key
     static String OPENID_SESSION_TYPE = "session_type";
     static String OPENID_ASSOCIATION_TYPE = "assoc_type";
@@ -55,7 +49,7 @@ public class AssociationResponse extends Response
 
 
     /** 
-     * Returns the error code (if any) occured while processing this response.
+     * Returns the error code (if any) occurred while processing this response.
      * @return the error code; null if none.
      */
     public String getErrorCode()
@@ -136,9 +130,9 @@ public class AssociationResponse extends Response
     }
 
 
-    Map toMap()
+    Map<String,String> toMap()
     {
-        Map map = super.toMap();
+        Map<String,String> map = super.toMap();
 
         // remove "openid.ns" from map and replace with just "ns"
         // openid prefix is invalid for association responses
@@ -211,13 +205,13 @@ public class AssociationResponse extends Response
     }
 
 
-    AssociationResponse( Map map ) throws OpenIdException
+    AssociationResponse( Map<String,String> map ) throws OpenIdException
     {
         super( map );
-        Set set = map.entrySet();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<Map.Entry<String, String>> set = map.entrySet();
+        for ( Iterator<Map.Entry<String, String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
+            Map.Entry<String,String> mapEntry = iter.next();
             String key = ( String ) mapEntry.getKey();
             String value = ( String ) mapEntry.getValue();
 

@@ -94,7 +94,7 @@ public class OpenId
     /**
      * Call this method if the data is posted by way of HTTP POST
      */
-    public String handleRequest( Map map ) throws OpenIdException
+    public String handleRequest( Map<String,String> map ) throws OpenIdException
     {
         throw new RuntimeException( "nyi" );
     }

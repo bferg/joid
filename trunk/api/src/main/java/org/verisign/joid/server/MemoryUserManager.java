@@ -12,8 +12,8 @@ import java.util.Map;
  */
 public class MemoryUserManager implements UserManager
 {
-    private Map/*<String, User>*/userMap = new HashMap();
-    private Map/*<String, String>*/rememberMeMap = new HashMap();
+    private Map<String, User> userMap = new HashMap<String, User>();
+    private Map<String, String> rememberMeMap = new HashMap<String, String>();
 
 
     public User getUser( String username )

@@ -19,7 +19,6 @@ import org.verisign.joid.extension.Extension;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,7 +36,7 @@ public class AuthenticationRequest extends Request
 {
     private final static Log log = LogFactory.getLog( AuthenticationRequest.class );
 
-    private Map extendedMap;
+    private Map<String,String> extendedMap;
 
     private String claimed_id;
     private String identity;
@@ -65,14 +64,14 @@ public class AuthenticationRequest extends Request
 
     public static String OPENID_SESSION_TYPE = "openid.session_type";
     public final static String DH_SHA1 = "DH-SHA1";
-    private static Map statelessMap = new HashMap();
+    private static Map<String,String> statelessMap = new HashMap<String,String>();
     private static AssociationRequest statelessAr;
 
     static
     {
         statelessMap.put( AuthenticationRequest.OPENID_SESSION_TYPE,
                 AuthenticationRequest.DH_SHA1 );
-        // this value is not used for stateless, but it's not a valid
+        // this value is not used for state-less, but it's not a valid
         // association request unless it's there
         //
         statelessMap.put( AuthenticationRequest.OPENID_DH_CONSUMER_PUBLIC,
@@ -103,10 +102,10 @@ public class AuthenticationRequest extends Request
      * @throws OpenIdException if the request cannot be created.
      */
     public static AuthenticationRequest create( String identity, String returnTo,
-                                               String trustRoot, String assocHandle )
+                                                String trustRoot, String assocHandle )
             throws OpenIdException
     {
-        Map map = new HashMap();
+        Map<String,String> map = new HashMap<String,String>();
         map.put( "openid.mode", CHECKID_SETUP );
         map.put( OPENID_IDENTITY, identity );
         map.put( OPENID_CLAIMED_ID, identity );
@@ -119,16 +118,16 @@ public class AuthenticationRequest extends Request
     }
 
 
-    AuthenticationRequest( Map map, String mode ) throws OpenIdException
+    AuthenticationRequest( Map<String,String> map, String mode ) throws OpenIdException
     {
         super( map, mode );
-        Set set = map.entrySet();
-        extendedMap = new HashMap();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<Map.Entry<String, String>> set = map.entrySet();
+        extendedMap = new HashMap<String,String>();
+        for ( Iterator<Map.Entry<String, String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = iter.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
 
             if ( OPENID_NS.equals( key ) )
             {
@@ -171,9 +170,9 @@ public class AuthenticationRequest extends Request
 
 
     // public for unit tests
-    public Map toMap()
+    public Map<String,String> toMap()
     {
-        Map map = super.toMap();
+        Map<String,String> map = super.toMap();
 
         if ( claimed_id != null )
         {
@@ -190,11 +189,11 @@ public class AuthenticationRequest extends Request
 
         if ( extendedMap != null && !extendedMap.isEmpty() )
         {
-            for ( Iterator iter = extendedMap.entrySet().iterator(); iter.hasNext(); )
+            for ( Iterator<Map.Entry<String, String>> iter = extendedMap.entrySet().iterator(); iter.hasNext(); )
             {
-                Map.Entry mapEntry = ( Map.Entry ) iter.next();
-                String key = ( String ) mapEntry.getKey();
-                String value = ( String ) mapEntry.getValue();
+                Map.Entry<String,String> mapEntry = iter.next();
+                String key = mapEntry.getKey();
+                String value = mapEntry.getValue();
                 if ( value == null )
                 {
                     continue;
@@ -249,13 +248,13 @@ public class AuthenticationRequest extends Request
 
         checkTrustRoot();
 
-        Set namespaces = new HashSet();
-        Set entries = new HashSet();
-        Set set = extendedMap.entrySet();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<String> namespaces = new HashSet<String>();
+        Set<String> entries = new HashSet<String>();
+        Set<Map.Entry<String, String>> set = extendedMap.entrySet();
+        for ( Iterator<Map.Entry<String, String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
-            String key = ( String ) mapEntry.getKey();
+            Map.Entry<String,String> mapEntry = iter.next();
+            String key = mapEntry.getKey();
             // all keys start "openid." in the set
 
             if ( key.startsWith( "ns." ) )
@@ -284,9 +283,9 @@ public class AuthenticationRequest extends Request
         // silently ignore them
         if ( this.isVersion2() )
         {
-            for ( Iterator iter = entries.iterator(); iter.hasNext(); )
+            for ( Iterator<String> iter = entries.iterator(); iter.hasNext(); )
             {
-                String key = ( String ) iter.next();
+                String key = iter.next();
                 int period = key.indexOf( '.' );
                 if ( period != -1 )
                 {
@@ -428,7 +427,7 @@ public class AuthenticationRequest extends Request
      *
      * @return the extensions; empty if none.
      */
-    public Map getExtensions()
+    public Map<String,String> getExtensions()
     {
         return extendedMap;
     }
@@ -439,14 +438,14 @@ public class AuthenticationRequest extends Request
      * 
      * @param map Map<String, String> of name value pairs
      */
-    public void addExtensions( Map map )
+    public void addExtensions( Map<String,String> map )
     {
-        Iterator it = map.entrySet().iterator();
+        Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
         while ( it.hasNext() )
         {
-            Map.Entry mapEntry = ( Map.Entry ) it.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = it.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
             extendedMap.put( key, value );
         }
     }

@@ -56,7 +56,7 @@ public class OpenIdServlet extends HttpServlet
         throws ServletException, IOException
     {
         StringBuffer sb = new StringBuffer();
-        Enumeration e = request.getParameterNames();
+        Enumeration<?> e = request.getParameterNames();
         while ( e.hasMoreElements() )
         {
             String name = ( String ) e.nextElement();
@@ -136,7 +136,7 @@ public class OpenIdServlet extends HttpServlet
     private void returnError( String query, HttpServletResponse response )
         throws ServletException, IOException
     {
-        Map map = RequestFactory.parseQuery( query );
+        Map<String,String> map = RequestFactory.parseQuery( query );
         String returnTo = ( String ) map.get( "openid.return_to" );
         boolean goodReturnTo = false;
         

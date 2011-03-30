@@ -36,11 +36,11 @@ import org.apache.commons.logging.Log;
  */
 public class SimpleRegistration
 {
-    private final static Log log = LogFactory.getLog( SimpleRegistration.class );
+    private final static Log LOG = LogFactory.getLog( SimpleRegistration.class );
 
-    private Set required;
-    private Set optional;
-    private Map supplied;
+    private Set<String> required;
+    private Set<String> optional;
+    private Map<String,String> supplied;
     private String policyUrl;
 
     /** The <code>openid.sreg</code> value */
@@ -88,26 +88,29 @@ public class SimpleRegistration
     /**
      * The set of the nine allowed SREG values.
      */
-    public final static Set allowed = new HashSet();
+    public final static Set<String> ALLOWED;
     static
     {
-        allowed.add( SREG_NICKNAME );
-        allowed.add( SREG_EMAIL );
-        allowed.add( SREG_FULLNAME );
-        allowed.add( SREG_DOB );
-        allowed.add( SREG_GENDER );
-        allowed.add( SREG_POSTCODE );
-        allowed.add( SREG_COUNTRY );
-        allowed.add( SREG_LANGUAGE );
-        allowed.add( SREG_TIMEZONE );
+        Set<String> set = new HashSet<String>();
+        set.add( SREG_NICKNAME );
+        set.add( SREG_EMAIL );
+        set.add( SREG_FULLNAME );
+        set.add( SREG_DOB );
+        set.add( SREG_GENDER );
+        set.add( SREG_POSTCODE );
+        set.add( SREG_COUNTRY );
+        set.add( SREG_LANGUAGE );
+        set.add( SREG_TIMEZONE );
+        
+        ALLOWED = Collections.unmodifiableSet( set );
     }
 
 
     /**
-     * Creates a simple registration. TODO: public for unit tests only.
+     * Creates a simple registration. 
      */
-    public SimpleRegistration( Set required, Set optional, Map supplied,
-                  String policyUrl )
+    SimpleRegistration( Set<String> required, Set<String> optional, Map<String,String> supplied,
+        String policyUrl )
     {
         this.required = required;
         this.optional = optional;
@@ -118,10 +121,10 @@ public class SimpleRegistration
 
 
     /**
-     * Creates a simple registration. TODO: public for unit tests only.
+     * Creates a simple registration. 
      */
-    public SimpleRegistration( Set required, Set optional, Map supplied,
-                              String policyUrl, String namespace )
+    SimpleRegistration( Set<String> required, Set<String> optional, Map<String,String> supplied, 
+        String policyUrl, String namespace )
     {
         this.required = required;
         this.optional = optional;
@@ -131,19 +134,19 @@ public class SimpleRegistration
     }
 
 
-    SimpleRegistration( Map map ) throws OpenIdException
+    SimpleRegistration( Map<String,String> map ) throws OpenIdException
     {
-        required = new HashSet();
-        optional = new HashSet();
-        supplied = new HashMap();
+        required = new HashSet<String>();
+        optional = new HashSet<String>();
+        supplied = new HashMap<String,String>();
         namespace = OPENID_SREG_NAMESPACE_11;
 
-        Set set = map.entrySet();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<Map.Entry<String,String>> set = map.entrySet();
+        for ( Iterator<Map.Entry<String,String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = iter.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
 
             if ( OPENID_SREG_REQUIRED.equals( key ) )
             {
@@ -159,8 +162,7 @@ public class SimpleRegistration
             }
             else if ( OPENID_SREG_NSDEF.equals( key ) )
             {
-                if ( OPENID_SREG_NAMESPACE_10.equals( value )
-                    || OPENID_SREG_NAMESPACE_11.equals( value ) )
+                if ( OPENID_SREG_NAMESPACE_10.equals( value ) || OPENID_SREG_NAMESPACE_11.equals( value ) )
                 {
                     namespace = value;
                 }
@@ -178,21 +180,21 @@ public class SimpleRegistration
     /**
      * Expects a map with values like "openid.sreg.nickname=blahblah" in it
      */
-    public static SimpleRegistration parseFromResponse( Map map )
+    public static SimpleRegistration parseFromResponse( Map<String,String> map )
     {
-        Set req = new HashSet();
-        Set opt = new HashSet();
-        Map sup = new HashMap();
+        Set<String> req = new HashSet<String>();
+        Set<String> opt = new HashSet<String>();
+        Map<String,String> sup = new HashMap<String,String>();
         String ns = OPENID_SREG_NAMESPACE_11;
 
         String trigger = OPENID_SREG + ".";
         int triggerLength = trigger.length();
-        Set set = map.entrySet();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<Map.Entry<String,String>> set = map.entrySet();
+        for ( Iterator<Map.Entry<String,String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = iter.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
 
             if ( key.startsWith( trigger ) )
             {
@@ -200,8 +202,7 @@ public class SimpleRegistration
             }
             else if ( OPENID_SREG_NSDEF.equals( key ) )
             {
-                if ( OPENID_SREG_NAMESPACE_10.equals( value )
-                    || OPENID_SREG_NAMESPACE_11.equals( value ) )
+                if ( OPENID_SREG_NAMESPACE_10.equals( value ) || OPENID_SREG_NAMESPACE_11.equals( value ) )
                 {
                     ns = value;
                 }
@@ -211,7 +212,7 @@ public class SimpleRegistration
     }
 
 
-    private void addToSetFromList( Set set, String value )
+    private void addToSetFromList( Set<String> set, String value )
     {
         if ( value == null )
         {
@@ -221,13 +222,13 @@ public class SimpleRegistration
         while ( st.hasMoreTokens() )
         {
             String token = st.nextToken().trim();
-            if ( allowed.contains( token ) )
+            if ( ALLOWED.contains( token ) )
             {
                 set.add( token );
             }
             else
             {
-                log.info( "Illegal sreg value: " + token );
+                LOG.info( "Illegal sreg value: " + token );
             }
         }
     }
@@ -239,25 +240,25 @@ public class SimpleRegistration
     }
 
 
-    public Set getRequired()
+    public Set<String> getRequired()
     {
-        return required;
-    } // clone?
+        return Collections.unmodifiableSet( required );
+    } 
 
 
-    public Set getOptional()
+    public Set<String> getOptional()
     {
-        return optional;
-    } // clone?
+        return Collections.unmodifiableSet( optional );
+    } 
 
 
-    public void setRequired( Set set )
+    public void setRequired( Set<String> set )
     {
         required = set;
     }
 
 
-    public void setOptional( Set set )
+    public void setOptional( Set<String> set )
     {
         optional = set;
     }
@@ -269,24 +270,22 @@ public class SimpleRegistration
     }
 
 
-    //public Map getSuppliedValues(){return supplied;}
-
-    public Map getSuppliedValues()
+    public Map<String,String> getSuppliedValues()
     {
-        Map map = new HashMap();
+        Map<String,String> map = new HashMap<String,String>();
         addAllNonEmpty( supplied, map );
         return map;
     }
 
 
-    private void addAllNonEmpty( Map from, Map to )
+    private void addAllNonEmpty( Map<String,String> from, Map<String,String> to )
     {
-        Set set = from.entrySet();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<Map.Entry<String,String>> set = from.entrySet();
+        for ( Iterator<Map.Entry<String,String>> iter = set.iterator(); iter.hasNext(); )
         {
-            Map.Entry mapEntry = ( Map.Entry ) iter.next();
-            String key = ( String ) mapEntry.getKey();
-            String value = ( String ) mapEntry.getValue();
+            Map.Entry<String,String> mapEntry = iter.next();
+            String key = mapEntry.getKey();
+            String value = mapEntry.getValue();
             if ( value != null )
             {
                 to.put( key, value );
@@ -301,5 +300,167 @@ public class SimpleRegistration
             + ", optional=" + optional + ", supplied=" + supplied
             + ", policy url=" + policyUrl
             + ", namespace=" + namespace + "]";
+    }
+
+
+    /**
+     * @param nickName the nickName to set
+     */
+    public void setNickName( String nickName )
+    {
+        this.nickName = nickName;
+    }
+
+
+    /**
+     * @return the nickName
+     */
+    public String getNickName()
+    {
+        return nickName;
+    }
+
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail( String email )
+    {
+        this.email = email;
+    }
+
+
+    /**
+     * @return the email
+     */
+    public String getEmail()
+    {
+        return email;
+    }
+
+
+    /**
+     * @param fullName the fullName to set
+     */
+    public void setFullName( String fullName )
+    {
+        this.fullName = fullName;
+    }
+
+
+    /**
+     * @return the fullName
+     */
+    public String getFullName()
+    {
+        return fullName;
+    }
+
+
+    /**
+     * @param postCode the postCode to set
+     */
+    public void setPostCode( String postCode )
+    {
+        this.postCode = postCode;
+    }
+
+
+    /**
+     * @return the postCode
+     */
+    public String getPostCode()
+    {
+        return postCode;
+    }
+
+
+    /**
+     * @param dob the dob to set
+     */
+    public void setDob( String dob )
+    {
+        this.dob = dob;
+    }
+
+
+    /**
+     * @return the dob
+     */
+    public String getDob()
+    {
+        return dob;
+    }
+
+
+    /**
+     * @param country the country to set
+     */
+    public void setCountry( String country )
+    {
+        this.country = country;
+    }
+
+
+    /**
+     * @return the country
+     */
+    public String getCountry()
+    {
+        return country;
+    }
+
+
+    /**
+     * @param language the language to set
+     */
+    public void setLanguage( String language )
+    {
+        this.language = language;
+    }
+
+
+    /**
+     * @return the language
+     */
+    public String getLanguage()
+    {
+        return language;
+    }
+
+
+    /**
+     * @param timeZone the timeZone to set
+     */
+    public void setTimeZone( String timeZone )
+    {
+        this.timeZone = timeZone;
+    }
+
+
+    /**
+     * @return the timeZone
+     */
+    public String getTimeZone()
+    {
+        return timeZone;
+    }
+
+
+    /**
+     * @param gender the gender to set
+     */
+    public void setGender( String gender )
+    {
+        this.gender = gender;
+    }
+
+
+    /**
+     * @return the gender
+     */
+    public String getGender()
+    {
+        return gender;
     }
 }

@@ -8,6 +8,8 @@ package org.verisign.joid.consumer;
  */
 public class AuthenticationException extends RuntimeException
 {
+    private static final long serialVersionUID = 2537052042761934028L;
+
     public AuthenticationException( String s )
     {
         super( s );

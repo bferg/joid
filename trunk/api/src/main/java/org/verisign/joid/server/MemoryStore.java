@@ -14,17 +14,15 @@ import java.util.List;
 import java.util.ListIterator;
 
 
-public class MemoryStore extends Store
+public class MemoryStore implements Store
 {
-
-    public static long DEFAULT_LIFESPAN = 300; // todo: should probably increase this
-    private static List associationList = new ArrayList();
-    private static List nonceList = new ArrayList();
+    public static long DEFAULT_LIFESPAN = 300; // @TODO: should probably increase this
+    private static List<Association> associationList = new ArrayList<Association>();
+    private static List<Nonce> nonceList = new ArrayList<Nonce>();
     private long associationLifetime = DEFAULT_LIFESPAN;
 
 
-    public Association generateAssociation( AssociationRequest req,
-                       Crypto crypto )
+    public Association generateAssociation( AssociationRequest req, Crypto crypto )
         throws OpenIdException
     {
         // boldly reusing the db implementation of Association
@@ -78,10 +76,10 @@ public class MemoryStore extends Store
     {
         if ( handle == null )
             return null;
-        ListIterator li = associationList.listIterator();
+        ListIterator<Association> li = associationList.listIterator();
         while ( li.hasNext() )
         {
-            Association a = ( Association ) li.next();
+            Association a = li.next();
             if ( handle.equals( a.getHandle() ) )
             {
                 return a;
@@ -95,10 +93,10 @@ public class MemoryStore extends Store
     {
         if ( nonce == null )
             return null;
-        ListIterator li = nonceList.listIterator();
+        ListIterator<Nonce> li = nonceList.listIterator();
         while ( li.hasNext() )
         {
-            Nonce n = ( Nonce ) li.next();
+            Nonce n = li.next();
             if ( nonce.equals( n.getNonce() ) )
             {
                 return n;

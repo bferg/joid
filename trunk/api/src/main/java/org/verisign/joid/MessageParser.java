@@ -30,12 +30,10 @@ import org.apache.commons.logging.Log;
 
 /**
  * Parses an OpenID message. 
- *
- * TODO: Made public only for unit tests. 
  */
-public class MessageParser
+class MessageParser
 {
-    private final static Log log = LogFactory.getLog( MessageParser.class );
+    private final static Log LOG = LogFactory.getLog( MessageParser.class );
     static char newline = '\n';
 
 
@@ -67,16 +65,16 @@ public class MessageParser
     private static String toStringDelimitedBy( Message message,
                           String kvDelim, char lineDelim ) throws OpenIdException
     {
-        Map map = message.toMap();
-        Set set = map.entrySet();
+        Map<String,String> map = message.toMap();
+        Set<Map.Entry<String, String>> set = map.entrySet();
         StringBuffer sb = new StringBuffer();
         try
         {
-            for ( Iterator iter = set.iterator(); iter.hasNext(); )
+            for ( Iterator<Map.Entry<String, String>> iter = set.iterator(); iter.hasNext(); )
             {
-                Map.Entry mapEntry = ( Map.Entry ) iter.next();
-                String key = ( String ) mapEntry.getKey();
-                String value = ( String ) mapEntry.getValue();
+                Map.Entry<String,String> mapEntry = iter.next();
+                String key = mapEntry.getKey();
+                String value = mapEntry.getValue();
 
                 if ( lineDelim == newline )
                 {
@@ -96,7 +94,10 @@ public class MessageParser
                     }
                     else
                     {
-                        throw new OpenIdException( "Value for key '" + key + "' is null in message map" );
+                        StringBuilder msg = new StringBuilder( "Value for key '" );
+                        msg.append( key ).append( "' is null in message map" );
+                        LOG.error( msg );
+                        throw new OpenIdException( msg.toString() );
                     }
                 }
 
@@ -131,10 +132,10 @@ public class MessageParser
      *
      * TODO: Made public only for unit tests. Do not use.
      */
-    public static Map urlEncodedToMap( String query )
+    public static Map<String,String> urlEncodedToMap( String query )
         throws UnsupportedEncodingException
     {
-        Map map = new HashMap();
+        Map<String,String> map = new HashMap<String,String>();
         if ( query == null )
         {
             return map;
@@ -155,20 +156,9 @@ public class MessageParser
     }
 
 
-    private static boolean isGoodValue( String value )
+    static Map<String,String> postedToMap( String query ) throws IOException
     {
-        if ( "&".equals( value ) || ";".equals( value ) )
-        {
-            return false;
-        }
-        // more tests here perchance
-        return true;
-    }
-
-
-    static Map postedToMap( String query ) throws IOException
-    {
-        Map map = new HashMap();
+        Map<String,String> map = new HashMap<String, String>();
         if ( query == null )
         {
             return map;
@@ -191,5 +181,4 @@ public class MessageParser
         }
         return map;
     }
-
 }

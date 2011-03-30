@@ -32,12 +32,12 @@ public abstract class Message
     static String OPENID_20_NAMESPACE = "http://specs.openid.net/auth/2.0";
     static String OPENID_NS = "openid.ns";
     static String OPENID_MODE = "openid.mode";
-    static Set OPENID_RESERVED_WORDS;
+    static Set<String> OPENID_RESERVED_WORDS;
 
     static
     {
         // from section 12 in spec
-        OPENID_RESERVED_WORDS = new HashSet( Arrays.asList( new String[]
+        OPENID_RESERVED_WORDS = new HashSet<String>( Arrays.asList( new String[]
             { "assoc_handle", "assoc_type", "claimed_id", "contact", "delegate",
                 "dh_consumer_public", "dh_gen", "dh_modulus", "error", "identity",
                 "invalidate_handle", "mode", "ns", "op_endpoint", "openid", "realm",
@@ -123,9 +123,9 @@ public abstract class Message
     }
 
 
-    Map toMap()
+    Map<String,String> toMap()
     {
-        Map map = new HashMap();
+        Map<String,String> map = new HashMap<String,String>();
         if ( ns != null )
         {
             map.put( Message.OPENID_NS, ns );

@@ -22,6 +22,5 @@ import org.verisign.joid.server.NonceImpl;
  */
 public class Nonce extends NonceImpl implements org.verisign.joid.Nonce
 {
-    private final static Log log = LogFactory.getLog(Nonce.class);
-
+    private final static Log log = LogFactory.getLog( Nonce.class );
 }

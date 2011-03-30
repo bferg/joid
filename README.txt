@@ -14,11 +14,6 @@ For javadocs API docs:
 For unit tests:
   $ mvn test
 
-  NOTE: To run the tests, you need to have a 'joid_test' database. 
-
-  $ mysqladmin -uroot -p<password> create joid_test
-  $ mysql -uroot -p<password> -Djoid_test < ./stores/hibernate/src/create.sql
-
 
 See src/examples for example usage.
 

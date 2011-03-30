@@ -15,7 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
 
-
+/**
+ * 
+ * This filter (for Server - OpenId provider - side) takes url's of the form: http://hostname/user/username
+        to provide an id page for each user
+ */
 public class UserUrlFilter implements Filter
 {
     private static Log log = LogFactory.getLog( UserUrlFilter.class );

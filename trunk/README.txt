@@ -6,13 +6,13 @@ OpenID 1.1 and 2.0 is covered.
 See more at <http://code.google.com/p/joid/>
 
 To build:
-  $ ant build
+  $ mvn install
 
 For javadocs API docs:
-  $ ant api
+  $ mvn javadoc:javadoc
 
 For unit tests:
-  $ ant tests
+  $ mvn test
 
   NOTE: To run the tests, you need to have a 'joid_test' database. 
 

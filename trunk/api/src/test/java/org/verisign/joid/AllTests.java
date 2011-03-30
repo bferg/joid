@@ -1576,11 +1576,11 @@ public class AllTests extends TestCase
         AuthenticationResponse aresp = ( AuthenticationResponse ) resp;
         assertTrue( aresp.isVersion2() );
 
-        Map map = aresp.toMap();
+        Map<String,String> map = aresp.toMap();
         // Check for sreg namespace
         if ( resp.isVersion2() )
         {
-            assertEquals( ( String ) map.get( "openid.ns.sreg" ),
+            assertEquals( map.get( "openid.ns.sreg" ),
                          SimpleRegistration.OPENID_SREG_NAMESPACE_10 );
         }
     }
@@ -1606,14 +1606,14 @@ public class AllTests extends TestCase
 
         SimpleRegistration sreg = areq.getSimpleRegistration();
         assertTrue( sreg.isRequested() );
-        Set set = sreg.getOptional();
-        Map supplied = new HashMap();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<String> set = sreg.getOptional();
+        Map<String,String> supplied = new HashMap<String, String>();
+        for ( Iterator<String> iter = set.iterator(); iter.hasNext(); )
         {
             s = ( String ) iter.next();
             supplied.put( s, "blahblah" );
         }
-        sreg = new SimpleRegistration( Collections.EMPTY_SET, set, supplied, "", sreg.getNamespace() );
+        sreg = new SimpleRegistration( Collections.<String>emptySet(), set, supplied, "", sreg.getNamespace() );
         areq.setSimpleRegistration( sreg );
 
         Response resp = req.processUsing( serverInfo );
@@ -1621,11 +1621,11 @@ public class AllTests extends TestCase
         AuthenticationResponse aresp = ( AuthenticationResponse ) resp;
         assertTrue( aresp.isVersion2() );
 
-        Map map = aresp.toMap();
+        Map<String,String> map = aresp.toMap();
         // Check for sreg namespace
         if ( resp.isVersion2() )
         {
-            assertEquals( ( String ) map.get( "openid.ns.sreg" ),
+            assertEquals( map.get( "openid.ns.sreg" ),
                          SimpleRegistration.OPENID_SREG_NAMESPACE_11 );
         }
     }
@@ -1652,14 +1652,14 @@ public class AllTests extends TestCase
 
         SimpleRegistration sreg = areq.getSimpleRegistration();
         assertTrue( sreg.isRequested() );
-        Set set = sreg.getOptional();
-        Map supplied = new HashMap();
-        for ( Iterator iter = set.iterator(); iter.hasNext(); )
+        Set<String> set = sreg.getOptional();
+        Map<String,String> supplied = new HashMap<String, String>();
+        for ( Iterator<String> iter = set.iterator(); iter.hasNext(); )
         {
-            s = ( String ) iter.next();
+            s = iter.next();
             supplied.put( s, "blahblah" );
         }
-        sreg = new SimpleRegistration( Collections.EMPTY_SET, set, supplied, "", sreg.getNamespace() );
+        sreg = new SimpleRegistration( Collections.<String>emptySet(), set, supplied, "", sreg.getNamespace() );
         areq.setSimpleRegistration( sreg );
 
         Response resp = req.processUsing( serverInfo );
@@ -1667,19 +1667,18 @@ public class AllTests extends TestCase
         AuthenticationResponse aresp = ( AuthenticationResponse ) resp;
         assertTrue( aresp.isVersion2() );
 
-        Map map = aresp.toMap();
+        Map<String,String> map = aresp.toMap();
         // Check for sreg namespace
         if ( resp.isVersion2() )
         {
-            assertEquals( ( String ) map.get( "openid.ns.sreg" ),
-                         SimpleRegistration.OPENID_SREG_NAMESPACE_11 );
+            assertEquals( map.get( "openid.ns.sreg" ), SimpleRegistration.OPENID_SREG_NAMESPACE_11 );
         }
     }
 
 
     public void testMessageMapToUrlStringOk() throws Exception
     {
-        HashMap testMap = new HashMap();
+        HashMap<String,String> testMap = new HashMap<String,String>();
         testMap.put( CheckAuthenticationRequest.OPENID_ASSOC_HANDLE, "adfasdf" );
         testMap.put( "openid.mode", "check_authentication" );
         testMap.put( AuthenticationResponse.OPENID_IDENTITY, "http://foo" );
@@ -1689,6 +1688,7 @@ public class AllTests extends TestCase
 
         CheckAuthenticationRequest testMessage = new CheckAuthenticationRequest( testMap, "check_authentication" );
         String urlStr = testMessage.toUrlString();
+        @SuppressWarnings("unused")
         String compareStr = "openid.assoc_handle=adfasdf&openid.identity=http%3A%2F%2Ffoo&openid.return_to=http%3A%2F%2Fbar&openid.sig=siggy&openid.mode=check_authentication&openid.response_nonce=42";
         String[] origParams = urlStr.split( "&" );
         Arrays.sort( origParams );
@@ -1700,7 +1700,7 @@ public class AllTests extends TestCase
 
     public void testMessageMapToUrlStringNullParam() throws Exception
     {
-        HashMap testMap = new HashMap();
+        HashMap<String,String> testMap = new HashMap<String,String>();
         testMap.put( CheckAuthenticationRequest.OPENID_ASSOC_HANDLE, "adfasdf" );
         testMap.put( "openid.mode", "check_authentication" );
         testMap.put( AuthenticationResponse.OPENID_IDENTITY, "http://foo" );
@@ -1712,6 +1712,7 @@ public class AllTests extends TestCase
         try
         {
             CheckAuthenticationRequest testMessage = new CheckAuthenticationRequest( testMap, "check_authentication" );
+            @SuppressWarnings("unused")
             String urlStr = testMessage.toUrlString();
         }
         catch ( OpenIdException e )
@@ -1813,10 +1814,12 @@ public class AllTests extends TestCase
         resp = req.processUsing( serverInfo );
         assertTrue( resp instanceof AuthenticationResponse );
         AuthenticationResponse authResp = ( AuthenticationResponse ) resp;
+        @SuppressWarnings("unused")
         String nonce = authResp.getNonce();
 
         // and check the response
         CheckAuthenticationRequest checkReq = new CheckAuthenticationRequest( authResp.toMap(), "check_authentication" );
+        @SuppressWarnings("unused")
         Response newResp = checkReq.processUsing( serverInfo );
 
         // now try checking it again, using the same response
@@ -1885,10 +1888,10 @@ public class AllTests extends TestCase
         assertTrue( req instanceof AuthenticationRequest );
         AuthenticationRequest areq = ( AuthenticationRequest ) req;
 
-        Map map = areq.toMap();
-        System.out.println( ( String ) map.get( "openid.return_to" ) );
+        Map<String,String> map = areq.toMap();
+        System.out.println( map.get( "openid.return_to" ) );
         assertEquals( "https://www.blogger.com/comment.do?loginRedirect=lm6phc1udus9",
-            ( String ) map.get( "openid.return_to" ) );
+            map.get( "openid.return_to" ) );
     }
 
 
@@ -1898,10 +1901,11 @@ public class AllTests extends TestCase
 
         Request req = RequestFactory.parse( s );
         assertTrue( req instanceof AuthenticationRequest );
+        @SuppressWarnings("unused")
         AuthenticationRequest areq = ( AuthenticationRequest ) req;
         SimpleRegistration sreg = ( ( AuthenticationRequest ) req )
             .getSimpleRegistration();
-        Set set = sreg.getOptional();
+        Set<String> set = sreg.getOptional();
         assertEquals( set.size(), 0 );
     }
 

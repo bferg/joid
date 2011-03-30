@@ -15,7 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
 
-
+/**
+ * This filter (for Consumer - relying party - side) automatically parses OpenID responses and sets the user's identity in the session.
+ */
 public class UserUrlFilter implements Filter
 {
     private static Log log = LogFactory.getLog( UserUrlFilter.class );

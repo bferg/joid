@@ -33,13 +33,15 @@ public class OpenIdProviderServlet extends HttpServlet
     private Store store;
     private Crypto crypto;
 
-
     public void init( ServletConfig config ) throws ServletException
     {
         super.init( config );
         store = StoreFactory.getInstance( MemoryStore.class.getName() );
         crypto = new Crypto();
-        openId = new OpenId( new ServerInfo( "http://endpoint", store, crypto ) );
+        
+        String endPointUrl = config.getInitParameter( "endPointUrl" );
+        
+        openId = new OpenId( new ServerInfo( endPointUrl , store, crypto ) );
     }
 
 

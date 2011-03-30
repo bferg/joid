@@ -29,5 +29,7 @@
   <modules>
     <module>consumer</module>
     <module>server</module>
+    <module>openid-provider</module>
+    <module>relying-party</module>
   </modules>
 </project>

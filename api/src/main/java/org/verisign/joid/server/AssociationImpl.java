@@ -153,9 +153,9 @@ public class AssociationImpl implements org.verisign.joid.Association
 
 
     /**
-     * Returns a string representation of this assocation.
+     * Returns a string representation of this Association.
      *
-     * @return a string representation of this assocation.
+     * @return a string representation of this Association.
      */
     public String toString()
     {

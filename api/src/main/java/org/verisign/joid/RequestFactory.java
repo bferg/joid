@@ -10,16 +10,11 @@
 // Distributed under an Apache License
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-
 package org.verisign.joid;
 
 
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 
@@ -29,13 +24,15 @@ import org.apache.commons.logging.Log;
  */
 public class RequestFactory
 {
-    private final static Log log = LogFactory.getLog( RequestFactory.class );
+    private final static Log LOG = LogFactory.getLog( RequestFactory.class );
 
 
     private RequestFactory()
     {
+        LOG.debug( "New instance created." );
     }
 
+    
     public static String OPENID_MODE = "openid.mode";
     public static String ASSOCIATE_MODE = "associate";
     public static String CHECKID_IMMEDIATE_MODE = "checkid_immediate";
@@ -54,7 +51,8 @@ public class RequestFactory
     public static Request parse( String query )
         throws UnsupportedEncodingException, OpenIdException
     {
-        Map map;
+        Map<String,String> map;
+        
         try
         {
             map = parseQuery( query );
@@ -65,13 +63,12 @@ public class RequestFactory
                       + e.toString() );
         }
 
-        String s = ( String ) map.get( OPENID_MODE );
+        String s = map.get( OPENID_MODE );
         if ( ASSOCIATE_MODE.equals( s ) )
         {
             return new AssociationRequest( map, s );
         }
-        else if ( CHECKID_IMMEDIATE_MODE.equals( s )
-            || CHECKID_SETUP_MODE.equals( s ) )
+        else if ( CHECKID_IMMEDIATE_MODE.equals( s ) || CHECKID_SETUP_MODE.equals( s ) )
         {
             return new AuthenticationRequest( map, s );
         }
@@ -94,10 +91,8 @@ public class RequestFactory
      * @throws UnsupportedEncodingException if the string is not properly 
      *  UTF-8 encoded.
      */
-    public static Map parseQuery( String query )
-        throws UnsupportedEncodingException
+    public static Map<String,String> parseQuery( String query ) throws UnsupportedEncodingException
     {
         return MessageParser.urlEncodedToMap( query );
     }
-
 }

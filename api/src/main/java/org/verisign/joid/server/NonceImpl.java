@@ -1,21 +1,17 @@
 package org.verisign.joid.server;
 
 
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
+import org.verisign.joid.Nonce;
+
 
 /**
- * User: treeder
- * Date: Jul 19, 2007
- * Time: 4:41:21 PM
+ * A simple Nonce implementation.
  */
-public class NonceImpl implements org.verisign.joid.Nonce
+public class NonceImpl implements Nonce
 {
-    private final static Log log = LogFactory.getLog( NonceImpl.class );
     private Long id;
     private String nonce;
     private Date checkedDate;
@@ -67,9 +63,9 @@ public class NonceImpl implements org.verisign.joid.Nonce
 
 
     /**
-     * Returns a string representation of this nonce.
+     * Returns a string representation of this Nonce.
      *
-     * @return a string representation of this nonce.
+     * @return a string representation of this Nonce.
      */
     public String toString()
     {

@@ -51,12 +51,11 @@ public class RelyingPartyServlet extends HttpServlet
     }
 
 
-    public void doPost( HttpServletRequest request,
-                        HttpServletResponse response )
+    public void doPost( HttpServletRequest request, HttpServletResponse response )
         throws ServletException, IOException
     {
         StringBuffer sb = new StringBuffer();
-        Enumeration e = request.getParameterNames();
+        Enumeration<?> e = request.getParameterNames();
         while ( e.hasMoreElements() )
         {
             String name = ( String ) e.nextElement();
@@ -84,8 +83,7 @@ public class RelyingPartyServlet extends HttpServlet
     }
 
 
-    public void doQuery( String query,
-                        HttpServletResponse response )
+    public void doQuery( String query, HttpServletResponse response )
         throws ServletException, IOException
     {
         log( "\nrequest\n-------\n" + query + "\n" );
@@ -136,8 +134,8 @@ public class RelyingPartyServlet extends HttpServlet
     private void returnError( String query, HttpServletResponse response )
         throws ServletException, IOException
     {
-        Map map = RequestFactory.parseQuery( query );
-        String returnTo = ( String ) map.get( "openid.return_to" );
+        Map<String,String> map = RequestFactory.parseQuery( query );
+        String returnTo = map.get( "openid.return_to" );
         boolean goodReturnTo = false;
         
         try

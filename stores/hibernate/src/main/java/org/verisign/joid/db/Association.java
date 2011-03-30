@@ -13,15 +13,16 @@
 
 package org.verisign.joid.db;
 
+
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.verisign.joid.server.AssociationImpl;
+
 
 /**
  * An association in the database.
  */
 public class Association extends AssociationImpl implements org.verisign.joid.Association
 {
-    private final static Log log = LogFactory.getLog(Association.class);
-
+    private final static Log log = LogFactory.getLog( Association.class );
 }

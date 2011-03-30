@@ -17,16 +17,8 @@ package org.verisign.joid;
 /**
  * Represents a store that is used by JOID for persisting associations.
  */
-public abstract class Store
+public interface Store
 {
-    /**
-     * Override constructor in the Store implementation.
-     */
-    protected Store()
-    {
-    }
-
-
     /**
      * Generates and returns association. To store the association
      * use {@link Store#saveAssociation(Association) saveAssociation()}
@@ -37,7 +29,7 @@ public abstract class Store
      *
      * @throws OpenIdException at unrecoverable errors.
      */
-    public abstract Association generateAssociation( AssociationRequest req, Crypto crypto )
+    Association generateAssociation( AssociationRequest req, Crypto crypto )
         throws OpenIdException;
 
 
@@ -46,7 +38,7 @@ public abstract class Store
      *
      * @param a the association to delete.
      */
-    public abstract void deleteAssociation( Association a );
+    void deleteAssociation( Association a );
 
 
     /**
@@ -54,7 +46,7 @@ public abstract class Store
      *
      * @param a the association to store.
      */
-    public abstract void saveAssociation( Association a );
+    void saveAssociation( Association a );
 
 
     /**
@@ -65,8 +57,7 @@ public abstract class Store
      *
      * @throws OpenIdException at unrecoverable errors.
      */
-    public abstract Association findAssociation( String handle )
-        throws OpenIdException;
+    Association findAssociation( String handle ) throws OpenIdException;
 
 
     /**
@@ -77,7 +68,7 @@ public abstract class Store
      *
      * @throws OpenIdException at unrecoverable errors.
      */
-    public abstract Nonce findNonce( String nonce ) throws OpenIdException;
+    Nonce findNonce( String nonce ) throws OpenIdException;
 
 
     /**
@@ -85,7 +76,7 @@ public abstract class Store
      *
      * @param n the nonce to store.
      */
-    public abstract void saveNonce( Nonce n );
+    void saveNonce( Nonce n );
 
 
     /**
@@ -97,5 +88,5 @@ public abstract class Store
      *
      * @throws OpenIdException at unrecoverable errors.
      */
-    public abstract Nonce generateNonce( String nonce ) throws OpenIdException;
+    Nonce generateNonce( String nonce ) throws OpenIdException;
 }

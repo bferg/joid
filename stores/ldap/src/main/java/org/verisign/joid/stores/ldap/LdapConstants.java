@@ -25,21 +25,11 @@ package org.verisign.joid.stores.ldap;
  *
  * @author <a href="mailto:akarasulu@gmail.com">Alex Karasulu</a>
  */
-public interface JoidLdapConstants
+public interface LdapConstants
 {
     // Nonce related schema entity constants 
     
     String NONCE_OC = "opNonceOc";
     String NONCE_AT = "opNonceAt";
     String CHECKED_DATE_AT = "opCheckedDateAt";
-    
-    // Association related schema entity constants 
-    
-    String ASSOCIATION_OC = "opAssociationOc";
-    String MODE_AT = "opModeAt";
-    String HANDLE_AT = "opHandleAt";
-    String SECRET_AT = "opSecretAt";
-    String ISSUED_DATE_AT = "opIssuedDateAt";
-    String LIFETIME_AT = "opLifetimeAt";
-    String ASSOCIATION_TYPE_AT = "opAssociationTypeAt";
 }

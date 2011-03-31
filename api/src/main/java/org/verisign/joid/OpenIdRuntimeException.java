@@ -17,4 +17,10 @@ public class OpenIdRuntimeException extends RuntimeException
     {
         super( s );
     }
+
+    
+    public OpenIdRuntimeException( String s, Throwable t )
+    {
+        super( s, t );
+    }
 }

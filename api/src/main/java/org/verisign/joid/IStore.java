@@ -29,8 +29,7 @@ public interface IStore
      *
      * @throws OpenIdException at unrecoverable errors.
      */
-    IAssociation generateAssociation( AssociationRequest req, Crypto crypto )
-        throws OpenIdException;
+    IAssociation generateAssociation( AssociationRequest req, Crypto crypto ) throws OpenIdException;
 
 
     /**
@@ -38,7 +37,7 @@ public interface IStore
      *
      * @param a the association to delete.
      */
-    void deleteAssociation( IAssociation a );
+    void deleteAssociation( IAssociation a ) throws OpenIdException;
 
 
     /**
@@ -46,7 +45,7 @@ public interface IStore
      *
      * @param a the association to store.
      */
-    void saveAssociation( IAssociation a );
+    void saveAssociation( IAssociation a ) throws OpenIdException;
 
 
     /**
@@ -76,7 +75,7 @@ public interface IStore
      *
      * @param n the nonce to store.
      */
-    void saveNonce( INonce n );
+    void saveNonce( INonce n ) throws OpenIdException;
 
 
     /**

@@ -179,4 +179,7 @@ public interface IAssociation
      * @return whether this association has expired.
      */
     public boolean hasExpired();
+
+
+    public Date getIssuedDate();
 }

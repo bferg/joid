@@ -20,21 +20,15 @@
 package org.verisign.joid.stores.ldap;
 
 
-import java.awt.dnd.InvalidDnDOperationException;
 import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.directory.ldap.client.api.LdapConnection;
-import org.apache.directory.shared.ldap.model.cursor.SearchCursor;
+import org.apache.directory.ldap.client.api.LdapConnectionConfig;
+import org.apache.directory.ldap.client.api.LdapConnectionPool;
+import org.apache.directory.ldap.client.api.PoolableLdapConnectionFactory;
 import org.apache.directory.shared.ldap.model.entry.Entry;
-import org.apache.directory.shared.ldap.model.exception.LdapException;
-import org.apache.directory.shared.ldap.model.exception.LdapInvalidDnException;
-import org.apache.directory.shared.ldap.model.filter.SearchScope;
-import org.apache.directory.shared.ldap.model.message.Response;
-import org.apache.directory.shared.ldap.model.message.SearchResultEntry;
 import org.apache.directory.shared.ldap.model.name.Dn;
-import org.apache.directory.shared.util.GeneralizedTime;
 
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.Crypto;
@@ -42,7 +36,6 @@ import org.verisign.joid.IAssociation;
 import org.verisign.joid.INonce;
 import org.verisign.joid.IStore;
 import org.verisign.joid.OpenIdException;
-import org.verisign.joid.OpenIdRuntimeException;
 import org.verisign.joid.server.Association;
 import org.verisign.joid.server.Nonce;
 
@@ -52,19 +45,46 @@ import org.verisign.joid.server.Nonce;
  *
  * @author <a href="mailto:akarasulu@gmail.com">Alex Karasulu</a>
  */
-public class LdapStore implements IStore, JoidLdapConstants
+public class LdapStore implements IStore, LdapConstants
 {
     private final static Log LOG = LogFactory.getLog( LdapStore.class );
-    
-    
+
     /** The association life time */
     private long associationLifetime = 600;
 
-    
     private Dn nonceBaseDn;
     private Dn associationBaseDn;
+
+    private AssociationDao associationDao;
+    
+    private LdapConnectionConfig connConfig;
+    private LdapConnectionPool connPool;
     
     
+    public void initialize()
+    {
+        connPool = new LdapConnectionPool( new PoolableLdapConnectionFactory( getConnConfig() ) );
+        associationDao = new AssociationDao( connPool, associationBaseDn );
+    }
+    
+
+    /**
+     * @param connConfig the connConfig to set
+     */
+    public void setConnConfig( LdapConnectionConfig connConfig )
+    {
+        this.connConfig = connConfig;
+    }
+
+
+    /**
+     * @return the connConfig
+     */
+    public LdapConnectionConfig getConnConfig()
+    {
+        return connConfig;
+    }
+
 
     /**
      * @param nonceBaseDn the nonceBaseDn to set
@@ -118,18 +138,6 @@ public class LdapStore implements IStore, JoidLdapConstants
     {
         return associationLifetime;
     }
-    
-    
-    private LdapConnection acquireConnection()
-    {
-        return null;
-    }
-    
-    
-    private void releaseConnection( LdapConnection conn )
-    {
-        
-    }
 
 
     /**
@@ -141,12 +149,12 @@ public class LdapStore implements IStore, JoidLdapConstants
         {
             LOG.debug( "Generating association from request:" + req );
         }
-        
+
         Association a = new Association();
         a.setMode( "unused" );
         a.setHandle( Crypto.generateHandle() );
         a.setSessionType( req.getSessionType() );
-        
+
         byte[] secret = null;
         if ( req.isNotEncrypted() )
         {
@@ -173,88 +181,36 @@ public class LdapStore implements IStore, JoidLdapConstants
     /**
      * {@inheritDoc}
      */
-    public void deleteAssociation( IAssociation a )
+    public void deleteAssociation( IAssociation association ) throws OpenIdException
     {
-        LdapConnection conn = acquireConnection();
-        StringBuilder sb = new StringBuilder( HANDLE_AT );
-        sb.append( '=' ).append( a.getHandle() );
-        
-        Dn deleteDn = null; 
-
-        try
-        {
-            deleteDn = associationBaseDn.add( sb.toString() );
-            conn.delete( deleteDn );
-        }
-        catch ( LdapInvalidDnException e )
-        {
-            String msg = "Failed to create dn for association entry to delete";
-            LOG.error( msg, e );
-            throw new OpenIdRuntimeException( msg + ':' + e.toString() );
-        }
-        catch ( LdapException e )
-        {
-            String msg = "Failed to delete association entry: " + deleteDn.toString();
-            LOG.error( msg, e );
-        }
-        finally
-        {
-            releaseConnection( conn );
-        }
+        associationDao.deleteEntry( association );
     }
-
+    
 
     /**
      * {@inheritDoc}
      */
-    public void saveAssociation( IAssociation a )
+    public void saveAssociation( IAssociation association ) throws OpenIdException
     {
+        Entry entry = associationDao.getEntry( association.getHandle() );
+        
+        if ( entry == null )
+        {
+            associationDao.create( association );
+        }
+        else
+        {
+            associationDao.update( association, entry );
+        }
     }
-
+    
 
     /**
      * {@inheritDoc}
      */
     public IAssociation findAssociation( String handle ) throws OpenIdException
     {
-        LdapConnection conn = acquireConnection();
-        StringBuilder sb = new StringBuilder( '(' );
-        sb.append( HANDLE_AT );
-        sb.append( '=' ).append( handle ).append( ')' );
-        
-        try
-        {
-            SearchCursor cursor = conn.search( associationBaseDn, sb.toString(), SearchScope.ONELEVEL, "*" );
-            SearchResultEntry response = ( SearchResultEntry ) cursor.get();
-            
-            if ( cursor.next() == true )
-            {
-                throw new OpenIdException( "Did not expect to get more than one association back." );
-            }
-            
-            Entry entry = response.getEntry();
-            Association a = new Association();
-            a.setAssociationType( entry.get( ASSOCIATION_TYPE_AT ).get().toString() );
-            a.setHandle( entry.get( HANDLE_AT ).get().toString() );
-            
-            GeneralizedTime gt = new GeneralizedTime( entry.get( ISSUED_DATE_AT ).get().toString() );
-            a.setIssuedDate( gt.getCalendar().getTime() );
-            a.setLifetime( Long.parseLong( entry.get( LIFETIME_AT ).get().toString() ) );
-            a.setMode( entry.get( MODE_AT ).get().toString() );
-            a.setSecret( entry.get( SECRET_AT ).get().toString() );
-            a.setAssociationType( entry.get( ASSOCIATION_TYPE_AT ).get().toString() );
-            
-            return a;
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Failed to find association with handle: " + handle, e );
-            throw new OpenIdException( e );
-        }
-        finally
-        {
-            releaseConnection( conn );
-        }
+        return associationDao.read( handle );
     }
 
 

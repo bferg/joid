@@ -20,7 +20,7 @@ import org.verisign.joid.OpenId;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.RequestFactory;
 import org.verisign.joid.AuthenticationRequest;
-import org.verisign.joid.Store;
+import org.verisign.joid.IStore;
 import org.verisign.joid.ServerInfo;
 import org.verisign.joid.StoreFactory;
 import org.verisign.joid.server.MemoryStore;
@@ -30,7 +30,7 @@ public class OpenIdProviderServlet extends HttpServlet
 {
     private static final long serialVersionUID = 297366254782L;
     private static OpenId openId;
-    private Store store;
+    private IStore store;
     private Crypto crypto;
 
     public void init( ServletConfig config ) throws ServletException

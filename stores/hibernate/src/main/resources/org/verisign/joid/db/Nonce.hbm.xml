@@ -4,7 +4,7 @@
   "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-  <class name="org.verisign.joid.db.Nonce" table="Nonce">
+  <class name="org.verisign.joid.server.Nonce" table="Nonce">
     <id name="id">
       <generator class="native"/>
     </id>

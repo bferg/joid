@@ -387,9 +387,9 @@ public class AuthenticationRequest extends Request
 
     public Response processUsing( ServerInfo si ) throws OpenIdException
     {
-        Store store = si.getStore();
+        IStore store = si.getStore();
         Crypto crypto = si.getCrypto();
-        Association assoc = null;
+        IAssociation assoc = null;
         String invalidate = null;
         if ( handle != null )
         {

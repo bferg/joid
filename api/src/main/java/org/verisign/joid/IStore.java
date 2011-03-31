@@ -17,11 +17,11 @@ package org.verisign.joid;
 /**
  * Represents a store that is used by JOID for persisting associations.
  */
-public interface Store
+public interface IStore
 {
     /**
      * Generates and returns association. To store the association
-     * use {@link Store#saveAssociation(Association) saveAssociation()}
+     * use {@link IStore#saveAssociation(IAssociation) saveAssociation()}
      *
      * @param req the association request.
      * @param crypto the crypto implementation to use.
@@ -29,7 +29,7 @@ public interface Store
      *
      * @throws OpenIdException at unrecoverable errors.
      */
-    Association generateAssociation( AssociationRequest req, Crypto crypto )
+    IAssociation generateAssociation( AssociationRequest req, Crypto crypto )
         throws OpenIdException;
 
 
@@ -38,7 +38,7 @@ public interface Store
      *
      * @param a the association to delete.
      */
-    void deleteAssociation( Association a );
+    void deleteAssociation( IAssociation a );
 
 
     /**
@@ -46,7 +46,7 @@ public interface Store
      *
      * @param a the association to store.
      */
-    void saveAssociation( Association a );
+    void saveAssociation( IAssociation a );
 
 
     /**
@@ -57,7 +57,7 @@ public interface Store
      *
      * @throws OpenIdException at unrecoverable errors.
      */
-    Association findAssociation( String handle ) throws OpenIdException;
+    IAssociation findAssociation( String handle ) throws OpenIdException;
 
 
     /**
@@ -68,7 +68,7 @@ public interface Store
      *
      * @throws OpenIdException at unrecoverable errors.
      */
-    Nonce findNonce( String nonce ) throws OpenIdException;
+    INonce findNonce( String nonce ) throws OpenIdException;
 
 
     /**
@@ -76,17 +76,17 @@ public interface Store
      *
      * @param n the nonce to store.
      */
-    void saveNonce( Nonce n );
+    void saveNonce( INonce n );
 
 
     /**
      * Generates and returns a nonce. To store the nonce
-     * use {@link Store#saveNonce(Nonce) saveNonce()}
+     * use {@link IStore#saveNonce(INonce) saveNonce()}
      *
      * @param nonce the nonce to use.
      * @return the generated nonce.
      *
      * @throws OpenIdException at unrecoverable errors.
      */
-    Nonce generateNonce( String nonce ) throws OpenIdException;
+    INonce generateNonce( String nonce ) throws OpenIdException;
 }

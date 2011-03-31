@@ -14,7 +14,7 @@
 package org.verisign.joid;
 
 
-import org.verisign.joid.Association;
+import org.verisign.joid.IAssociation;
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.AssociationResponse;
 import org.verisign.joid.AuthenticationRequest;
@@ -32,11 +32,11 @@ import org.verisign.joid.Response;
 import org.verisign.joid.ResponseFactory;
 import org.verisign.joid.ServerInfo;
 import org.verisign.joid.SimpleRegistration;
-import org.verisign.joid.Store;
+import org.verisign.joid.IStore;
 import org.verisign.joid.StoreFactory;
 import org.verisign.joid.extension.PapeRequest;
 import org.verisign.joid.extension.PapeResponse;
-import org.verisign.joid.server.AssociationImpl;
+import org.verisign.joid.server.Association;
 import org.verisign.joid.server.MemoryStore;
 
 import java.io.ByteArrayOutputStream;
@@ -85,7 +85,7 @@ public class AllTests extends TestCase
     }
 
     private static Crypto crypto = new Crypto();
-    private static Store store = StoreFactory.getInstance( MemoryStore.class.getName() );
+    private static IStore store = StoreFactory.getInstance( MemoryStore.class.getName() );
     private static ServerInfo serverInfo = new ServerInfo( "http://example.com",
                               store, crypto );
 
@@ -146,7 +146,7 @@ public class AllTests extends TestCase
 
     public void testAssociationLifeLength() throws Exception
     {
-        Association a = new AssociationImpl();
+        IAssociation a = new Association();
         a.setIssuedDate( new Date() );
         a.setLifetime( new Long( 1 ) );
         assertFalse( a.hasExpired() );

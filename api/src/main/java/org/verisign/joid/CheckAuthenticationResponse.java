@@ -106,7 +106,7 @@ public class CheckAuthenticationResponse extends Response
      * throws at errors in signature creation
      */
     CheckAuthenticationResponse( AuthenticationResponse ar,
-                Association a, Crypto crypto,
+                IAssociation a, Crypto crypto,
                 String invalidateHandle )
         throws OpenIdException
     {

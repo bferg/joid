@@ -22,7 +22,6 @@ package org.verisign.joid.stores.ldap;
 
 import java.text.ParseException;
 import java.util.Calendar;
-import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

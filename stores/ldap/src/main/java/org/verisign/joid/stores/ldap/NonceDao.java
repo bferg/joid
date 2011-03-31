@@ -45,9 +45,9 @@ import org.verisign.joid.server.Nonce;
 
 
 /**
- * TODO NonceDao.
+ * An LDAP data access object for Nonce objects.
  *
- * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
+ * @author <a href="mailto:akarasulu@gmail.com">Alex Karasulu</a>
  */
 public class NonceDao implements LdapDao<INonce, String>
 {

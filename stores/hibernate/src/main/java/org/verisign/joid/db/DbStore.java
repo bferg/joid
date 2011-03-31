@@ -41,9 +41,11 @@ public class DbStore implements IStore
     private long associationLifetime = 600;
 
 
-    public org.verisign.joid.IAssociation
-        generateAssociation( AssociationRequest req, Crypto crypto )
-            throws OpenIdException
+    /**
+     * {@inheritDoc}
+     */
+    public IAssociation generateAssociation( AssociationRequest req, Crypto crypto )
+        throws OpenIdException
     {
         Association a = new Association();
         a.setMode( "unused" );
@@ -73,8 +75,10 @@ public class DbStore implements IStore
     }
 
 
-    public org.verisign.joid.INonce generateNonce( String nonce )
-        throws OpenIdException
+    /**
+     * {@inheritDoc}
+     */
+    public INonce generateNonce( String nonce ) throws OpenIdException
     {
         Nonce n = new Nonce();
         n.setNonce( nonce );
@@ -83,7 +87,10 @@ public class DbStore implements IStore
     }
 
 
-    public void saveNonce( org.verisign.joid.INonce n )
+    /**
+     * {@inheritDoc}
+     */
+    public void saveNonce( INonce n )
     {
         Session session = HibernateUtil.currentSession();
         Transaction tx = session.beginTransaction();
@@ -93,7 +100,10 @@ public class DbStore implements IStore
     }
 
 
-    public void saveAssociation( org.verisign.joid.IAssociation a )
+    /**
+     * {@inheritDoc}
+     */
+    public void saveAssociation( IAssociation a )
     {
         Session session = HibernateUtil.currentSession();
         Transaction tx = session.beginTransaction();
@@ -103,15 +113,20 @@ public class DbStore implements IStore
     }
 
 
-    public void deleteAssociation( org.verisign.joid.IAssociation a )
+    /**
+     * {@inheritDoc}
+     */
+    public void deleteAssociation( IAssociation a )
     {
         Session session = HibernateUtil.currentSession();
         session.delete( a );
     }
 
 
-    public org.verisign.joid.IAssociation findAssociation( String handle )
-        throws OpenIdException
+    /**
+     * {@inheritDoc}
+     */
+    public IAssociation findAssociation( String handle ) throws OpenIdException
     {
         Session session = HibernateUtil.currentSession();
         Transaction tx = session.beginTransaction();
@@ -139,8 +154,10 @@ public class DbStore implements IStore
     }
 
 
-    public org.verisign.joid.INonce findNonce( String nonce )
-        throws OpenIdException
+    /**
+     * {@inheritDoc}
+     */
+    public INonce findNonce( String nonce ) throws OpenIdException
     {
         Session session = HibernateUtil.currentSession();
         Transaction tx = session.beginTransaction();
@@ -166,5 +183,4 @@ public class DbStore implements IStore
             return ( INonce ) l.get( 0 );
         }
     }
-
 }

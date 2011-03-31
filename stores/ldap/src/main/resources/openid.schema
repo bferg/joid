@@ -1,0 +1,89 @@
+#
+# Nonce related attributeTypes and objectClasses
+#
+
+attributetype ( 1.3.6.1.4.1.18060.123.1
+    NAME 'opNonceAt'
+    DESC 'OpenID Nonce attribute'
+    EQUALITY exactCaseMatch
+    SUBSTRING exactCaseSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.18060.123.2
+    NAME 'opCheckedDateAt'
+    DESC 'OpenID Nonce checkedDate attribute'
+    EQUALITY generalizedTimeMatch
+    ORDERING generalizedTimeOrderingMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+    SINGLE-VALUE )
+
+objectclass ( 1.3.6.1.4.1.18060.123.3
+    NAME 'opNonceOc'
+    DESC 'Nonce objectClass for JOID OpenID implementation'
+    SUP top
+    STRUCTURAL
+    MUST ( opNonceAt $ opCheckedDateAt ) )
+
+
+#
+# Association related attributeTypes and objectClasses
+#
+
+
+attributetype ( 1.3.6.1.4.1.18060.123.4
+    NAME 'opModeAt'
+    DESC 'OpenID Association mode attribute'
+    EQUALITY caseIgnoreMatch
+    SUBSTRING caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.18060.123.5
+    NAME 'opHandleAt'
+    DESC 'OpenID Association handle attribute'
+    EQUALITY exactCaseMatch
+    SUBSTRING exactCaseSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.18060.123.6
+    NAME 'opSecretAt'
+    DESC 'OpenID Association secret attribute'
+    EQUALITY exactCaseMatch
+    SUBSTRING exactCaseSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.18060.123.7
+    NAME 'opAssociationTypeAt'
+    DESC 'OpenID Association type attribute'
+    EQUALITY exactCaseMatch
+    SUBSTRING exactCaseSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
+    SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.18060.123.8
+    NAME 'opIssuedDateAt'
+    DESC 'OpenID Association issuedDate attribute'
+    EQUALITY generalizedTimeMatch
+    ORDERING generalizedTimeOrderingMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
+    SINGLE-VALUE )
+
+attributetype ( 1.3.6.1.4.1.18060.123.9
+    NAME 'opLifetimeAt'
+    DESC 'OpenID Association lifetime attribute'
+    EQUALITY integerMatch
+    ORDERING integerOrderingMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
+    SINGLE-VALUE )
+
+objectclass ( 1.3.6.1.4.1.18060.123.10
+    NAME 'opAssociationOc'
+    DESC 'OpenID Association objectclass'
+    SUP top
+    STRUCTURAL
+    MUST ( opModeAt $ opHandleAt $ opSecretAt $ 
+           opIssuedDateAt $ opLifetimeAt $ opAssociationType ) )
+

@@ -25,7 +25,7 @@
 	
 	<servlet>
 		<servlet-name>loginServlet</servlet-name>
-		<servlet-class>org.verisign.joid.examples.server.OpenIdProviderServlet</servlet-class>
+		<servlet-class>org.verisign.joid.server.OpenIdServlet</servlet-class>
 		<init-param>
 			<param-name>endPointUrl</param-name>
 			<param-value>http://localhost:8180/joid/login</param-value>

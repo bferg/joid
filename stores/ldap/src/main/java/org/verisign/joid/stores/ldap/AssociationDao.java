@@ -21,31 +21,23 @@ package org.verisign.joid.stores.ldap;
 
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.directory.ldap.client.api.LdapConnection;
-import org.apache.directory.ldap.client.api.LdapConnectionPool;
-import org.apache.directory.ldap.client.api.LdapNetworkConnection;
+import org.apache.directory.shared.ldap.model.constants.SchemaConstants;
 import org.apache.directory.shared.ldap.model.cursor.SearchCursor;
 import org.apache.directory.shared.ldap.model.entry.DefaultEntry;
-import org.apache.directory.shared.ldap.model.entry.DefaultModification;
 import org.apache.directory.shared.ldap.model.entry.Entry;
-import org.apache.directory.shared.ldap.model.entry.EntryAttribute;
 import org.apache.directory.shared.ldap.model.entry.Modification;
-import org.apache.directory.shared.ldap.model.entry.ModificationOperation;
 import org.apache.directory.shared.ldap.model.exception.LdapException;
 import org.apache.directory.shared.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.shared.ldap.model.exception.LdapNoSuchObjectException;
 import org.apache.directory.shared.ldap.model.filter.SearchScope;
 import org.apache.directory.shared.ldap.model.message.SearchResultEntry;
 import org.apache.directory.shared.ldap.model.name.Dn;
-import org.apache.directory.shared.ldap.model.schema.AttributeType;
 import org.apache.directory.shared.util.GeneralizedTime;
 import org.verisign.joid.IAssociation;
 import org.verisign.joid.OpenIdException;
@@ -62,9 +54,7 @@ class AssociationDao implements LdapDao<IAssociation, String>
 {
     private static final Log LOG = LogFactory.getLog( AssociationDao.class );
     
-    private static final Modification[] EMPTY_MODS = new Modification[0];
-    
-    private LdapConnectionPool connPool;
+    private LdapConnectionManager connMan;
     
     private Dn baseDn;
 
@@ -86,12 +76,12 @@ class AssociationDao implements LdapDao<IAssociation, String>
     /**
      * Creates a new instance of AssociationDao.
      *
-     * @param connPool The LDAP Connection Pool to use.
+     * @param connPool The LDAP connection manager to use.
      * @param baseDn The baseDn under which association entries are found.
      */
-    AssociationDao( LdapConnectionPool connPool, Dn baseDn )
+    AssociationDao( LdapConnectionManager connMan, Dn baseDn )
     {
-        this.connPool = connPool;
+        this.connMan = connMan;
         this.baseDn = baseDn;
     }
 
@@ -119,7 +109,7 @@ class AssociationDao implements LdapDao<IAssociation, String>
         {
             String msg = "Failed to create dn for association entry to delete";
             LOG.error( msg, e );
-            throw new OpenIdException( msg + ':' + e.toString() );
+            throw new OpenIdException( msg + ':' + e.toString(), e );
         }
     
         return associationDn;
@@ -138,7 +128,7 @@ class AssociationDao implements LdapDao<IAssociation, String>
         
         try
         {
-            conn = acquireConnection();
+            conn = connMan.acquireConnection();
             entry = conn.lookup( dn );
         }
         catch ( LdapNoSuchObjectException e )
@@ -157,7 +147,7 @@ class AssociationDao implements LdapDao<IAssociation, String>
         }
         finally
         {
-            releaseConnection( conn );
+            connMan.releaseConnection( conn );
         }
         
         return entry;
@@ -169,7 +159,7 @@ class AssociationDao implements LdapDao<IAssociation, String>
      */
     public void create( IAssociation association ) throws OpenIdException
     {
-        LdapConnection conn = acquireConnection();
+        LdapConnection conn = connMan.acquireConnection();
         Entry entry = toEntry( association );
 
         try
@@ -184,7 +174,7 @@ class AssociationDao implements LdapDao<IAssociation, String>
         }
         finally
         {
-            releaseConnection( conn );
+            connMan.releaseConnection( conn );
         }
     }
 
@@ -195,11 +185,11 @@ class AssociationDao implements LdapDao<IAssociation, String>
     public void update( IAssociation entity, Entry before ) throws OpenIdException
     {
         Entry after = toEntry( entity );
-        LdapConnection conn = acquireConnection();
+        LdapConnection conn = connMan.acquireConnection();
         
         try
         {
-            Modification[] mods = calculateModifications( before, after );
+            Modification[] mods = LdapStore.calculateModifications( before, after );
             conn.modify( before.getDn(), mods );
         }
         catch ( LdapException e )
@@ -210,7 +200,7 @@ class AssociationDao implements LdapDao<IAssociation, String>
         }
         finally
         {
-            releaseConnection( conn );
+            connMan.releaseConnection( conn );
         }
     }
 
@@ -229,7 +219,7 @@ class AssociationDao implements LdapDao<IAssociation, String>
      */
     public IAssociation read( String handle ) throws OpenIdException
     {
-        LdapConnection conn = acquireConnection();
+        LdapConnection conn = connMan.acquireConnection();
         StringBuilder sb = new StringBuilder( '(' );
         sb.append( HANDLE_AT );
         sb.append( '=' ).append( handle ).append( ')' );
@@ -248,12 +238,13 @@ class AssociationDao implements LdapDao<IAssociation, String>
         }
         catch ( Exception e )
         {
-            LOG.error( "Failed to find association with handle: " + handle, e );
-            throw new OpenIdException( e );
+            String msg = "Failed to find association with handle: " + handle;
+            LOG.error( msg, e );
+            throw new OpenIdException( msg, e );
         }
         finally
         {
-            releaseConnection( conn );
+            connMan.releaseConnection( conn );
         }
     }
 
@@ -267,27 +258,27 @@ class AssociationDao implements LdapDao<IAssociation, String>
 
         if ( association == null )
         {
-            LOG.warn( "No association to delte for pk" + primaryKey );
+            LOG.warn( "No association to delte for pk: " + primaryKey );
             return null;
         }
         
         LdapConnection conn = null;
-        Dn associationDn = getDn( primaryKey );
+        Dn dn = getDn( primaryKey );
 
         try
         {
-            conn = acquireConnection();
-            conn.delete( associationDn );
+            conn = connMan.acquireConnection();
+            conn.delete( dn );
         }
         catch ( LdapException e )
         {
-            String msg = "Failed to delete association entry: " + associationDn.toString();
+            String msg = "Failed to delete association entry: " + dn.toString();
             LOG.error( msg, e );
             throw new OpenIdRuntimeException( msg, e ); 
         }
         finally
         {
-            releaseConnection( conn );
+            connMan.releaseConnection( conn );
         }
         
         return association;
@@ -343,13 +334,14 @@ class AssociationDao implements LdapDao<IAssociation, String>
        
         try
         {
+            entry.add( SchemaConstants.OBJECT_CLASS_AT, ASSOCIATION_OC );
             entry.add( ASSOCIATION_TYPE_AT, association.getAssociationType() );
             entry.add( HANDLE_AT, association.getHandle() );
             entry.add( LIFETIME_AT, Long.toString( association.getLifetime() ) );
             entry.add( SECRET_AT, association.getMacKey() );
             
             Calendar calendar = Calendar.getInstance();
-            calendar.setTime( new Date() );
+            calendar.setTime( association.getIssuedDate() );
             GeneralizedTime gt = new GeneralizedTime( calendar );
             entry.add( ISSUED_DATE_AT, gt.toGeneralizedTime() );
         }
@@ -361,92 +353,5 @@ class AssociationDao implements LdapDao<IAssociation, String>
         }
         
         return entry;
-    }
-
-    
-    // -----------------------------------------------------------------------
-    // Private methods
-    // -----------------------------------------------------------------------
-    
-    
-    private Modification[] calculateModifications( Entry before, Entry after ) throws LdapException 
-    {
-        List<Modification> modList = new ArrayList<Modification>();
-
-        for ( EntryAttribute attribute : before )
-        {
-            AttributeType type = attribute.getAttributeType();
-            EntryAttribute afterAttribute = after.get( type );
-            
-            // if after change attribute is null then op is a remove
-            if ( afterAttribute == null )
-            {
-                modList.add( new DefaultModification( ModificationOperation.REMOVE_ATTRIBUTE, attribute ) );
-                continue;
-            }
-            
-            // if both attributes are equal do nothing
-            if ( afterAttribute.equals( attribute ) )
-            {
-                continue;
-            }
-                
-            // if single valued attribute then perform a replace 
-            if ( type.isSingleValued() )
-            {
-                modList.add( new DefaultModification( ModificationOperation.REPLACE_ATTRIBUTE, afterAttribute ) );
-                continue;
-            }
-            
-            // if multi-valued attribute then we must determine what changed
-            throw new NotImplementedException();
-            
-        }
-        
-        
-        // calculate add attribute modifications to perform for attributes present in 
-        // after entry but not present in before entry due to add changes 
-        for ( EntryAttribute attribute : after )
-        {
-            AttributeType type = attribute.getAttributeType();
-            EntryAttribute beforeAttribute = before.get( type );
-            
-            // if before change attribute is null then op is an add
-            if ( beforeAttribute == null )
-            {
-                modList.add( new DefaultModification( ModificationOperation.ADD_ATTRIBUTE, attribute ) );
-                continue;
-            }
-        }
-        
-        
-        return modList.toArray( EMPTY_MODS );
-    }
-
-    
-    private LdapConnection acquireConnection() 
-    {
-        try
-        {
-            return connPool.getConnection();
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Failed to acquire LDAP connection", e );
-            throw new OpenIdRuntimeException( e.getMessage() );
-        }
-    }
-
-
-    private void releaseConnection( LdapConnection conn )
-    {
-        try
-        {
-            connPool.releaseConnection( ( LdapNetworkConnection ) conn );
-        }
-        catch ( Exception e )
-        {
-            LOG.error( "Failed to release LDAP connection", e );
-        }
     }
 }

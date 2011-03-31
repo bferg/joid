@@ -18,7 +18,7 @@ import java.util.Date;
 
 
 /**
- * A nocncne.
+ * A nonce.
  *
  * Implement this interface to represent an OpenID association's nonce.
  */
@@ -40,4 +40,7 @@ public interface INonce
      * @param checkedDate the timestamp of check.
      */
     public void setCheckedDate( Date checkedDate );
+
+
+    public Date getCheckedDate();
 }

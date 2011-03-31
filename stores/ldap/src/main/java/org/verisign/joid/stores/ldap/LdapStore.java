@@ -20,15 +20,24 @@
 package org.verisign.joid.stores.ldap;
 
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.apache.directory.ldap.client.api.PoolableLdapConnectionFactory;
+import org.apache.directory.shared.ldap.model.entry.DefaultModification;
 import org.apache.directory.shared.ldap.model.entry.Entry;
+import org.apache.directory.shared.ldap.model.entry.EntryAttribute;
+import org.apache.directory.shared.ldap.model.entry.Modification;
+import org.apache.directory.shared.ldap.model.entry.ModificationOperation;
+import org.apache.directory.shared.ldap.model.exception.LdapException;
 import org.apache.directory.shared.ldap.model.name.Dn;
+import org.apache.directory.shared.ldap.model.schema.AttributeType;
 
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.Crypto;
@@ -45,10 +54,12 @@ import org.verisign.joid.server.Nonce;
  *
  * @author <a href="mailto:akarasulu@gmail.com">Alex Karasulu</a>
  */
-public class LdapStore implements IStore, LdapConstants
+public class LdapStore implements IStore
 {
     private final static Log LOG = LogFactory.getLog( LdapStore.class );
 
+    private static final Modification[] EMPTY_MODS = new Modification[0];
+    
     /** The association life time */
     private long associationLifetime = 600;
 
@@ -56,6 +67,7 @@ public class LdapStore implements IStore, LdapConstants
     private Dn associationBaseDn;
 
     private AssociationDao associationDao;
+    private NonceDao nonceDao;
     
     private LdapConnectionConfig connConfig;
     private LdapConnectionPool connPool;
@@ -64,7 +76,9 @@ public class LdapStore implements IStore, LdapConstants
     public void initialize()
     {
         connPool = new LdapConnectionPool( new PoolableLdapConnectionFactory( getConnConfig() ) );
-        associationDao = new AssociationDao( connPool, associationBaseDn );
+        
+        associationDao = new AssociationDao( new LdapNetworkConnectionManager( connPool ), associationBaseDn );
+        nonceDao = new NonceDao( new LdapNetworkConnectionManager( connPool ), associationBaseDn );
     }
     
 
@@ -219,15 +233,25 @@ public class LdapStore implements IStore, LdapConstants
      */
     public INonce findNonce( String nonce ) throws OpenIdException
     {
-        return null;
+        return nonceDao.read( nonce );
     }
 
 
     /**
      * {@inheritDoc}
      */
-    public void saveNonce( INonce n )
+    public void saveNonce( INonce nonce ) throws OpenIdException
     {
+        Entry entry = nonceDao.getEntry( nonce.getNonce() );
+        
+        if ( entry == null )
+        {
+            nonceDao.create( nonce );
+        }
+        else
+        {
+            nonceDao.update( nonce, entry );
+        }
     }
 
 
@@ -240,5 +264,65 @@ public class LdapStore implements IStore, LdapConstants
         n.setNonce( nonce );
         n.setCheckedDate( new Date() );
         return n;
+    }
+
+
+    // -----------------------------------------------------------------------
+    // Utility methods
+    // -----------------------------------------------------------------------
+    
+    
+    static Modification[] calculateModifications( Entry before, Entry after ) throws LdapException 
+    {
+        List<Modification> modList = new ArrayList<Modification>();
+
+        for ( EntryAttribute attribute : before )
+        {
+            AttributeType type = attribute.getAttributeType();
+            EntryAttribute afterAttribute = after.get( type );
+            
+            // if after change attribute is null then op is a remove
+            if ( afterAttribute == null )
+            {
+                modList.add( new DefaultModification( ModificationOperation.REMOVE_ATTRIBUTE, attribute ) );
+                continue;
+            }
+            
+            // if both attributes are equal do nothing
+            if ( afterAttribute.equals( attribute ) )
+            {
+                continue;
+            }
+                
+            // if single valued attribute then perform a replace 
+            if ( type.isSingleValued() )
+            {
+                modList.add( new DefaultModification( ModificationOperation.REPLACE_ATTRIBUTE, afterAttribute ) );
+                continue;
+            }
+            
+            // if multi-valued attribute then we must determine what changed
+            throw new NotImplementedException();
+            
+        }
+        
+        
+        // calculate add attribute modifications to perform for attributes present in 
+        // after entry but not present in before entry due to add changes 
+        for ( EntryAttribute attribute : after )
+        {
+            AttributeType type = attribute.getAttributeType();
+            EntryAttribute beforeAttribute = before.get( type );
+            
+            // if before change attribute is null then op is an add
+            if ( beforeAttribute == null )
+            {
+                modList.add( new DefaultModification( ModificationOperation.ADD_ATTRIBUTE, attribute ) );
+                continue;
+            }
+        }
+        
+        
+        return modList.toArray( EMPTY_MODS );
     }
 }

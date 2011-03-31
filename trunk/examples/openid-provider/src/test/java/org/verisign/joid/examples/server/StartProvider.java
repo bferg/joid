@@ -5,7 +5,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
-public class Start {
+public class StartProvider {
 
 	public static void main(String[] args) throws Exception {
 		Server server = new Server();

@@ -20,16 +20,33 @@
 package org.verisign.joid.stores.ldap;
 
 
+import org.apache.directory.ldap.client.api.LdapConnection;
+
+
 /**
- * JOID specific OpenID LDAP Schema Entity Constants
+ * Interface for LDAP connection management to abstract away different kinds of
+ * connection management mechanisms: i.e. pooled network connections verses 
+ * internal non-pooled ldap session connections. 
  *
  * @author <a href="mailto:akarasulu@gmail.com">Alex Karasulu</a>
  */
-public interface LdapConstants
+public interface LdapConnectionManager
 {
-    // Nonce related schema entity constants 
+    /**
+     * Releases an {@link LdapConnection} after use. Depending on the 
+     * implementation and the connection type, the connection might actually 
+     * be destroyed.
+     *
+     * @param conn The connection to be released.
+     */
+    void releaseConnection( LdapConnection conn );
     
-    String NONCE_OC = "opNonceOc";
-    String NONCE_AT = "opNonceAt";
-    String CHECKED_DATE_AT = "opCheckedDateAt";
+    
+    /**
+     * Acquires an {@link LdapConnection} either by creating one or accessing
+     * one that is free from within a connection pool.
+     *
+     * @return An {@link LdapConnection} object ready to be used.
+     */
+    LdapConnection acquireConnection();
 }

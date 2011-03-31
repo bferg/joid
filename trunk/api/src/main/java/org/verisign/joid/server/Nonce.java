@@ -4,13 +4,13 @@ package org.verisign.joid.server;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 
-import org.verisign.joid.Nonce;
+import org.verisign.joid.INonce;
 
 
 /**
  * A simple Nonce implementation.
  */
-public class NonceImpl implements Nonce
+public class Nonce implements INonce
 {
     private Long id;
     private String nonce;

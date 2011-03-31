@@ -62,11 +62,11 @@ public class CheckAuthenticationRequest extends Request
     public Response processUsing( ServerInfo si ) throws OpenIdException
     {
         String invalidate = null;
-        Store store = si.getStore();
+        IStore store = si.getStore();
         String nonceStr = ar.getNonce();
         if ( nonceStr != null )
         {
-            Nonce n = store.findNonce( nonceStr );
+            INonce n = store.findNonce( nonceStr );
             if ( n != null )
             {
                 String s = "Nonce has already been checked";
@@ -79,7 +79,7 @@ public class CheckAuthenticationRequest extends Request
                 store.saveNonce( n );
             }
         }
-        Association assoc = store.findAssociation( handle );
+        IAssociation assoc = store.findAssociation( handle );
         if ( ( assoc == null ) || ( assoc.hasExpired() ) )
         {
             invalidate = handle;

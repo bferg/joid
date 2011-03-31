@@ -17,10 +17,10 @@ import java.text.SimpleDateFormat;
  * Date: Jul 19, 2007
  * Time: 4:39:09 PM
  */
-public class AssociationImpl implements org.verisign.joid.Association
+public class Association implements org.verisign.joid.IAssociation
 {
 
-    private final static Log log = LogFactory.getLog( AssociationImpl.class );
+    private final static Log log = LogFactory.getLog( Association.class );
     private Long id;
     private String mode;
     private String handle;

@@ -1,12 +1,12 @@
 package org.verisign.joid.server;
 
 
-import org.verisign.joid.Association;
+import org.verisign.joid.IAssociation;
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.Crypto;
-import org.verisign.joid.Nonce;
+import org.verisign.joid.INonce;
 import org.verisign.joid.OpenIdException;
-import org.verisign.joid.Store;
+import org.verisign.joid.IStore;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,19 +14,19 @@ import java.util.List;
 import java.util.ListIterator;
 
 
-public class MemoryStore implements Store
+public class MemoryStore implements IStore
 {
     public static long DEFAULT_LIFESPAN = 300; // @TODO: should probably increase this
-    private static List<Association> associationList = new ArrayList<Association>();
-    private static List<Nonce> nonceList = new ArrayList<Nonce>();
+    private static List<IAssociation> associationList = new ArrayList<IAssociation>();
+    private static List<INonce> nonceList = new ArrayList<INonce>();
     private long associationLifetime = DEFAULT_LIFESPAN;
 
 
-    public Association generateAssociation( AssociationRequest req, Crypto crypto )
+    public IAssociation generateAssociation( AssociationRequest req, Crypto crypto )
         throws OpenIdException
     {
         // boldly reusing the db implementation of Association
-        AssociationImpl a = new AssociationImpl();
+        Association a = new Association();
         a.setMode( "unused" );
         a.setHandle( Crypto.generateHandle() );
         a.setSessionType( req.getSessionType() );
@@ -53,33 +53,33 @@ public class MemoryStore implements Store
     }
 
 
-    public void saveAssociation( Association a )
+    public void saveAssociation( IAssociation a )
     {
         associationList.add( a );
     }
 
 
-    public void saveNonce( Nonce n )
+    public void saveNonce( INonce n )
     {
         nonceList.add( n );
     }
 
 
-    public void deleteAssociation( Association a )
+    public void deleteAssociation( IAssociation a )
     {
         throw new RuntimeException( "not yet implemented" );
         // "associationList.delete(a)"
     }
 
 
-    public Association findAssociation( String handle ) throws OpenIdException
+    public IAssociation findAssociation( String handle ) throws OpenIdException
     {
         if ( handle == null )
             return null;
-        ListIterator<Association> li = associationList.listIterator();
+        ListIterator<IAssociation> li = associationList.listIterator();
         while ( li.hasNext() )
         {
-            Association a = li.next();
+            IAssociation a = li.next();
             if ( handle.equals( a.getHandle() ) )
             {
                 return a;
@@ -89,14 +89,14 @@ public class MemoryStore implements Store
     }
 
 
-    public Nonce findNonce( String nonce ) throws OpenIdException
+    public INonce findNonce( String nonce ) throws OpenIdException
     {
         if ( nonce == null )
             return null;
-        ListIterator<Nonce> li = nonceList.listIterator();
+        ListIterator<INonce> li = nonceList.listIterator();
         while ( li.hasNext() )
         {
-            Nonce n = li.next();
+            INonce n = li.next();
             if ( nonce.equals( n.getNonce() ) )
             {
                 return n;
@@ -106,9 +106,9 @@ public class MemoryStore implements Store
     }
 
 
-    public Nonce generateNonce( String nonce ) throws OpenIdException
+    public INonce generateNonce( String nonce ) throws OpenIdException
     {
-        NonceImpl n = new NonceImpl();
+        Nonce n = new Nonce();
         n.setNonce( nonce );
         n.setCheckedDate( new Date() );
         return n;

@@ -29,6 +29,8 @@ import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.Crypto;
 import org.verisign.joid.DiffieHellman;
 import org.verisign.joid.OpenIdException;
+import org.verisign.joid.server.Association;
+import org.verisign.joid.server.Nonce;
 
 
 /**

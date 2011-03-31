@@ -20,7 +20,7 @@ package org.verisign.joid;
 public class ServerInfo
 {
     private String urlEndPoint;
-    private Store store;
+    private IStore store;
     private Crypto crypto;
 
 
@@ -31,7 +31,7 @@ public class ServerInfo
      * @param store the store implementation to use.
      * @param crypto the crypto implementation to use.
      */
-    public ServerInfo( String urlEndPoint, Store store, Crypto crypto )
+    public ServerInfo( String urlEndPoint, IStore store, Crypto crypto )
     {
         this.urlEndPoint = urlEndPoint;
         this.store = store;
@@ -45,7 +45,7 @@ public class ServerInfo
     }
 
 
-    public Store getStore()
+    public IStore getStore()
     {
         return store;
     }

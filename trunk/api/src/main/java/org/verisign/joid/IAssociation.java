@@ -24,7 +24,7 @@ import java.util.Date;
  * Implement this interface to represent an OpenID association.
  */
 
-public interface Association
+public interface IAssociation
 {
     /**
      * Returns whether this association is valid (was successful)

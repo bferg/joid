@@ -177,7 +177,7 @@ public class AssociationResponse extends Response
     }
 
 
-    AssociationResponse( AssociationRequest ar, Association a, Crypto crypto )
+    AssociationResponse( AssociationRequest ar, IAssociation a, Crypto crypto )
     {
         super( null );
         this.ns = ar.getNamespace();

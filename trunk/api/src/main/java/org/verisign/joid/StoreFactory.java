@@ -47,9 +47,9 @@ public class StoreFactory
      * @throws IllegalArgumentException if the class doesn't exist or is
      *  not a store type.
      */
-    public static Store getInstance( String className )
+    public static IStore getInstance( String className )
     {
-        return ( Store ) DependencyUtils.newInstance( className );
+        return ( IStore ) DependencyUtils.newInstance( className );
     }
 
     /**

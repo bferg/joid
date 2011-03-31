@@ -21,23 +21,27 @@ import org.apache.commons.logging.Log;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.verisign.joid.IAssociation;
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.Crypto;
+import org.verisign.joid.INonce;
 import org.verisign.joid.OpenIdException;
-import org.verisign.joid.Store;
+import org.verisign.joid.IStore;
+import org.verisign.joid.server.Association;
+import org.verisign.joid.server.Nonce;
 
 
 /**
  * A database backed store.
  */
-public class DbStore implements Store
+public class DbStore implements IStore
 {
     private final static Log log = LogFactory.getLog( DbStore.class );
 
     private long associationLifetime = 600;
 
 
-    public org.verisign.joid.Association
+    public org.verisign.joid.IAssociation
         generateAssociation( AssociationRequest req, Crypto crypto )
             throws OpenIdException
     {
@@ -69,7 +73,7 @@ public class DbStore implements Store
     }
 
 
-    public org.verisign.joid.Nonce generateNonce( String nonce )
+    public org.verisign.joid.INonce generateNonce( String nonce )
         throws OpenIdException
     {
         Nonce n = new Nonce();
@@ -79,7 +83,7 @@ public class DbStore implements Store
     }
 
 
-    public void saveNonce( org.verisign.joid.Nonce n )
+    public void saveNonce( org.verisign.joid.INonce n )
     {
         Session session = HibernateUtil.currentSession();
         Transaction tx = session.beginTransaction();
@@ -89,7 +93,7 @@ public class DbStore implements Store
     }
 
 
-    public void saveAssociation( org.verisign.joid.Association a )
+    public void saveAssociation( org.verisign.joid.IAssociation a )
     {
         Session session = HibernateUtil.currentSession();
         Transaction tx = session.beginTransaction();
@@ -99,14 +103,14 @@ public class DbStore implements Store
     }
 
 
-    public void deleteAssociation( org.verisign.joid.Association a )
+    public void deleteAssociation( org.verisign.joid.IAssociation a )
     {
         Session session = HibernateUtil.currentSession();
         session.delete( a );
     }
 
 
-    public org.verisign.joid.Association findAssociation( String handle )
+    public org.verisign.joid.IAssociation findAssociation( String handle )
         throws OpenIdException
     {
         Session session = HibernateUtil.currentSession();
@@ -130,12 +134,12 @@ public class DbStore implements Store
         }
         else
         {
-            return ( Association ) l.get( 0 );
+            return ( IAssociation ) l.get( 0 );
         }
     }
 
 
-    public org.verisign.joid.Nonce findNonce( String nonce )
+    public org.verisign.joid.INonce findNonce( String nonce )
         throws OpenIdException
     {
         Session session = HibernateUtil.currentSession();
@@ -159,7 +163,7 @@ public class DbStore implements Store
         }
         else
         {
-            return ( Nonce ) l.get( 0 );
+            return ( INonce ) l.get( 0 );
         }
     }
 

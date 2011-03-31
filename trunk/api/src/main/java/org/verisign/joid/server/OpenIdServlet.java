@@ -9,7 +9,7 @@ import org.verisign.joid.OpenId;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.RequestFactory;
 import org.verisign.joid.ServerInfo;
-import org.verisign.joid.Store;
+import org.verisign.joid.IStore;
 import org.verisign.joid.StoreFactory;
 import org.verisign.joid.util.CookieUtils;
 import org.verisign.joid.util.DependencyUtils;
@@ -40,7 +40,7 @@ public class OpenIdServlet extends HttpServlet
     private static Log log = LogFactory.getLog( OpenIdServlet.class );
     private static final long serialVersionUID = 297366254782L;
     private static OpenId openId;
-    private Store store;
+    private IStore store;
     private Crypto crypto;
     private String loginPage;
     public static final String USERNAME_ATTRIBUTE = "username";

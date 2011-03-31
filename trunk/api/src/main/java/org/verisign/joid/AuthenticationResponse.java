@@ -299,7 +299,7 @@ public class AuthenticationResponse extends Response
      */
     AuthenticationResponse( ServerInfo serverInfo,
                AuthenticationRequest ar,
-               Association a, Crypto crypto,
+               IAssociation a, Crypto crypto,
                String invalidateHandle )
         throws OpenIdException
     {

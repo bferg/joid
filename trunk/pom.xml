@@ -35,7 +35,12 @@
     <commons.httpclient.version>3.1</commons.httpclient.version>
     <junit.version>4.8.2</junit.version>
     <jetty.version>6.1.14</jetty.version>
-    <org.apache.directory.shared.version>1.0.0-M2</org.apache.directory.shared.version>
+    <org.apache.directory.shared.version>
+      1.0.0-M3-SNAPSHOT
+    </org.apache.directory.shared.version>
+    <org.apache.directory.server.version>
+      1.5.8-SNAPSHOT
+    </org.apache.directory.server.version>
   </properties>
   
   <issueManagement>
@@ -192,6 +197,24 @@
         <groupId>org.apache.directory.shared</groupId>
         <artifactId>shared-ldap-client-api</artifactId>
         <version>${org.apache.directory.shared.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.directory.server</groupId>
+        <artifactId>apacheds-server-annotations</artifactId>
+        <version>${org.apache.directory.server.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.directory.server</groupId>
+        <artifactId>apacheds-core-annotations</artifactId>
+        <version>${org.apache.directory.server.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.directory.server</groupId>
+        <artifactId>apacheds-test-framework</artifactId>
+        <version>${org.apache.directory.server.version}</version>
       </dependency>
 
       <!-- Web Dependencies -->

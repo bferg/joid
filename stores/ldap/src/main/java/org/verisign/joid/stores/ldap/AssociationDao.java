@@ -20,7 +20,7 @@
 package org.verisign.joid.stores.ldap;
 
 
-import java.text.ParseException;
+import java.text.ParseException; 
 import java.util.Calendar;
 
 import org.apache.commons.logging.Log;
@@ -34,8 +34,8 @@ import org.apache.directory.shared.ldap.model.entry.Modification;
 import org.apache.directory.shared.ldap.model.exception.LdapException;
 import org.apache.directory.shared.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.shared.ldap.model.exception.LdapNoSuchObjectException;
-import org.apache.directory.shared.ldap.model.filter.SearchScope;
 import org.apache.directory.shared.ldap.model.message.SearchResultEntry;
+import org.apache.directory.shared.ldap.model.message.SearchScope;
 import org.apache.directory.shared.ldap.model.name.Dn;
 import org.apache.directory.shared.util.GeneralizedTime;
 import org.verisign.joid.IAssociation;

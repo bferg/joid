@@ -34,8 +34,8 @@ import org.apache.directory.shared.ldap.model.entry.Modification;
 import org.apache.directory.shared.ldap.model.exception.LdapException;
 import org.apache.directory.shared.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.shared.ldap.model.exception.LdapNoSuchObjectException;
-import org.apache.directory.shared.ldap.model.filter.SearchScope;
 import org.apache.directory.shared.ldap.model.message.SearchResultEntry;
+import org.apache.directory.shared.ldap.model.message.SearchScope;
 import org.apache.directory.shared.ldap.model.name.Dn;
 import org.apache.directory.shared.util.GeneralizedTime;
 import org.verisign.joid.INonce;
@@ -75,6 +75,29 @@ public class NonceDao implements LdapDao<INonce, String>
     }
 
     
+    /**
+     * Creates a new instance of NonceDao.
+     *
+     * @param connPool The LDAP Connection manager to use.
+     * @param baseDn The baseDn under which nonce entries are found.
+     */
+    NonceDao( LdapConnectionManager connMan, String baseDn ) throws OpenIdException
+    {
+        this.connMan = connMan;
+        
+        try
+        {
+            this.baseDn = new Dn( baseDn );
+        }
+        catch ( LdapInvalidDnException e )
+        {
+            String msg = "Invalid dn base argument: " + baseDn;
+            LOG.error( msg, e );
+            throw new OpenIdException( msg, e );
+        }
+    }
+
+    
     // -----------------------------------------------------------------------
     // LdapDao implementation methods
     // -----------------------------------------------------------------------
@@ -111,7 +134,7 @@ public class NonceDao implements LdapDao<INonce, String>
     public INonce read( String nonce ) throws OpenIdException
     {
         LdapConnection conn = connMan.acquireConnection();
-        StringBuilder sb = new StringBuilder( '(' );
+        StringBuilder sb = new StringBuilder( "(" );
         sb.append( NONCE_AT );
         sb.append( '=' ).append( nonce ).append( ')' );
 
@@ -257,7 +280,7 @@ public class NonceDao implements LdapDao<INonce, String>
         try
         {
             entry.add( SchemaConstants.OBJECT_CLASS_AT, NONCE_OC );
-            entry.add( nonce.getNonce(), NONCE_AT );
+            entry.add( NONCE_AT, nonce.getNonce() );
             
             Calendar calendar = Calendar.getInstance();
             calendar.setTime( nonce.getCheckedDate() );
@@ -271,7 +294,7 @@ public class NonceDao implements LdapDao<INonce, String>
             throw new OpenIdException( msg, e );
         }
         
-        return null;
+        return entry;
     }
 
     

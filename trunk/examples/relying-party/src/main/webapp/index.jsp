@@ -7,29 +7,7 @@ This page is a sample for consumers to use, but also serves as a testing page fo
 <%
     String returnTo = UrlUtils.getBaseUrl( request );
     String trustRoot = "http://localhost:8180";//@TODO make as an init param
-	if ( request.getParameter( "signin" ) != null ) 
-	{
-		try 
-		{
-			String id = request.getParameter( "openid_url" );
-			if ( ! id.startsWith( "http" ) ) 
-			{
-				id = "http://" + id;
-			}
-		
-			String s = OpenIdFilter.joid().getAuthUrl( id, returnTo, trustRoot );
-			response.sendRedirect( s );
-		} 
-		catch ( Throwable e ) 
-		{
-			e.printStackTrace();
-			%>
-				An error occurred! Please press back and try again.
-			<%
-      	}
-			
-		return;
-	}
+	
 %>
 <html>
 <head>
@@ -56,7 +34,7 @@ This page is a sample for consumers to use, but also serves as a testing page fo
 		}
 	</script>
 	<div>
-		<form action="index.jsp" method="post" id="openid_form">
+		<form action="/relying-party" method="post" id="openid_form">
 			<input type="hidden" name="signin" value="true" /> 
 			<b>Login with your OpenID URL:</b> 
 			<input type="text" size="30" value="<%=trustRoot + "/user/austinpowers"%>" name="openid_url" id="openid_url" /> 

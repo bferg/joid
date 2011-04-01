@@ -29,6 +29,17 @@
 		<filter-name>OpenIdFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+	
+	<servlet>
+	  <servlet-name>RelyingPartyServlet</servlet-name>
+      <servlet-class>org.verisign.joid.examples.relying.party.RelyingPartyServlet</servlet-class>	   
+	</servlet>
+	
+	<servlet-mapping>
+	  <servlet-name>RelyingPartyServlet</servlet-name>
+	  <url-pattern>/relying-party</url-pattern>
+	</servlet-mapping>
+	
     
 </web-app>
 

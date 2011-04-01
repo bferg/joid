@@ -31,5 +31,6 @@
     <module>server</module>
     <module>openid-provider</module>
     <module>relying-party</module>
+    <module>testing</module>
   </modules>
 </project>

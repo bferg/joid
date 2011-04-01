@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Export-Package: org.verisign.joid;uses:="org.apache.commons.logging,or
+ g.verisign.joid.extension,org.apache.tsik.datatypes,org.verisign.joid
+ .util,org.apache.tsik.uuid,javax.crypto.spec,javax.crypto",org.verisi
+ gn.joid.server;uses:="org.verisign.joid,org.apache.commons.logging,ja
+ vax.servlet,org.verisign.joid.util,javax.servlet.http",org.verisign.j
+ oid.util;uses:="org.apache.commons.logging,javax.servlet.http",org.ve
+ risign.joid.consumer;uses:="org.verisign.joid,org.apache.commons.http
+ client.methods,org.apache.commons.httpclient.params,javax.xml.parsers
+ ,org.w3c.dom,org.apache.commons.httpclient,org.xml.sax,org.apache.com
+ mons.logging,javax.servlet,org.verisign.joid.util,javax.servlet.http"
+ ,org.verisign.joid.extension;uses:="org.verisign.joid"
+Built-By: akarasulu
+Tool: Bnd-1.15.0
+Bundle-Name: JOID Examples Selenium Tests
+Created-By: Apache Maven Bundle Plugin
+Bundle-Version: 1.1.1.SNAPSHOT
+Build-Jdk: 1.6.0_24
+Bnd-LastModified: 1301687765293
+Bundle-ManifestVersion: 2
+Bundle-Description: The JOID Examples Selenium Testing both Provider a
+ nd Relying Party
+Import-Package: javax.crypto,javax.crypto.spec,javax.servlet;version="
+ [2.5,3)",javax.servlet.http;version="[2.5,3)",javax.xml.parsers,org.a
+ pache.commons.httpclient,org.apache.commons.httpclient.methods,org.ap
+ ache.commons.httpclient.params,org.apache.commons.logging,org.apache.
+ tsik.datatypes,org.apache.tsik.uuid,org.w3c.dom,org.xml.sax
+Bundle-SymbolicName: org.joid.api
+

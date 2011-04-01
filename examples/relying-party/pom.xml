@@ -121,6 +121,8 @@
               <maxIdleTime>60000</maxIdleTime>
             </connector>
           </connectors>
+          <stopKey>bar</stopKey>
+          <stopPort>9998</stopPort>
         </configuration>
       </plugin>
     </plugins>

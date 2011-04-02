@@ -22,6 +22,7 @@ package org.verisign.joid.stores.ldap;
 
 import static org.junit.Assert.*;
 
+import java.util.Calendar;
 import java.util.Date;
 
 import org.apache.commons.lang.RandomStringUtils;
@@ -38,6 +39,11 @@ import org.apache.directory.server.core.annotations.CreateIndex;
 import org.apache.directory.server.core.annotations.ContextEntry;
 import org.apache.directory.server.core.integ.AbstractLdapTestUnit;
 import org.apache.directory.server.core.integ.FrameworkRunner;
+import org.apache.directory.shared.ldap.model.constants.SchemaConstants;
+import org.apache.directory.shared.ldap.model.entry.DefaultEntry;
+import org.apache.directory.shared.ldap.model.entry.Entry;
+import org.apache.directory.shared.ldap.model.name.Dn;
+import org.apache.directory.shared.util.GeneralizedTime;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -173,14 +179,26 @@ public class NonceDaoITest extends AbstractLdapTestUnit
         testCreate();
         INonce reloaded = dao.read( nonce.getNonce() );
         assertEquals( reloaded.getNonce(), nonce.getNonce() );
+
+        // now set the reloaded instance's date to UNIX start 
         Date newDate = new Date( 0 );
         reloaded.setCheckedDate( newDate );
-        dao.update( nonce );
-        
+
+        // the reloaded no longer has the same checked date as the original nonce instance
         assertFalse( reloaded.getCheckedDate().equals( nonce.getCheckedDate() ) );
+        
+        // now update the store with the new date
+        dao.update( reloaded );
+        
+        // keep a handle on the lastReloaded instance and reload the reloaded again
         INonce lastReloaded = reloaded;
         reloaded = dao.read( nonce.getNonce() );
-        assertFalse( reloaded.getCheckedDate().equals( lastReloaded.getCheckedDate() ) );
+
+        // the lastReloaded and freshly reloaded instances should be the 
+        // same yet different from the original nonce we started out with
+        assertFalse( reloaded.equals( lastReloaded ) );
+        assertTrue( reloaded.getCheckedDate().equals( lastReloaded.getCheckedDate() ) );
+        assertFalse( reloaded.getCheckedDate().equals( nonce.getCheckedDate() ) );
     }
 
 
@@ -188,10 +206,31 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#update(org.verisign.joid.INonce, org.apache.directory.shared.ldap.model.entry.Entry)}.
      */
     @Test
-    @Ignore ( "Not yet implemented" )
-    public void testUpdateINonceEntry()
+    public void testUpdateINonceEntry() throws Exception
     {
-        fail( "Not yet implemented" );
+        testCreate();
+        INonce reloaded = dao.read( nonce.getNonce() );
+        assertEquals( reloaded.getNonce(), nonce.getNonce() );
+
+        // now set the reloaded instance's date to UNIX start 
+        Date newDate = new Date( 0 );
+        reloaded.setCheckedDate( newDate );
+
+        // the reloaded no longer has the same checked date as the original nonce instance
+        assertFalse( reloaded.getCheckedDate().equals( nonce.getCheckedDate() ) );
+        
+        // now update the store with the new date
+        dao.update( reloaded, dao.toEntry( nonce ) );
+        
+        // keep a handle on the lastReloaded instance and reload the reloaded again
+        INonce lastReloaded = reloaded;
+        reloaded = dao.read( nonce.getNonce() );
+
+        // the lastReloaded and freshly reloaded instances should be the 
+        // same yet different from the original nonce we started out with
+        assertFalse( reloaded.equals( lastReloaded ) );
+        assertTrue( reloaded.getCheckedDate().equals( lastReloaded.getCheckedDate() ) );
+        assertFalse( reloaded.getCheckedDate().equals( nonce.getCheckedDate() ) );
     }
 
 
@@ -199,10 +238,13 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#delete(java.lang.String)}.
      */
     @Test
-    @Ignore ( "Not yet implemented" )
-    public void testDelete()
+    public void testDelete() throws Exception
     {
-        fail( "Not yet implemented" );
+        testCreate();
+        
+        INonce deleted = dao.delete( nonce.getNonce() );
+        assertEquals( deleted.getNonce(), nonce.getNonce() );
+        assertNull( dao.read( nonce.getNonce() ) );
     }
 
 
@@ -210,10 +252,12 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#deleteEntry(org.verisign.joid.INonce)}.
      */
     @Test
-    @Ignore ( "Not yet implemented" )
-    public void testDeleteEntry()
+    public void testDeleteEntry() throws Exception
     {
-        fail( "Not yet implemented" );
+        testCreate();
+        
+        dao.deleteEntry( nonce );
+        assertNull( dao.read( nonce.getNonce() ) );
     }
 
 
@@ -221,10 +265,21 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#toObject(org.apache.directory.shared.ldap.model.entry.Entry)}.
      */
     @Test
-    @Ignore ( "Not yet implemented" )
-    public void testToObject()
+    @Ignore ( "For some reason the checkedDate is not holding" )
+    public void testToObject() throws Exception
     {
-        fail( "Not yet implemented" );
+        Entry entry = new DefaultEntry( new Dn( NonceDao.NONCE_AT + "=" + nonce.getNonce() ) );
+        entry.add( SchemaConstants.OBJECT_CLASS_AT, NonceDao.NONCE_OC );
+        entry.add( NonceDao.NONCE_AT, nonce.getNonce() );
+        
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime( nonce.getCheckedDate() );
+        GeneralizedTime gt = new GeneralizedTime( calendar );
+        entry.add( NonceDao.CHECKED_DATE_AT, gt.toGeneralizedTime() );
+        
+        INonce generated = dao.toObject( entry );
+        assertEquals( generated.getNonce(), nonce.getNonce() );
+        assertEquals( generated.getCheckedDate().getTime(), nonce.getCheckedDate().getTime() );
     }
 
 
@@ -232,8 +287,8 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#toEntry(org.verisign.joid.INonce)}.
      */
     @Test
-    @Ignore ( "Not yet implemented" )
-    public void testToEntry()
+    @Ignore ( "For some reason the checkedDate is not holding" )
+    public void testToEntry() throws Exception
     {
         fail( "Not yet implemented" );
     }
@@ -243,10 +298,11 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#getEntry(java.lang.String)}.
      */
     @Test
-    @Ignore ( "Not yet implemented" )
-    public void testGetEntry()
+    @Ignore ( "For some reason the checkedDate is not holding" )
+    public void testGetEntry() throws Exception
     {
-        fail( "Not yet implemented" );
+        Entry entry = dao.getEntry( nonce.getNonce() );
+        assertEquals( entry.get( NonceDao.NONCE_AT ).getString(), nonce.getNonce() );
     }
 
 
@@ -254,9 +310,9 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#getDn(java.lang.String)}.
      */
     @Test
-    @Ignore ( "Not yet implemented" )
-    public void testGetDn()
+    public void testGetDn() throws Exception
     {
-        fail( "Not yet implemented" );
+        Dn dn = new Dn( NonceDao.NONCE_AT + "=" + nonce.getNonce() + ",ou=nonces, dc=joid, dc=org" );
+        assertEquals( dn, dao.getDn( nonce.getNonce() ) );
     }
 }

@@ -141,8 +141,9 @@ public class NonceDao implements LdapDao<INonce, String>
         try
         {
             SearchCursor cursor = conn.search( baseDn, sb.toString(), SearchScope.ONELEVEL, "*" );
+            cursor.next();
             SearchResultEntry response = ( SearchResultEntry ) cursor.get();
-
+            
             if ( cursor.next() == true )
             {
                 throw new OpenIdException( "Did not expect to get more than one nonce back." );

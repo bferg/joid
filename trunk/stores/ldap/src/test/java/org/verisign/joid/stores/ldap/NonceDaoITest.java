@@ -263,6 +263,8 @@ public class NonceDaoITest extends AbstractLdapTestUnit
 
     /**
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#toObject(org.apache.directory.shared.ldap.model.entry.Entry)}.
+     * 
+     * @TODO debug and fix the checkedDate problem
      */
     @Test
     @Ignore ( "For some reason the checkedDate is not holding" )
@@ -285,6 +287,8 @@ public class NonceDaoITest extends AbstractLdapTestUnit
 
     /**
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#toEntry(org.verisign.joid.INonce)}.
+     * 
+     * @TODO debug and fix the checkedDate problem
      */
     @Test
     @Ignore ( "For some reason the checkedDate is not holding" )
@@ -296,6 +300,8 @@ public class NonceDaoITest extends AbstractLdapTestUnit
 
     /**
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#getEntry(java.lang.String)}.
+     * 
+     * @TODO debug and fix the checkedDate problem
      */
     @Test
     @Ignore ( "For some reason the checkedDate is not holding" )

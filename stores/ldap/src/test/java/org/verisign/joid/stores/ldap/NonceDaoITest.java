@@ -30,6 +30,7 @@ import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.apache.directory.ldap.client.api.PoolableLdapConnectionFactory;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
+import org.apache.directory.server.core.annotations.ApplyLdifFiles;
 import org.apache.directory.server.core.annotations.ApplyLdifs;
 import org.apache.directory.server.core.annotations.CreateDS;
 import org.apache.directory.server.core.annotations.CreatePartition;
@@ -72,6 +73,8 @@ import org.verisign.joid.server.Nonce;
     } )
 @CreateLdapServer( transports =
     { @CreateTransport(protocol = "LDAP") })
+
+@ApplyLdifFiles( "openid.ldif" )   
 @ApplyLdifs(
     {
         // Entry # 0
@@ -122,7 +125,13 @@ public class NonceDaoITest extends AbstractLdapTestUnit
     }
     
     
-    static INonce generateNonce() throws OpenIdException
+    /**
+     * Utility method to generate and reuse a Nonce.
+     *
+     * @return the generated random nonce.
+     * @throws OpenIdException
+     */
+    private static INonce generateNonce() throws OpenIdException
     {
         String nonce = RandomStringUtils.randomAlphanumeric( 16 );
         Nonce n = new Nonce();
@@ -136,7 +145,6 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#create(org.verisign.joid.INonce)}.
      */
     @Test
-    @Ignore
     public void testCreate() throws Exception
     {
         assertNotNull( ldapServer );
@@ -148,7 +156,6 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#read(java.lang.String)}.
      */
     @Test
-    @Ignore
     public void testRead() throws Exception
     {
         testCreate();
@@ -161,10 +168,19 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#update(org.verisign.joid.INonce)}.
      */
     @Test
-    @Ignore ( "Not yet implemented" )
-    public void testUpdateINonce()
+    public void testUpdateINonce() throws Exception
     {
-        fail( "Not yet implemented" );
+        testCreate();
+        INonce reloaded = dao.read( nonce.getNonce() );
+        assertEquals( reloaded.getNonce(), nonce.getNonce() );
+        Date newDate = new Date( 0 );
+        reloaded.setCheckedDate( newDate );
+        dao.update( nonce );
+        
+        assertFalse( reloaded.getCheckedDate().equals( nonce.getCheckedDate() ) );
+        INonce lastReloaded = reloaded;
+        reloaded = dao.read( nonce.getNonce() );
+        assertFalse( reloaded.getCheckedDate().equals( lastReloaded.getCheckedDate() ) );
     }
 
 

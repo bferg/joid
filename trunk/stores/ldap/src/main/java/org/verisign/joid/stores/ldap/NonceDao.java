@@ -138,18 +138,26 @@ public class NonceDao implements LdapDao<INonce, String>
         sb.append( NONCE_AT );
         sb.append( '=' ).append( nonce ).append( ')' );
 
+        SearchCursor cursor = null;
         try
         {
-            SearchCursor cursor = conn.search( baseDn, sb.toString(), SearchScope.ONELEVEL, "*" );
-            cursor.next();
-            SearchResultEntry response = ( SearchResultEntry ) cursor.get();
-            
-            if ( cursor.next() == true )
-            {
-                throw new OpenIdException( "Did not expect to get more than one nonce back." );
-            }
+            cursor = conn.search( baseDn, sb.toString(), SearchScope.ONELEVEL, "*" );
 
-            return toObject( response.getEntry() );
+            if ( cursor.next() )
+            {
+                SearchResultEntry response = ( SearchResultEntry ) cursor.get();
+
+                if ( cursor.next() == true )
+                {
+                    throw new OpenIdException( "Did not expect to get more than one nonce back." );
+                }
+
+                return toObject( response.getEntry() );
+            }
+            else
+            {
+                return null;
+            }
         }
         catch ( Exception e )
         {
@@ -159,6 +167,17 @@ public class NonceDao implements LdapDao<INonce, String>
         }
         finally
         {
+            if ( cursor != null )
+            {
+                try
+                {
+                    cursor.close();
+                }
+                catch ( Exception e )
+                {
+                    LOG.warn( "Failed to properly close a cursor.", e );
+                }
+            }
             connMan.releaseConnection( conn );
         }
     }
@@ -249,6 +268,11 @@ public class NonceDao implements LdapDao<INonce, String>
      */
     public INonce toObject( Entry entry ) throws OpenIdException
     {
+        if ( ! entry.contains( SchemaConstants.OBJECT_CLASS_AT, NONCE_OC ) )
+        {
+            throw new OpenIdException( "Entry's objectClass does not contain " + NONCE_OC );
+        }
+        
         Nonce nonce = new Nonce();
         nonce.setNonce( entry.get( NONCE_AT ).get().toString() );
         

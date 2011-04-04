@@ -280,7 +280,8 @@ public class NonceDao implements LdapDao<INonce, String>
         
         try
         {
-            gt = new GeneralizedTime( entry.get( CHECKED_DATE_AT ).get().toString() );
+            String gtString = entry.get( CHECKED_DATE_AT ).get().toString();
+            gt = new GeneralizedTime( gtString );
         }
         catch ( ParseException e )
         {

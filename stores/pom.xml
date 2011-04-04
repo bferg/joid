@@ -27,7 +27,6 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>ldap</module>
     <module>hibernate</module>
   </modules>
 </project>

@@ -30,9 +30,9 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.apache.directory.ldap.client.api.PoolableLdapConnectionFactory;
+import org.apache.directory.shared.ldap.model.entry.Attribute;
 import org.apache.directory.shared.ldap.model.entry.DefaultModification;
 import org.apache.directory.shared.ldap.model.entry.Entry;
-import org.apache.directory.shared.ldap.model.entry.EntryAttribute;
 import org.apache.directory.shared.ldap.model.entry.Modification;
 import org.apache.directory.shared.ldap.model.entry.ModificationOperation;
 import org.apache.directory.shared.ldap.model.exception.LdapException;
@@ -276,10 +276,10 @@ public class LdapStore implements IStore
     {
         List<Modification> modList = new ArrayList<Modification>();
 
-        for ( EntryAttribute attribute : before )
+        for ( Attribute attribute : before )
         {
             AttributeType type = attribute.getAttributeType();
-            EntryAttribute afterAttribute = after.get( type );
+            Attribute afterAttribute = after.get( type );
             
             // if after change attribute is null then op is a remove
             if ( afterAttribute == null )
@@ -309,10 +309,10 @@ public class LdapStore implements IStore
         
         // calculate add attribute modifications to perform for attributes present in 
         // after entry but not present in before entry due to add changes 
-        for ( EntryAttribute attribute : after )
+        for ( Attribute attribute : after )
         {
             AttributeType type = attribute.getAttributeType();
-            EntryAttribute beforeAttribute = before.get( type );
+            Attribute beforeAttribute = before.get( type );
             
             // if before change attribute is null then op is an add
             if ( beforeAttribute == null )

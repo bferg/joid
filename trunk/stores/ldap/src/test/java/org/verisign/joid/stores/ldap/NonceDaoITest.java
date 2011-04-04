@@ -267,7 +267,7 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * @TODO debug and fix the checkedDate problem
      */
     @Test
-    @Ignore ( "For some reason the checkedDate is not holding" )
+    // @Ignore ( "For some reason the checkedDate is not holding" )
     public void testToObject() throws Exception
     {
         Entry entry = new DefaultEntry( new Dn( NonceDao.NONCE_AT + "=" + nonce.getNonce() ) );

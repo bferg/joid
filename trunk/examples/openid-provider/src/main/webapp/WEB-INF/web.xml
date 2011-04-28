@@ -23,7 +23,7 @@
 		<servlet-class>org.verisign.joid.server.OpenIdServlet</servlet-class>
 		<init-param>
 			<param-name>endPointUrl</param-name>
-			<param-value>http://localhost:8180/joid/login</param-value>
+			<param-value>http://localhost:8180/login</param-value>
 			<description>Change this to your endpoint url.</description>
 		</init-param>
 		<init-param>
@@ -46,11 +46,20 @@
 			</description>
 		</init-param>
     </servlet>
+    
+    <servlet>
+        <servlet-name>providerServlet</servlet-name>
+        <servlet-class>org.verisign.joid.examples.server.ProviderServlet</servlet-class>
+   </servlet>  
 
 	<servlet-mapping>
 		<servlet-name>loginServlet</servlet-name>
 		<url-pattern>/login</url-pattern>
 	</servlet-mapping>
+	<servlet-mapping>
+        <servlet-name>providerServlet</servlet-name>
+        <url-pattern>/authenticate</url-pattern>
+    </servlet-mapping>
 
 </web-app>
 

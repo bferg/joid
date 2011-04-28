@@ -5,6 +5,12 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.bio.SocketConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
+/**
+ * 
+ * A runnable test class that enables relying party application in an embedded Jetty container
+ *
+ * @author <a href="mailto:birkan.duman@gmail.com">Birkan Duman</a>
+ */
 public class StartRelyingParty {
 
 	public static void main(String[] args) throws Exception {

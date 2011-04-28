@@ -39,7 +39,10 @@ public class OpenIdServlet extends HttpServlet
         super.init( config );
         store = StoreFactory.getInstance( MemoryStore.class.getName() );
         crypto = new Crypto();
-        openId = new OpenId( new ServerInfo( "http://endpoint", store, crypto ) );
+        
+        String endPointUrl = config.getInitParameter( "endPointUrl" );
+        
+        openId = new OpenId( new ServerInfo( endPointUrl , store, crypto ) );
     }
 
 

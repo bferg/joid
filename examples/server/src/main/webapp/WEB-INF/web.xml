@@ -60,7 +60,7 @@
 		<servlet-class>org.verisign.joid.server.OpenIdServlet</servlet-class>
 		<init-param>
 			<param-name>endPointUrl</param-name>
-			<param-value>http://localhost:8080/joid/login</param-value>
+			<param-value>http://localhost:8280/joid/login</param-value>
 			<description>Change this to your endpoint url.</description>
 		</init-param>
 		<init-param>

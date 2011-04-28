@@ -14,13 +14,13 @@ public class Start {
 		// Set some timeout options to make debugging easier.
 		connector.setMaxIdleTime(1000 * 60 * 60);
 		connector.setSoLingerTime(-1);
-		connector.setPort(8180);
+		connector.setPort(8280);
 		server.setConnectors(new Connector[] { connector });
 
 		WebAppContext bb = new WebAppContext();
 		bb.setClassLoader( Thread.currentThread().getContextClassLoader() );
 		bb.setServer(server);
-		bb.setContextPath("/joid-examples-server");
+		bb.setContextPath("/");
 		bb.setWar("src/main/webapp");
 		
 		// START JMX SERVER

@@ -112,7 +112,11 @@ public class OpenIdServlet extends HttpServlet
                         HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException
     {
-        log( "\nrequest\n-------\n" + query + "\n" );
+        if( log.isDebugEnabled() )
+        {
+            log.debug( "\nrequest\n-------\n" + query + "\n" );
+        }
+        
         if ( !( openId.canHandle( query ) ) )
         {
             returnError( query, response );
@@ -123,7 +127,11 @@ public class OpenIdServlet extends HttpServlet
             boolean isAuth = openId.isAuthenticationRequest( query );
             HttpSession session = request.getSession( true );
             String user = getLoggedIn( request );
-            log.debug( "[OpenIdServlet] Logged in as: " + user );
+            
+            if( log.isDebugEnabled() )
+            {
+                log.debug( "[OpenIdServlet] Logged in as: " + user );
+            }
 
             if ( request.getParameter( AuthenticationRequest.OPENID_TRUST_ROOT ) != null )
             {
@@ -167,8 +175,14 @@ public class OpenIdServlet extends HttpServlet
                 response.sendRedirect( loginPage );
                 return;
             }
+            
             String s = openId.handleRequest( query );
-            log( "\nresponse\n--------\n" + s + "\n" );
+            
+            if( log.isDebugEnabled() )
+            {
+                log.debug( "\nresponse\n--------\n" + s + "\n" );
+            }    
+            
             if ( isAuth )
             {
                 AuthenticationRequest authReq = ( AuthenticationRequest )
@@ -192,8 +206,15 @@ public class OpenIdServlet extends HttpServlet
                     String returnTo = ( String ) session.getAttribute( AuthenticationRequest.OPENID_RETURN_TO );
                     String delim = ( returnTo.indexOf( '?' ) >= 0 ) ? "&" : "?";
                     s = response.encodeRedirectURL( returnTo + delim + s );
-                    log.debug( "sending redirect to: " + s );
+                    
+                    if( log.isDebugEnabled() )
+                    {
+                        log.debug( "sending redirect to: " + s );
+                    }
+                    
+                    
                     response.sendRedirect( s );
+                    return;
                 }
                 else
                 {
@@ -213,6 +234,7 @@ public class OpenIdServlet extends HttpServlet
                 }
                 out.print( s );
                 out.flush();
+                return;
             }
         }
         catch ( OpenIdException e )

@@ -1,6 +1,7 @@
 <%--
 This page is a sample login page for OpenID SERVERS. You only need this if you are an OpenID provider. Consumers do NOT need this page.
 --%>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ page import="org.apache.commons.lang.RandomStringUtils" %>
 <%@ page import="org.verisign.joid.AuthenticationRequest" %>
 <%@ page import="org.verisign.joid.server.MemoryUserManager" %>
@@ -9,6 +10,7 @@ This page is a sample login page for OpenID SERVERS. You only need this if you a
 <%@ page import="org.verisign.joid.util.CookieUtils" %>
 <%@ page import="org.verisign.joid.util.UrlUtils" %>
 <%@ page import="java.net.URLDecoder" %>
+
 <%!
     
 private String getParam(HttpServletRequest request, String s)
@@ -38,7 +40,7 @@ private String getParam(HttpServletRequest request, String s)
 </head>
 <body>
 
-<form action="/authenticate" method="post">
+<form action="/authenticate" method="post" accept-charset="utf-8">
     <input type="hidden" name="query" value="<%=getParam(request, "query")%>"/>
     <input type="hidden" name="openid.realm"
            value="<%=getParam(request, "openid.realm")%>"/>

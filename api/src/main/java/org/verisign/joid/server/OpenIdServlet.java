@@ -79,60 +79,32 @@ public class OpenIdServlet extends HttpServlet
                        HttpServletResponse response )
             throws ServletException, IOException
     {
-        StringBuffer sb = new StringBuffer();
-        Enumeration<?> e = request.getParameterNames();
-        while ( e.hasMoreElements() )
-        {
-            String name = ( String ) e.nextElement();
-            String[] values = request.getParameterValues( name );
-            if ( values.length == 0 )
-            {
-                throw new IOException( "Empty value not allowed: "
-                        + name + " has no value" );
-            }
-            try
-            {
-                sb.append( URLEncoder.encode( name, "UTF-8" ) + "="
-                        + URLEncoder.encode( values[0], "UTF-8" ) );
-            }
-            catch ( UnsupportedEncodingException ex )
-            {
-                throw new IOException( ex.toString() );
-            }
-            if ( e.hasMoreElements() )
-            {
-                sb.append( "&" );
-            }
-        }
-        doQuery( sb.toString(), request, response );
+       
+        doQuery( populateQueryStringFromPost( request ), request, response );
     }
 
 
-    public void doQuery( String query,
+    public void doQuery( String queryString,
                         HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException
     {
-        if( log.isDebugEnabled() )
-        {
-            log.debug( "\nrequest\n-------\n" + query + "\n" );
-        }
+       
         
-        if ( !( openId.canHandle( query ) ) )
+        if ( !( openId.canHandle( queryString ) ) )
         {
-            returnError( query, response );
+            returnError( queryString, response );
             return;
         }
+        
         try
         {
-            boolean isAuth = openId.isAuthenticationRequest( query );
+            boolean isAuth = openId.isAuthenticationRequest( queryString );
+            
             HttpSession session = request.getSession( true );
+            
             String user = getLoggedIn( request );
             
-            if( log.isDebugEnabled() )
-            {
-                log.debug( "[OpenIdServlet] Logged in as: " + user );
-            }
-
+            
             if ( request.getParameter( AuthenticationRequest.OPENID_TRUST_ROOT ) != null )
             {
                 session.setAttribute(
@@ -145,97 +117,55 @@ public class OpenIdServlet extends HttpServlet
                     AuthenticationRequest.OPENID_RETURN_TO,
                     request.getParameter( AuthenticationRequest.OPENID_RETURN_TO ) );
             }
-
-            if ( isAuth && user == null )
-            {
-                // @TODO: should ask user to accept realm even if logged in, but only once
-                // ask user to accept this realm
-                request.setAttribute( QUERY, query );
-                request.setAttribute( AuthenticationRequest.OPENID_REALM,
-                    request.getParameter( AuthenticationRequest.OPENID_REALM ) );
-                session.setAttribute( QUERY, query );
-                //if claimed_id is null then use identity instead (because of diffs between v2 & v1 of spec)
-                if ( request.getParameter( AuthenticationRequest.OPENID_CLAIMED_ID ) == null )
-                {
-                    session.setAttribute(
-                        AuthenticationRequest.OPENID_CLAIMED_ID,
-                        request.getParameter( AuthenticationRequest.OPENID_IDENTITY ) );
-                }
-                else
-                {
-                    session.setAttribute(
-                         AuthenticationRequest.OPENID_CLAIMED_ID,
-                         request.getParameter( AuthenticationRequest.OPENID_CLAIMED_ID ) );
-                }
-                session.setAttribute(
-                        AuthenticationRequest.OPENID_REALM,
-                        request.getParameter( AuthenticationRequest.OPENID_REALM ) );
-
-                //                rd.forward(request, response);
-                response.sendRedirect( loginPage );
-                return;
-            }
             
-            String s = openId.handleRequest( query );
-            
-            if( log.isDebugEnabled() )
-            {
-                log.debug( "\nresponse\n--------\n" + s + "\n" );
-            }    
             
             if ( isAuth )
             {
-                AuthenticationRequest authReq = ( AuthenticationRequest )
-                        RequestFactory.parse( query );
-                //                String claimedId = (String) session.getAttribute(ID_CLAIMED);
-                /* Ensure that the previously claimed id is the same as the just
-                passed in claimed id. */
-                @SuppressWarnings("unused")
-                String identity;
-                if ( request.getParameter( AuthenticationRequest.OPENID_CLAIMED_ID ) == null )
+                if ( user == null )
                 {
-                    identity = request.getParameter( AuthenticationRequest.OPENID_IDENTITY );
-                }
-                else
-                {
-                    identity = authReq.getClaimedIdentity();
-                }
-                if ( getUserManager().canClaim( user, authReq.getClaimedIdentity() ) )
-                {
-                    //String returnTo = authReq.getReturnTo();
-                    String returnTo = ( String ) session.getAttribute( AuthenticationRequest.OPENID_RETURN_TO );
-                    String delim = ( returnTo.indexOf( '?' ) >= 0 ) ? "&" : "?";
-                    s = response.encodeRedirectURL( returnTo + delim + s );
+                    //if we fall here, then a relying party redirected to this provider with a get request, so we are setting required session attributes and redirecting the user to our login page
                     
-                    if( log.isDebugEnabled() )
+                    // @TODO: should ask user to accept realm even if logged in, but only once
+                    // ask user to accept this realm
+                    request.setAttribute( QUERY, queryString );
+                    request.setAttribute( AuthenticationRequest.OPENID_REALM,
+                        request.getParameter( AuthenticationRequest.OPENID_REALM ) );
+                    session.setAttribute( QUERY, queryString );
+                    //if claimed_id is null then use identity instead (because of diffs between v2 & v1 of spec)
+                    if ( request.getParameter( AuthenticationRequest.OPENID_CLAIMED_ID ) == null )
                     {
-                        log.debug( "sending redirect to: " + s );
+                        session.setAttribute(
+                            AuthenticationRequest.OPENID_CLAIMED_ID,
+                            request.getParameter( AuthenticationRequest.OPENID_IDENTITY ) );
+                    }
+                    else
+                    {
+                        session.setAttribute(
+                             AuthenticationRequest.OPENID_CLAIMED_ID,
+                             request.getParameter( AuthenticationRequest.OPENID_CLAIMED_ID ) );
                     }
                     
-                    
-                    response.sendRedirect( s );
+                    session.setAttribute(
+                            AuthenticationRequest.OPENID_REALM,
+                            request.getParameter( AuthenticationRequest.OPENID_REALM ) );
+
+                    //redirecting to OpenID Provider login page
+                    response.sendRedirect( loginPage );
                     return;
                 }
                 else
                 {
-                    throw new OpenIdException( "User cannot claim this id." );
+                    processAuthenticationRequest( request, response, queryString );
                 }
+                
+                
 
             }
             else
             {
-                // Association request
-                int len = s.length();
-                PrintWriter out = response.getWriter();
-                response.setHeader( "Content-Length", Integer.toString( len ) );
-                if ( openId.isAnErrorResponse( s ) )
-                {
-                    response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
-                }
-                out.print( s );
-                out.flush();
-                return;
+                processAssocationRequest( response, queryString );
             }
+            
         }
         catch ( OpenIdException e )
         {
@@ -244,6 +174,72 @@ public class OpenIdServlet extends HttpServlet
                     .SC_INTERNAL_SERVER_ERROR, e.getMessage() );
         }
     }
+
+
+    private void processAuthenticationRequest( HttpServletRequest request, HttpServletResponse response,
+        String queryString ) throws UnsupportedEncodingException,
+        OpenIdException, IOException
+    {
+        
+        String openIdResponse = openId.handleRequest( queryString );
+        
+        AuthenticationRequest authReq = ( AuthenticationRequest )
+                RequestFactory.parse( queryString );
+        //                String claimedId = (String) session.getAttribute(ID_CLAIMED);
+        /* Ensure that the previously claimed id is the same as the just
+        passed in claimed id. */
+       
+//        String identity = null;
+//        if ( request.getParameter( AuthenticationRequest.OPENID_CLAIMED_ID ) == null )
+//        {
+//            identity = request.getParameter( AuthenticationRequest.OPENID_IDENTITY );
+//        }
+//        else
+//        {
+//            identity = authReq.getClaimedIdentity();
+//        }
+        if ( getUserManager().canClaim(  getLoggedIn( request ) , authReq.getClaimedIdentity() ) )
+        {
+            //String returnTo = authReq.getReturnTo();
+            String returnTo = ( String ) request.getSession().getAttribute( AuthenticationRequest.OPENID_RETURN_TO );
+            String delim = ( returnTo.indexOf( '?' ) >= 0 ) ? "&" : "?";
+            String returnToUrlWithOpenIdResponse = response.encodeRedirectURL( returnTo + delim + openIdResponse );
+            
+            if( log.isDebugEnabled() )
+            {
+                log.debug( "sending redirect to: " + returnToUrlWithOpenIdResponse );
+            }
+            
+            //redirecting to relying party with OpenID response query
+            response.sendRedirect( returnToUrlWithOpenIdResponse );
+            return;
+        }
+        else
+        {
+            throw new OpenIdException( "User cannot claim this id." );
+        }
+    }
+
+
+    private void processAssocationRequest( HttpServletResponse response, String queryString ) throws IOException, OpenIdException
+    {
+        // Association request
+        String openIdResponse = openId.handleRequest( queryString );
+        
+        
+        int len = openIdResponse.length();
+        PrintWriter out = response.getWriter();
+        response.setHeader( "Content-Length", Integer.toString( len ) );
+        if ( openId.isAnErrorResponse( openIdResponse ) )
+        {
+            response.setStatus( HttpServletResponse.SC_BAD_REQUEST );
+        }
+        out.print( openIdResponse );
+        out.flush();
+        return;
+    }
+    
+    
 
 
     /**
@@ -274,12 +270,38 @@ public class OpenIdServlet extends HttpServlet
         return o;
     }
 
+    
+    private String populateQueryStringFromPost( HttpServletRequest request ) throws IOException
+    {
+        StringBuffer sb = new StringBuffer();
+        Enumeration<?> e = request.getParameterNames();
+        while ( e.hasMoreElements() )
+        {
+            String name = ( String ) e.nextElement();
+            String[] values = request.getParameterValues( name );
+            if ( values.length == 0 )
+            {
+                throw new IOException( "Empty value not allowed: "
+                        + name + " has no value" );
+            }
+            try
+            {
+                sb.append( URLEncoder.encode( name, "UTF-8" ) + "="
+                        + URLEncoder.encode( values[0], "UTF-8" ) );
+            }
+            catch ( UnsupportedEncodingException ex )
+            {
+                throw new IOException( ex.toString() );
+            }
+            if ( e.hasMoreElements() )
+            {
+                sb.append( "&" );
+            }
+        }
+        return sb.toString();
+    }
 
-    /**
-     *
-     * @param request
-     * @param username if null, will logout
-     */
+
     public static void setLoggedIn( HttpServletRequest request, String username )
     {
         request.getSession( true ).setAttribute( USERNAME_ATTRIBUTE, username );

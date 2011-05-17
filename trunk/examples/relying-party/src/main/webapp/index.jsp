@@ -34,7 +34,7 @@ This page is a sample for consumers to use, but also serves as a testing page fo
 		}
 	</script>
 	<div>
-		<form action="/relying-party" method="post" id="openid_form">
+		<form action="/relying-party" method="post" id="openid_form" accept-charset="utf-8">
 			<input type="hidden" name="signin" value="true" /> 
 			<b>Login with your OpenID URL:</b> 
 			<input type="text" size="30" value="<%=trustRoot + "/user/austinpowers"%>" name="openid_url" id="openid_url" /> 

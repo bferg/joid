@@ -29,4 +29,14 @@
   <modules>
     <module>hibernate</module>
   </modules>
+
+  <profiles>
+    <profile>
+      <id>apacheds</id>
+      <modules>
+        <module>hibernate</module>
+        <module>ldap</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

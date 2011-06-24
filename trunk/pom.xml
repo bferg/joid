@@ -36,10 +36,10 @@
     <junit.version>4.8.2</junit.version>
     <jetty.version>6.1.14</jetty.version>
     <org.apache.directory.shared.version>
-      1.0.0-M5-SNAPSHOT
+      1.0.0-M6-SNAPSHOT
     </org.apache.directory.shared.version>
     <org.apache.directory.server.version>
-      1.5.8-SNAPSHOT
+      2.0.0-M2-SNAPSHOT
     </org.apache.directory.server.version>
   </properties>
   

@@ -27,7 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.shared.ldap.model.constants.SchemaConstants;
-import org.apache.directory.shared.ldap.model.cursor.SearchCursor;
+import org.apache.directory.shared.ldap.model.cursor.EntryCursor;
 import org.apache.directory.shared.ldap.model.entry.DefaultEntry;
 import org.apache.directory.shared.ldap.model.entry.Entry;
 import org.apache.directory.shared.ldap.model.entry.Modification;
@@ -138,7 +138,7 @@ public class NonceDao implements LdapDao<INonce, String>
         sb.append( NONCE_AT );
         sb.append( '=' ).append( nonce ).append( ')' );
 
-        SearchCursor cursor = null;
+        EntryCursor cursor = null;
         try
         {
             cursor = conn.search( baseDn, sb.toString(), SearchScope.ONELEVEL, "*" );

@@ -27,7 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.shared.ldap.model.constants.SchemaConstants;
-import org.apache.directory.shared.ldap.model.cursor.SearchCursor;
+import org.apache.directory.shared.ldap.model.cursor.EntryCursor;
 import org.apache.directory.shared.ldap.model.entry.DefaultEntry;
 import org.apache.directory.shared.ldap.model.entry.Entry;
 import org.apache.directory.shared.ldap.model.entry.Modification;
@@ -225,7 +225,7 @@ class AssociationDao implements LdapDao<IAssociation, String>
 
         try
         {
-            SearchCursor cursor = conn.search( baseDn, sb.toString(), SearchScope.ONELEVEL, "*" );
+            EntryCursor cursor = conn.search( baseDn, sb.toString(), SearchScope.ONELEVEL, "*" );
             SearchResultEntry response = ( SearchResultEntry ) cursor.get();
 
             if ( cursor.next() == true )

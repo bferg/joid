@@ -34,7 +34,6 @@ import org.apache.directory.shared.ldap.model.entry.Modification;
 import org.apache.directory.shared.ldap.model.exception.LdapException;
 import org.apache.directory.shared.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.shared.ldap.model.exception.LdapNoSuchObjectException;
-import org.apache.directory.shared.ldap.model.message.SearchResultEntry;
 import org.apache.directory.shared.ldap.model.message.SearchScope;
 import org.apache.directory.shared.ldap.model.name.Dn;
 import org.apache.directory.shared.util.GeneralizedTime;
@@ -145,14 +144,14 @@ public class NonceDao implements LdapDao<INonce, String>
 
             if ( cursor.next() )
             {
-                SearchResultEntry response = ( SearchResultEntry ) cursor.get();
+                DefaultEntry response = ( DefaultEntry ) cursor.get();
 
                 if ( cursor.next() == true )
                 {
                     throw new OpenIdException( "Did not expect to get more than one nonce back." );
                 }
 
-                return toObject( response.getEntry() );
+                return toObject( response );
             }
             else
             {

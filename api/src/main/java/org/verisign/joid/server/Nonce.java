@@ -1,14 +1,16 @@
 package org.verisign.joid.server;
 
 
-import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.verisign.joid.INonce;
 
 
 /**
  * A simple Nonce implementation.
+ * 
+ * @TODO Remove hibernate residue and fix the damn javadocs.
  */
 public class Nonce implements INonce
 {
@@ -17,7 +19,13 @@ public class Nonce implements INonce
     private Date checkedDate;
 
 
-    /** Hibernate mapping. */
+    /** 
+     * Hibernate mapping. 
+     * 
+     * @TODO Why in the world would the hibernate mapping key be 
+     * exposed in the primary object? This is something that should 
+     * be removed.
+     */
     public Long getId()
     {
         return id;
@@ -52,8 +60,23 @@ public class Nonce implements INonce
     }
 
 
-    /** Hibernate mapping. */
+    /** 
+     * Set's the checkedDate property by cloning the date.
+     */
     public void setCheckedDate( Date date )
+    {
+        this.checkedDate = ( Date ) date.clone();
+    }
+
+    
+    /** 
+     * Original flawed setter which used simple date format parsing and looses
+     * the milliseconds argument which is used in LDAP timestamps.
+     * 
+     * @deprecated
+     * @TODO - confirm no issues with replacing this then delete this method
+     */
+    public void _setCheckedDate( Date date )
     {
         SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
         Date tmp = date;
@@ -61,7 +84,7 @@ public class Nonce implements INonce
         this.checkedDate = tmp;
     }
 
-
+    
     /**
      * Returns a string representation of this Nonce.
      *

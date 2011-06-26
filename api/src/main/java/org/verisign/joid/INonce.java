@@ -22,7 +22,6 @@ import java.util.Date;
  *
  * Implement this interface to represent an OpenID association's nonce.
  */
-
 public interface INonce
 {
 

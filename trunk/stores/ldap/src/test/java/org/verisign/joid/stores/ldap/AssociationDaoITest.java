@@ -22,9 +22,11 @@ package org.verisign.joid.stores.ldap;
 
 import static org.junit.Assert.*;
 
+import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
@@ -51,18 +53,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.verisign.joid.INonce;
+import org.verisign.joid.IAssociation;
 import org.verisign.joid.OpenIdException;
-import org.verisign.joid.server.Nonce;
+import org.verisign.joid.server.Association;
 
 
 /**
- * Integration test cases for the NonceDao implementation.
+ * Integration test cases for the AssociatinDao implementation.
  *
- * @author <a href="mailto:akarasulu@apache.org">Alex Karasulu</a>
+ * @author <a href="mailto:dev@directory.apache.org">Apache Directory Project</a>
  */
 @RunWith( FrameworkRunner.class )
-@CreateDS( allowAnonAccess = true, name = "NonceDaoITest-class", partitions =
+@CreateDS( allowAnonAccess = true, name = "AssociationDaoITest-class", partitions =
     {
         @CreatePartition(
             name = "joid",
@@ -100,15 +102,15 @@ import org.verisign.joid.server.Nonce;
         "description: openid nonces reside under this search base"
     }
 )
-public class NonceDaoITest extends AbstractLdapTestUnit
+public class AssociationDaoITest extends AbstractLdapTestUnit
 {
-    private static final Logger LOG = LoggerFactory.getLogger( NonceDaoITest.class );
+    private static final Logger LOG = LoggerFactory.getLogger( AssociationDaoITest.class );
     
-    private static final String BASE_DN = "ou=nonces,dc=joid,dc=org";
+    private static final String BASE_DN = "ou=associations,dc=joid,dc=org";
     
-    private INonce nonce;
+    private IAssociation association;
 
-    private NonceDao dao;
+    private AssociationDao dao;
     
     
     @Before
@@ -134,8 +136,8 @@ public class NonceDaoITest extends AbstractLdapTestUnit
 
         LdapConnectionPool connPool = new LdapConnectionPool( new PoolableLdapConnectionFactory( config ) );
         LdapNetworkConnectionManager connMan = new LdapNetworkConnectionManager( connPool );
-        dao = new NonceDao( connMan, BASE_DN );
-        nonce = generateNonce();
+        dao = new AssociationDao( connMan, BASE_DN );
+        association = generateAssociation();
     }
     
     
@@ -143,102 +145,118 @@ public class NonceDaoITest extends AbstractLdapTestUnit
     public void after() throws Exception
     {
         dao = null;
-        nonce = null;
+        association = null;
     }
     
     
     /**
-     * Utility method to generate and reuse a Nonce.
+     * Utility method to generate and reuse an Association.
      *
-     * @return the generated random nonce.
+     * @return the generated random assocation.
      * @throws OpenIdException
      */
-    private static INonce generateNonce() throws OpenIdException
+    private static IAssociation generateAssociation() throws OpenIdException
     {
-        String nonce = RandomStringUtils.randomAlphanumeric( 16 );
-        Nonce n = new Nonce();
-        n.setNonce( nonce );
-        n.setCheckedDate( new Date() );
-        return n;
+        Association association = new Association();
+        association.setAssociationType( "HMAC-SHA1" );
+        association.setEncryptedMacKey( RandomStringUtils.randomAlphanumeric( 16 ).getBytes() );
+        association.setIssuedDate( new Date() );
+        association.setLifetime( 600L );
+        association.setMacKey( RandomStringUtils.randomAlphanumeric( 16 ).getBytes() );
+        association.setSecret( "secret" );
+        association.setPublicDhKey( new BigInteger( "1895327263942918" ) );
+        association.setSessionType( "DH-SHA1" );
+        association.setHandle( RandomStringUtils.randomAlphanumeric( 16 ) );
+        
+        return association;
     }
 
 
     /**
-     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#create(org.verisign.joid.INonce)}.
+     * Test's the Dao's create functionality.
      */
     @Test
     public void testCreate() throws Exception
     {
         assertNotNull( ldapServer );
-        dao.create( nonce );
+        dao.create( association );
     }
 
 
     /**
-     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#create(org.verisign.joid.INonce)}.
+     * Tests the Dao's create functionality attempting to fail by recreating the 
+     * same association.
      */
     @Test( expected = OpenIdException.class )
     public void testDoubleCreate() throws Exception
     {
         assertNotNull( ldapServer );
-        dao.create( nonce );
-        dao.create( nonce );
+        dao.create( association );
+        dao.create( association );
     }
 
 
     /**
-     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#read(java.lang.String)}.
+     * Simple test for the Dao's read functionality.
      */
     @Test
     public void testRead() throws Exception
     {
         testCreate();
-        INonce reloaded = dao.read( nonce.getNonce() );
-        assertEquals( reloaded.getNonce(), nonce.getNonce() );
+        IAssociation reloaded = dao.read( association.getHandle() );
+        
+        assertEquals( reloaded.getHandle(), association.getHandle() );
+        assertEquals( reloaded.getAssociationType(), association.getAssociationType() );
+        assertEquals( reloaded.getEncryptedMacKey(), association.getEncryptedMacKey() );
+        assertEquals( reloaded.getIssuedDate(), association.getIssuedDate() );
+        assertEquals( reloaded.getLifetime(), association.getLifetime() );
+        assertEquals( reloaded.getMacKey(), association.getMacKey() );
+        assertEquals( reloaded.getPublicDhKey(), association.getPublicDhKey() );
+        assertEquals( reloaded.getSessionType(), association.getSessionType() );
     }
 
 
     /**
-     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#read(java.lang.String)}.
+     * Tests the return of null on read of non-existent association.
      */
     @Test
     public void testReadNonexistant() throws Exception
     {
         testCreate();
-        INonce reloaded = dao.read( "nonexistant-nonce" );
+        IAssociation reloaded = dao.read( "nonexistant-nonce" );
         assertNull( "Should return null to show non-existance", reloaded );
     }
 
 
     /**
-     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#update(org.verisign.joid.INonce)}.
+     * Tests the Dao object's ability to update an Association.
      */
     @Test
-    public void testUpdateINonce() throws Exception
+    public void testUpdateIAssociation() throws Exception
     {
         testCreate();
-        INonce reloaded = dao.read( nonce.getNonce() );
-        assertEquals( reloaded.getNonce(), nonce.getNonce() );
+        IAssociation reloaded = dao.read( association.getHandle() );
+        assertEquals( reloaded.getHandle(), association.getHandle() );
 
         // now set the reloaded instance's date to UNIX start 
         Date newDate = new Date( 0 );
-        reloaded.setCheckedDate( newDate );
+        reloaded.setIssuedDate( newDate );
 
-        // the reloaded no longer has the same checked date as the original nonce instance
-        assertFalse( reloaded.getCheckedDate().equals( nonce.getCheckedDate() ) );
+        // the reloaded no longer has the same issued date as the original association instance
+        assertFalse( reloaded.getIssuedDate().equals( association.getIssuedDate() ) );
         
         // now update the store with the new date
         dao.update( reloaded );
         
         // keep a handle on the lastReloaded instance and reload the reloaded again
-        INonce lastReloaded = reloaded;
-        reloaded = dao.read( nonce.getNonce() );
+        IAssociation lastReloaded = reloaded;
+        reloaded = dao.read( association.getHandle() );
 
         // the lastReloaded and freshly reloaded instances should be the 
-        // same yet different from the original nonce we started out with
+        // same yet different from the original association we started out with
         assertFalse( reloaded.equals( lastReloaded ) );
-        assertTrue( reloaded.getCheckedDate().equals( lastReloaded.getCheckedDate() ) );
-        assertFalse( reloaded.getCheckedDate().equals( nonce.getCheckedDate() ) );
+        assertTrue( reloaded.getIssuedDate().equals( lastReloaded.getIssuedDate() ) );
+        assertFalse( reloaded.getIssuedDate().equals( association.getIssuedDate() ) );
     }
 
 
@@ -246,101 +264,106 @@ public class NonceDaoITest extends AbstractLdapTestUnit
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#update(org.verisign.joid.INonce, org.apache.directory.shared.ldap.model.entry.Entry)}.
      */
     @Test
-    public void testUpdateINonceEntry() throws Exception
+    public void testUpdateIAssociationEntry() throws Exception
     {
         testCreate();
-        INonce reloaded = dao.read( nonce.getNonce() );
-        assertEquals( reloaded.getNonce(), nonce.getNonce() );
+        IAssociation reloaded = dao.read( association.getHandle() );
+        assertEquals( reloaded.getHandle(), association.getHandle() );
 
         // now set the reloaded instance's date to UNIX start 
         Date newDate = new Date( 0 );
-        reloaded.setCheckedDate( newDate );
+        reloaded.setIssuedDate( newDate );
 
-        // the reloaded no longer has the same checked date as the original nonce instance
-        assertFalse( reloaded.getCheckedDate().equals( nonce.getCheckedDate() ) );
+        // the reloaded no longer has the same issued date as the original association
+        assertFalse( reloaded.getIssuedDate().equals( association.getIssuedDate() ) );
         
         // now update the store with the new date
-        dao.update( reloaded, dao.toEntry( nonce ) );
+        dao.update( reloaded, dao.toEntry( association ) );
         
         // keep a handle on the lastReloaded instance and reload the reloaded again
-        INonce lastReloaded = reloaded;
-        reloaded = dao.read( nonce.getNonce() );
+        IAssociation lastReloaded = reloaded;
+        reloaded = dao.read( association.getHandle() );
 
         // the lastReloaded and freshly reloaded instances should be the 
-        // same yet different from the original nonce we started out with
+        // same yet different from the original association we started out with
         assertFalse( reloaded.equals( lastReloaded ) );
-        assertTrue( reloaded.getCheckedDate().equals( lastReloaded.getCheckedDate() ) );
-        assertFalse( reloaded.getCheckedDate().equals( nonce.getCheckedDate() ) );
+        assertTrue( reloaded.getIssuedDate().equals( lastReloaded.getIssuedDate() ) );
+        assertFalse( reloaded.getIssuedDate().equals( association.getIssuedDate() ) );
     }
 
 
     /**
-     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#delete(java.lang.String)}.
+     * Tests the AssociationDao's ability to delete an Association.
      */
     @Test
     public void testDelete() throws Exception
     {
         testCreate();
         
-        INonce deleted = dao.delete( nonce.getNonce() );
-        assertEquals( deleted.getNonce(), nonce.getNonce() );
-        assertNull( dao.read( nonce.getNonce() ) );
+        IAssociation deleted = dao.delete( association.getHandle() );
+        assertEquals( deleted.getHandle(), association.getHandle() );
+        assertNull( dao.read( association.getHandle() ) );
     }
 
+    
     /**
-     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#delete(java.lang.String)}.
+     * Checks the Dao's behavior (returns null) when attempting to delete a 
+     * non-existent association.
      */
     @Test
-    public void testNonexistantDelete() throws Exception
+    public void testNonexistentDelete() throws Exception
     {
         testCreate();
         
-        INonce deleted = dao.delete( nonce.getNonce() );
-        assertEquals( deleted.getNonce(), nonce.getNonce() );
-        assertNull( dao.read( nonce.getNonce() ) );
+        IAssociation deleted = dao.delete( association.getHandle() );
+        assertEquals( deleted.getHandle(), association.getHandle() );
+        assertNull( dao.read( association.getHandle() ) );
 
         // second attempt to delete should produce an error.
-        assertNull( "Should be null since nothing got deleted", dao.delete( nonce.getNonce() ) );
+        assertNull( "Should be null since nothing got deleted", dao.delete( association.getHandle() ) );
     }
 
 
     /**
-     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#deleteEntry(org.verisign.joid.INonce)}.
+     * Tests the Dao's deleteEntry method.
      */
     @Test
     public void testDeleteEntry() throws Exception
     {
         testCreate();
         
-        dao.deleteEntry( nonce );
-        assertNull( dao.read( nonce.getNonce() ) );
+        dao.deleteEntry( association );
+        assertNull( dao.read( association.getHandle() ) );
     }
     
-    
+
     /**
-     * Tests the NonceDao's ability to generate a {@link INonce} object from 
-     * an LDAP entry for the nonce.
+     * Tests the Dao's ability to generate an Association object instance from 
+     * the association entry.
      */
     @Test
     public void testToObject() throws Exception
     {
-        Entry entry = new DefaultEntry( new Dn( NonceDao.NONCE_AT + "=" + nonce.getNonce() ) );
-        entry.add( SchemaConstants.OBJECT_CLASS_AT, NonceDao.NONCE_OC );
-        entry.add( NonceDao.NONCE_AT, nonce.getNonce() );
+        Entry entry = new DefaultEntry( new Dn( AssociationDao.HANDLE_AT + "=" + association.getHandle() ) );
+        entry.add( SchemaConstants.OBJECT_CLASS_AT, AssociationDao.ASSOCIATION_OC );
+        entry.add( AssociationDao.HANDLE_AT, association.getHandle() );
         
         Calendar calendar = Calendar.getInstance();
-        calendar.setTime( nonce.getCheckedDate() );
+        calendar.setTime( association.getIssuedDate() );
         GeneralizedTime gt = new GeneralizedTime( calendar );
-        entry.add( NonceDao.CHECKED_DATE_AT, gt.toGeneralizedTime() );
+        entry.add( AssociationDao.ISSUED_DATE_AT, gt.toGeneralizedTime() );
         
-        INonce generated = dao.toObject( entry );
-        assertEquals( generated.getNonce(), nonce.getNonce() );
-        assertEquals( generated.getCheckedDate().getTime(), nonce.getCheckedDate().getTime() );
+        IAssociation generated = dao.toObject( entry );
+        assertEquals( generated.getHandle(), association.getHandle() );
+        assertEquals( generated.getIssuedDate().getTime(), association.getIssuedDate().getTime() );
+        
+        throw new NotImplementedException();
     }
 
 
     /**
-     * Tests the NonceDao's ability to convert a Nonce into an entry.
+     * Tests the AssociationDao's ability to convert an Association into an 
+     * LDAP entry.
      */
     @Test
     public void testToEntry() throws Exception
@@ -350,26 +373,27 @@ public class NonceDaoITest extends AbstractLdapTestUnit
 
 
     /**
-     * Tests the NonceDao's ability to get an LDAP entry from the store
-     * as a simple LDAP entry before using it to build an object.
+     * Tests the AssociationDao's ability to get an LDAP entry from the store
+     * corresponding to an Association without using the entry to build the 
+     * object.
      */
     @Test
     public void testGetEntry() throws Exception
     {
-        Entry entry = dao.getEntry( nonce.getNonce() );
-        assertEquals( entry.get( NonceDao.NONCE_AT ).getString(), nonce.getNonce() );
+        Entry entry = dao.getEntry( association.getHandle() );
+        assertEquals( entry.get( AssociationDao.HANDLE_AT ).getString(), association.getHandle() );
         fail( "Not yet implemented" );
     }
 
 
     /**
-     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#getDn(java.lang.String)}.
+     * Tests the Dao's ability to generate the DN for an association.
      */
     @Test
     public void testGetDn() throws Exception
     {
-        Dn dn = new Dn( NonceDao.NONCE_AT + "=" + nonce.getNonce() + ",ou=nonces, dc=joid, dc=org" );
-        assertEquals( dn, dao.getDn( nonce.getNonce() ) );
+        Dn dn = new Dn( AssociationDao.HANDLE_AT + "=" + association.getHandle() + ",ou=associations, dc=joid, dc=org" );
+        assertEquals( dn, dao.getDn( association.getHandle() ) );
     }
     
     
@@ -379,7 +403,7 @@ public class NonceDaoITest extends AbstractLdapTestUnit
     @Test( expected=OpenIdException.class )
     public void testBadDn() throws Exception
     {
-        new NonceDao( null, "a bad dn" );
+        new AssociationDao( null, "a bad dn" );
     }
     
     
@@ -389,6 +413,6 @@ public class NonceDaoITest extends AbstractLdapTestUnit
     @Test
     public void testWithDn() throws Exception
     {
-        new NonceDao( null, new Dn( "dc=joid,dc=com" ) );
+        new AssociationDao( null, new Dn( "dc=joid,dc=com" ) );
     }
 }

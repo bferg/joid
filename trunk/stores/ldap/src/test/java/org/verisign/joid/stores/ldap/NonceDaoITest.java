@@ -28,6 +28,7 @@ import java.util.Date;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
+import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.directory.ldap.client.api.PoolableLdapConnectionFactory;
 import org.apache.directory.server.annotations.CreateLdapServer;
 import org.apache.directory.server.annotations.CreateTransport;
@@ -49,6 +50,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.verisign.joid.INonce;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.server.Nonce;
@@ -100,6 +103,8 @@ import org.verisign.joid.server.Nonce;
 )
 public class NonceDaoITest extends AbstractLdapTestUnit
 {
+    private static final Logger LOG = LoggerFactory.getLogger( NonceDaoITest.class );
+    
     private static final String BASE_DN = "ou=nonces,dc=joid,dc=org";
     
     private INonce nonce;
@@ -110,11 +115,23 @@ public class NonceDaoITest extends AbstractLdapTestUnit
     @Before
     public void before() throws Exception
     {
+        assertTrue( getLdapServer().isEnabled() );
+        
         LdapConnectionConfig config = new LdapConnectionConfig();
         
+        config.setName( "uid=admin,ou=system" );
         config.setCredentials( "secret" );
         config.setLdapHost( "localhost" );
         config.setLdapPort( getLdapServer().getPort() );
+        
+        LOG.info( "Connection config = {}", config );
+        
+        // Test to see if we can bind to the LDAP server
+        LdapNetworkConnection conn = new LdapNetworkConnection( config );
+        conn.connect();
+        conn.bind();
+        assertTrue( conn.exists( "dc=joid,dc=org" ) );
+        conn.close();
 
         LdapConnectionPool connPool = new LdapConnectionPool( new PoolableLdapConnectionFactory( config ) );
         LdapNetworkConnectionManager connMan = new LdapNetworkConnectionManager( connPool );
@@ -159,6 +176,18 @@ public class NonceDaoITest extends AbstractLdapTestUnit
 
 
     /**
+     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#create(org.verisign.joid.INonce)}.
+     */
+    @Test( expected = OpenIdException.class )
+    public void testDoubleCreate() throws Exception
+    {
+        assertNotNull( ldapServer );
+        dao.create( nonce );
+        dao.create( nonce );
+    }
+
+
+    /**
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#read(java.lang.String)}.
      */
     @Test
@@ -167,6 +196,18 @@ public class NonceDaoITest extends AbstractLdapTestUnit
         testCreate();
         INonce reloaded = dao.read( nonce.getNonce() );
         assertEquals( reloaded.getNonce(), nonce.getNonce() );
+    }
+
+
+    /**
+     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#read(java.lang.String)}.
+     */
+    @Test
+    public void testReadNonexistant() throws Exception
+    {
+        testCreate();
+        INonce reloaded = dao.read( "nonexistant-nonce" );
+        assertNull( "Should return null to show non-existance", reloaded );
     }
 
 
@@ -247,6 +288,22 @@ public class NonceDaoITest extends AbstractLdapTestUnit
         assertNull( dao.read( nonce.getNonce() ) );
     }
 
+    /**
+     * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#delete(java.lang.String)}.
+     */
+    @Test
+    public void testNonexistantDelete() throws Exception
+    {
+        testCreate();
+        
+        INonce deleted = dao.delete( nonce.getNonce() );
+        assertEquals( deleted.getNonce(), nonce.getNonce() );
+        assertNull( dao.read( nonce.getNonce() ) );
+
+        // second attempt to delete should produce an error.
+        assertNull( "Should be null since nothing got deleted", dao.delete( nonce.getNonce() ) );
+    }
+
 
     /**
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#deleteEntry(org.verisign.joid.INonce)}.
@@ -259,8 +316,8 @@ public class NonceDaoITest extends AbstractLdapTestUnit
         dao.deleteEntry( nonce );
         assertNull( dao.read( nonce.getNonce() ) );
     }
-
-
+    
+    
     /**
      * Test method for {@link org.verisign.joid.stores.ldap.NonceDao#toObject(org.apache.directory.shared.ldap.model.entry.Entry)}.
      * 
@@ -320,5 +377,25 @@ public class NonceDaoITest extends AbstractLdapTestUnit
     {
         Dn dn = new Dn( NonceDao.NONCE_AT + "=" + nonce.getNonce() + ",ou=nonces, dc=joid, dc=org" );
         assertEquals( dn, dao.getDn( nonce.getNonce() ) );
+    }
+    
+    
+    /**
+     * Test with a bad DN to the constructor
+     */
+    @Test( expected=OpenIdException.class )
+    public void testBadDn() throws Exception
+    {
+        new NonceDao( null, "a bad dn" );
+    }
+    
+    
+    /**
+     * Test with a Dn object in alternative constructor
+     */
+    @Test
+    public void testWithDn() throws Exception
+    {
+        new NonceDao( null, new Dn( "dc=joid,dc=com" ) );
     }
 }

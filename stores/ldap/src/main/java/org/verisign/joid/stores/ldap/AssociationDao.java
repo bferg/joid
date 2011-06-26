@@ -75,13 +75,36 @@ class AssociationDao implements LdapDao<IAssociation, String>
     /**
      * Creates a new instance of AssociationDao.
      *
-     * @param connPool The LDAP connection manager to use.
+     * @param connMan The LDAP connection manager to use.
      * @param baseDn The baseDn under which association entries are found.
      */
     AssociationDao( LdapConnectionManager connMan, Dn baseDn )
     {
         this.connMan = connMan;
         this.baseDn = baseDn;
+    }
+    
+    
+    /**
+     * Creates a new instance of AssociationDao.
+     *
+     * @param connMan The LDAP connection manager to use.
+     * @param baseDn The baseDn under which association entries are found.
+     */
+    public AssociationDao( LdapConnectionManager connMan, String baseDn ) throws OpenIdException
+    {
+        this.connMan = connMan;
+        
+        try
+        {
+            this.baseDn = new Dn( baseDn );
+        }
+        catch ( LdapInvalidDnException e ) 
+        {
+            String msg = "Invalid dn base argument: " + baseDn;
+            LOG.error( msg, e );
+            throw new OpenIdException( msg, e );
+        }
     }
 
     

@@ -64,8 +64,6 @@ class AssociationDao implements LdapDao<IAssociation, String>
     static final String ISSUED_DATE_AT = "opIssuedDateAt";
 
     static final String LIFETIME_AT = "opLifetimeAt";
-    
-    static final String MODE_AT = "opModeAt";
 
     static final String SECRET_AT = "opSecretAt";
 
@@ -348,7 +346,6 @@ class AssociationDao implements LdapDao<IAssociation, String>
         
         association.setIssuedDate( gt.getCalendar().getTime() );
         association.setLifetime( Long.parseLong( entry.get( LIFETIME_AT ).get().toString() ) );
-        association.setMode( entry.get( MODE_AT ).get().toString() );
         association.setSecret( entry.get( SECRET_AT ).get().toString() );
 
         return association;
@@ -365,7 +362,6 @@ class AssociationDao implements LdapDao<IAssociation, String>
         try
         {
             entry.add( SchemaConstants.OBJECT_CLASS_AT, ASSOCIATION_OC );
-            entry.add( MODE_AT, association.getMode() );
             entry.add( ASSOCIATION_TYPE_AT, association.getAssociationType().toString() );
             entry.add( HANDLE_AT, association.getHandle() );
             entry.add( LIFETIME_AT, Long.toString( association.getLifetime() ) );

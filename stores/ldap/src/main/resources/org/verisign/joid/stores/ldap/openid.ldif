@@ -37,18 +37,6 @@ m-syntax: 1.3.6.1.4.1.1466.115.121.1.24
 m-length: 0
 m-singleValue: TRUE
 
-dn: m-oid=1.3.6.1.4.1.18060.123.4, ou=attributeTypes, cn=openid, ou=schema
-objectclass: metaAttributeType
-objectclass: metaTop
-objectclass: top
-m-oid: 1.3.6.1.4.1.18060.123.4
-m-name: opModeAt
-m-description: OpenID Association mode attribute
-m-equality: caseIgnoreMatch
-m-syntax: 1.3.6.1.4.1.1466.115.121.1.15
-m-length: 0
-m-singleValue: TRUE
-
 dn: m-oid=1.3.6.1.4.1.18060.123.5, ou=attributeTypes, cn=openid, ou=schema
 objectclass: metaAttributeType
 objectclass: metaTop
@@ -170,7 +158,6 @@ m-oid: 1.3.6.1.4.1.18060.123.10
 m-name: opAssociationOc
 m-description: OpenID Association objectclass
 m-supObjectClass: top
-m-must: opModeAt
 m-must: opHandleAt
 m-must: opSecretAt
 m-must: opIssuedDateAt

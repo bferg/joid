@@ -6,7 +6,6 @@ drop table if exists Association, Nonce;
 
 CREATE TABLE Association (
     id int(11) NOT NULL auto_increment,
-    mode varchar(20) default NULL,
     handle varchar(255) default NULL,
     secret varchar(255) default NULL,
     issuedDate datetime default NULL,

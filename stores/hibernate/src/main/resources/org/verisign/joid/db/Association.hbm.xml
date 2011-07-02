@@ -8,7 +8,6 @@
     <id name="id">
       <generator class="native"/>
     </id>
-    <property name="mode" type="string"/>
     <property name="handle" type="string"/>
     <property name="secret" type="string"/>
     <property name="issuedDate" type="timestamp"/>

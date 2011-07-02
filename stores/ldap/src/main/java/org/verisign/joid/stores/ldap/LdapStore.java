@@ -165,7 +165,6 @@ public class LdapStore implements IStore
         }
 
         Association a = new Association();
-        a.setMode( "unused" );
         a.setHandle( Crypto.generateHandle() );
         a.setSessionType( req.getSessionType() );
 

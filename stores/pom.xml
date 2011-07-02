@@ -26,15 +26,23 @@
   <name>JOID Stores Parent</name>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>hibernate</module>
-  </modules>
-
   <profiles>
+    <profile>
+      <id>hibernate</id>
+      <modules>
+        <module>hibernate</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>all</id>
+      <modules>
+        <module>hibernate</module>
+        <module>ldap</module>
+      </modules>
+    </profile>
     <profile>
       <id>apacheds</id>
       <modules>
-        <module>hibernate</module>
         <module>ldap</module>
       </modules>
     </profile>

@@ -38,7 +38,7 @@ public class AssociationResponse extends Response
     private static String OPENID_DH_SERVER_PUBLIC = "dh_server_public";
     private static String OPENID_EXPIRES_IN = "expires_in";
 
-    private String sessionType;
+    private SessionType sessionType;
     private AssociationType associationType;
     private String associationHandle;
     private int expiresIn;
@@ -124,7 +124,7 @@ public class AssociationResponse extends Response
      * Returns the session type in this response.
      * @return the session type in this response.
      */
-    public String getSessionType()
+    public SessionType getSessionType()
     {
         return sessionType;
     }
@@ -150,10 +150,10 @@ public class AssociationResponse extends Response
         else
         {
             if ( !( !isVersion2() // OpenID 1.x
-            && AssociationRequest.NO_ENCRYPTION.equals( sessionType ) ) )
+            && SessionType.NO_ENCRYPTION == sessionType ) )
             {
                 // do not send session type for 1.1 responses if it is no-encryption
-                map.put( AssociationResponse.OPENID_SESSION_TYPE, sessionType );
+                map.put( AssociationResponse.OPENID_SESSION_TYPE, sessionType.toString() );
             }
             map.put( AssociationResponse.OPENID_ASSOCIATION_HANDLE,
                 associationHandle );
@@ -217,11 +217,11 @@ public class AssociationResponse extends Response
 
             if ( AssociationResponse.OPENID_SESSION_TYPE.equals( key ) )
             {
-                sessionType = AssociationRequest.parseSessionType( value );
+                sessionType = SessionType.parse( value );
             }
             else if ( AssociationResponse.OPENID_ASSOCIATION_TYPE.equals( key ) )
             {
-                associationType = AssociationRequest.parseAssociationType( value );
+                associationType = AssociationType.parse( value );
             }
             else if ( OPENID_DH_SERVER_PUBLIC.equals( key ) )
             {

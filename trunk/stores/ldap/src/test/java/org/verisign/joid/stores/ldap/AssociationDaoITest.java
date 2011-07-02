@@ -55,6 +55,7 @@ import org.slf4j.LoggerFactory;
 import org.verisign.joid.AssociationType;
 import org.verisign.joid.IAssociation;
 import org.verisign.joid.OpenIdException;
+import org.verisign.joid.SessionType;
 import org.verisign.joid.server.Association;
 
 
@@ -165,7 +166,7 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
         association.setMacKey( RandomStringUtils.randomAlphanumeric( 16 ).getBytes() );
         association.setSecret( "secret" );
         association.setPublicDhKey( new BigInteger( "1895327263942918" ) );
-        association.setSessionType( "DH-SHA1" );
+        association.setSessionType( SessionType.DH_SHA1 );
         association.setHandle( RandomStringUtils.randomAlphanumeric( 16 ) );
         
         return association;

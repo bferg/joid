@@ -26,7 +26,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.apache.tsik.datatypes.Base64;
 import org.apache.tsik.uuid.UUID;
-import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.Crypto;
 
 
@@ -163,15 +162,15 @@ public class Crypto
     public byte[] generateRandom( String s )
     {
         int len = 0;
-        if ( AssociationRequest.DH_SHA1.equals( s ) )
+        if ( SessionType.DH_SHA1.toString().equals( s ) )
         {
             len = 20;
         }
-        else if ( AssociationRequest.DH_SHA256.equals( s ) )
+        else if ( SessionType.DH_SHA256.toString().equals( s ) )
         {
             len = 32;
         }
-        else if ( AssociationRequest.NO_ENCRYPTION.equals( s ) )
+        else if ( SessionType.NO_ENCRYPTION.toString().equals( s ) )
         {
             len = 0;
         }

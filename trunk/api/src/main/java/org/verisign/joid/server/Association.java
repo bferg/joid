@@ -3,9 +3,9 @@ package org.verisign.joid.server;
 
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
-import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.AssociationType;
 import org.verisign.joid.Crypto;
+import org.verisign.joid.SessionType;
 
 import java.util.Date;
 import java.util.Calendar;
@@ -32,7 +32,7 @@ public class Association implements org.verisign.joid.IAssociation
 
     // Not in db
     private String error;
-    private String sessionType;
+    private SessionType sessionType;
     private byte[] encryptedMacKey;
     private BigInteger publicKey;
 
@@ -45,8 +45,7 @@ public class Association implements org.verisign.joid.IAssociation
 
     public boolean isEncrypted()
     {
-        return ( ( AssociationRequest.DH_SHA1.equals( sessionType ) ) || ( AssociationRequest.DH_SHA256
-            .equals( sessionType ) ) );
+        return SessionType.DH_SHA1 == sessionType || SessionType.DH_SHA256 == sessionType;
     }
 
 
@@ -186,13 +185,13 @@ public class Association implements org.verisign.joid.IAssociation
     }
 
 
-    public void setSessionType( String sessionType )
+    public void setSessionType( SessionType sessionType )
     {
         this.sessionType = sessionType;
     }
 
 
-    public String getSessionType()
+    public SessionType getSessionType()
     {
         return sessionType;
     }

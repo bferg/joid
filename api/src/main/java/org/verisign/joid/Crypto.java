@@ -175,11 +175,11 @@ public class Crypto
         {
             len = 0;
         }
-        else if ( AssociationRequest.HMAC_SHA1.equals( s ) )
+        else if ( AssociationType.HMAC_SHA1.toString().equals( s ) )
         {
             len = 20;
         }
-        else if ( AssociationRequest.HMAC_SHA256.equals( s ) )
+        else if ( AssociationType.HMAC_SHA256.toString().equals( s ) )
         {
             len = 32;
         }

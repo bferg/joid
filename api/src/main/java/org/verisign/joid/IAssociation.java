@@ -48,6 +48,10 @@ public interface IAssociation
      * @return error code as a string, null if no error string.
      */
     public String getErrorCode();
+    
+    public String getSecret();
+    
+    public void setSecret( String secret );
 
 
     /**
@@ -98,7 +102,7 @@ public interface IAssociation
      *
      * @return the association type.
      */
-    public String getAssociationType();
+    public AssociationType getAssociationType();
 
 
     /**
@@ -106,7 +110,7 @@ public interface IAssociation
      *
      * @param s the association type.
      */
-    public void setAssociationType( String s );
+    public void setAssociationType( AssociationType at );
 
 
     /**
@@ -157,6 +161,12 @@ public interface IAssociation
     public boolean isEncrypted();
 
 
+    public void setMode( String mode );
+    
+    
+    public String getMode();
+    
+    
     /**
      * Sets the encrypted MAC key for this association.
      *

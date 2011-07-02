@@ -39,7 +39,7 @@ public class AssociationResponse extends Response
     private static String OPENID_EXPIRES_IN = "expires_in";
 
     private String sessionType;
-    private String associationType;
+    private AssociationType associationType;
     private String associationHandle;
     private int expiresIn;
     private byte[] macKey;
@@ -114,7 +114,7 @@ public class AssociationResponse extends Response
      * Returns the association type in this response.
      * @return the association type in this response.
      */
-    public String getAssociationType()
+    public AssociationType getAssociationType()
     {
         return associationType;
     }
@@ -158,7 +158,7 @@ public class AssociationResponse extends Response
             map.put( AssociationResponse.OPENID_ASSOCIATION_HANDLE,
                 associationHandle );
             map.put( AssociationResponse.OPENID_ASSOCIATION_TYPE,
-                associationType );
+                associationType.toString() );
             map.put( AssociationResponse.OPENID_EXPIRES_IN, "" + expiresIn );
             if ( macKey != null )
             {

@@ -186,7 +186,7 @@ public class AllTests extends TestCase
         AssociationResponse ar = ( AssociationResponse ) resp2;
 
         assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
-        assertTrue( "HMAC-SHA1".equals( ar.getAssociationType() ) );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getMacKey() );
         assertTrue( null != ar.getEncryptedMacKey() );
@@ -222,7 +222,7 @@ public class AllTests extends TestCase
         AssociationResponse ar = ( AssociationResponse ) resp2;
 
         assertTrue( null == ar.getSessionType() );
-        assertTrue( "HMAC-SHA1".equals( ar.getAssociationType() ) );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null != ar.getMacKey() );
         assertTrue( null == ar.getEncryptedMacKey() );
@@ -338,7 +338,7 @@ public class AllTests extends TestCase
         assertFalse( ar.isVersion2() );
 
         assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
-        assertTrue( "HMAC-SHA1".equals( ar.getAssociationType() ) );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
         assertTrue( null == ar.getMacKey() );
@@ -376,7 +376,7 @@ public class AllTests extends TestCase
         String signature = authr.getSignature();
         assertTrue( signature != null );
 
-        String reSigned = authr.sign( "HMAC-SHA1", clearKey, sigList );
+        String reSigned = authr.sign( AssociationType.HMAC_SHA1, clearKey, sigList );
         assertEquals( reSigned, signature );
 
         // check that we can authenticate the signature
@@ -400,7 +400,7 @@ public class AllTests extends TestCase
         assertFalse( ar.isVersion2() );
 
         assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
-        assertTrue( "HMAC-SHA1".equals( ar.getAssociationType() ) );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
         assertTrue( null == ar.getMacKey() );
@@ -437,7 +437,7 @@ public class AllTests extends TestCase
         String signature = authr.getSignature();
         assertTrue( signature != null );
 
-        String reSigned = authr.sign( "HMAC-SHA1", clearKey, sigList );
+        String reSigned = authr.sign( AssociationType.HMAC_SHA1, clearKey, sigList );
         assertEquals( reSigned, signature );
 
         // check that the wrong signature doesn't authenticate
@@ -460,7 +460,7 @@ public class AllTests extends TestCase
         AssociationResponse ar = associate( dh );
 
         assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
-        assertTrue( "HMAC-SHA1".equals( ar.getAssociationType() ) );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
         assertTrue( null == ar.getMacKey() );
@@ -509,7 +509,7 @@ public class AllTests extends TestCase
         String signature = authr.getSignature();
         assertTrue( signature != null );
 
-        String reSigned = authr.sign( "HMAC-SHA1", clearKey, sigList );
+        String reSigned = authr.sign( AssociationType.HMAC_SHA1, clearKey, sigList );
         assertEquals( reSigned, signature );
 
         // check that we can authenticate the signaure
@@ -556,7 +556,7 @@ public class AllTests extends TestCase
         AssociationResponse ar = ( AssociationResponse ) resp2;
 
         assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
-        assertTrue( "HMAC-SHA1".equals( ar.getAssociationType() ) );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getMacKey() );
         assertTrue( null != ar.getEncryptedMacKey() );
@@ -572,7 +572,7 @@ public class AllTests extends TestCase
         AssociationResponse ar = associate( dh );
 
         assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
-        assertTrue( "HMAC-SHA1".equals( ar.getAssociationType() ) );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
         assertTrue( null == ar.getMacKey() );
@@ -616,7 +616,7 @@ public class AllTests extends TestCase
         String namespace = authr.getNamespace();
         assertTrue( v2.equals( namespace ) );
 
-        String reSigned = authr.sign( "HMAC-SHA1", clearKey, sigList );
+        String reSigned = authr.sign( AssociationType.HMAC_SHA1, clearKey, sigList );
         assertEquals( reSigned, signature );
 
         // check that we can authenticate the signature
@@ -638,7 +638,7 @@ public class AllTests extends TestCase
         AssociationResponse ar = associate( dh );
 
         assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
-        assertTrue( "HMAC-SHA1".equals( ar.getAssociationType() ) );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
         assertTrue( null == ar.getMacKey() );
@@ -683,7 +683,7 @@ public class AllTests extends TestCase
         String namespace = authr.getNamespace();
         assertTrue( v2.equals( namespace ) );
 
-        String reSigned = authr.sign( "HMAC-SHA1", clearKey, sigList );
+        String reSigned = authr.sign( AssociationType.HMAC_SHA1, clearKey, sigList );
         assertEquals( reSigned, signature );
 
         // Check that the wrong signature doesn't authenticate
@@ -706,7 +706,7 @@ public class AllTests extends TestCase
         AssociationResponse ar = associate( dh );
 
         assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
-        assertTrue( "HMAC-SHA1".equals( ar.getAssociationType() ) );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
         assertTrue( null == ar.getMacKey() );
@@ -750,10 +750,10 @@ public class AllTests extends TestCase
         String namespace = authr.getNamespace();
         assertTrue( v2.equals( namespace ) );
 
-        String reSigned = authr.sign( "HMAC-SHA1", clearKey, sigList );
+        String reSigned = authr.sign( AssociationType.HMAC_SHA1, clearKey, sigList );
         assertEquals( reSigned, signature );
 
-        // check that we can authenticate the signaure
+        // check that we can authenticate the signature
         //
         Map<String,String> map = authr.toMap();
         CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );

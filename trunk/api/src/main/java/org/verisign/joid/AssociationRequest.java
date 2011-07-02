@@ -27,7 +27,7 @@ import java.util.Set;
 public class AssociationRequest extends Request
 {
     private String sessionType;
-    private String associationType;
+    private AssociationType associationType;
     private BigInteger dhModulus;
     private BigInteger dhGenerator;
     private BigInteger dhConsumerPublic;
@@ -46,13 +46,6 @@ public class AssociationRequest extends Request
 
     /** <code>DH-SHA256</code> as per the specification. */
     public static String DH_SHA256 = "DH-SHA256";
-
-    /** <code>HMAC-SHA1</code> as per the specification. */
-    public static String HMAC_SHA1 = "HMAC-SHA1";
-
-    /** <code>HMAC-SHA256</code> as per the specification. */
-    public static String HMAC_SHA256 = "HMAC-SHA256";
-
 
     /**
      * Returns a ref to the static strings for subsequent
@@ -87,7 +80,7 @@ public class AssociationRequest extends Request
 
         map.put( AssociationRequest.OPENID_SESSION_TYPE, sessionType );
         map.put( AssociationRequest.OPENID_ASSOCIATION_TYPE,
-            associationType );
+            associationType.toString() );
         map.put( AssociationRequest.OPENID_DH_CONSUMER_PUBLIC,
             Crypto.convertToString( dhConsumerPublic ) );
 
@@ -99,16 +92,18 @@ public class AssociationRequest extends Request
      * Returns a ref to the static strings for subsequent
      * reference equality check (that is, no 
      * <code>.equals()</code> needed)
+     * 
+     * @TODO this should just be return the AssociationType not a string
      */
-    static String parseAssociationType( String s )
+    static AssociationType parseAssociationType( String s )
     {
-        if ( HMAC_SHA1.equals( s ) )
+        if ( AssociationType.HMAC_SHA1.getName().equals( s ) )
         {
-            return HMAC_SHA1;
+            return AssociationType.HMAC_SHA1;
         }
-        else if ( HMAC_SHA256.equals( s ) )
+        else if ( AssociationType.HMAC_SHA256.getName().equals( s ) )
         {
-            return HMAC_SHA256;
+            return AssociationType.HMAC_SHA256;
         }
         else
         {
@@ -151,7 +146,7 @@ public class AssociationRequest extends Request
             BigInteger pubKey = crypto.getPublicKey();
             Map<String,String> map = new HashMap<String,String>();
             map.put( "openid.mode", "associate" );
-            map.put( OPENID_ASSOCIATION_TYPE, HMAC_SHA1 );
+            map.put( OPENID_ASSOCIATION_TYPE, AssociationType.HMAC_SHA1.toString() );
             map.put( OPENID_SESSION_TYPE, DH_SHA1 );
             map.put( OPENID_NS, OPENID_20_NAMESPACE );
             map.put( OPENID_DH_CONSUMER_PUBLIC, Crypto.convertToString( pubKey ) );
@@ -168,7 +163,7 @@ public class AssociationRequest extends Request
     {
         super( map, mode );
         this.sessionType = NO_ENCRYPTION; //default value
-        this.associationType = HMAC_SHA1; //default value
+        this.associationType = AssociationType.HMAC_SHA1; //default value
 
         this.dhModulus = DiffieHellman.DEFAULT_MODULUS;
         this.dhGenerator = DiffieHellman.DEFAULT_GENERATOR;
@@ -232,10 +227,10 @@ public class AssociationRequest extends Request
         }
 
         if ( ( ( sessionType.equals( AssociationRequest.DH_SHA1 ) ) &&
-            ( !associationType.equals( AssociationRequest.HMAC_SHA1 ) ) )
+            ( !associationType.equals( AssociationType.HMAC_SHA1 ) ) )
             ||
             ( ( sessionType.equals( AssociationRequest.DH_SHA256 ) ) &&
-            ( !associationType.equals( AssociationRequest.HMAC_SHA256 ) ) ) )
+            ( !associationType.equals( AssociationType.HMAC_SHA256 ) ) ) )
         {
             throw new OpenIdException( "Mismatch " + OPENID_SESSION_TYPE
                       + " and " + OPENID_ASSOCIATION_TYPE );
@@ -311,7 +306,7 @@ public class AssociationRequest extends Request
      *
      * @return the association type.
      */
-    public String getAssociationType()
+    public AssociationType getAssociationType()
     {
         return this.associationType;
     }

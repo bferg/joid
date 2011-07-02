@@ -4,6 +4,7 @@ package org.verisign.joid.server;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.verisign.joid.AssociationRequest;
+import org.verisign.joid.AssociationType;
 import org.verisign.joid.Crypto;
 
 import java.util.Date;
@@ -22,12 +23,12 @@ public class Association implements org.verisign.joid.IAssociation
 
     private final static Log log = LogFactory.getLog( Association.class );
     private Long id;
-    private String mode;
+    private String mode = "DH-SHA1";
     private String handle;
     private String secret;
     private Date issuedDate;
     private Long lifetime;
-    private String associationType;
+    private AssociationType at = AssociationType.HMAC_SHA1;
 
     // Not in db
     private String error;
@@ -140,15 +141,15 @@ public class Association implements org.verisign.joid.IAssociation
     }
 
 
-    public String getAssociationType()
+    public AssociationType getAssociationType()
     {
-        return associationType;
+        return at;
     }
 
 
-    public void setAssociationType( String s )
+    public void setAssociationType( AssociationType s )
     {
-        this.associationType = s;
+        this.at = s;
     }
 
 
@@ -168,7 +169,7 @@ public class Association implements org.verisign.joid.IAssociation
         {
             s += ", public key=" + Crypto.convertToString( publicKey );
         }
-        s += ", type=" + associationType + ", issuedDate=" + issuedDate + "]";
+        s += ", type=" + at + ", issuedDate=" + issuedDate + "]";
         return s;
     }
 

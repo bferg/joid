@@ -58,7 +58,7 @@ public class AuthenticationResponse extends Response
     private String invalidateHandle;
     private String associationHandle;
     private String signed;
-    private String algo;
+    private AssociationType algo;
     private String signature;
     private SimpleRegistration sreg;
     private String urlEndPoint;
@@ -236,7 +236,7 @@ public class AuthenticationResponse extends Response
      * @throws OpenIdException at signature errors, or if the signed list 
      * points to elements that are not mapped.
      */
-    public String sign( String algorithm, byte[] key, String signed ) throws OpenIdException
+    public String sign( AssociationType algorithm, byte[] key, String signed ) throws OpenIdException
     {
         Map<String,String> map = toMap();
         log.debug( "in sign() map=" + map );
@@ -263,13 +263,13 @@ public class AuthenticationResponse extends Response
             byte[] b;
             if ( algorithm == null )
             {
-                algorithm = AssociationRequest.HMAC_SHA1;
+                algorithm = AssociationType.HMAC_SHA1;
             }
-            if ( algorithm.equals( AssociationRequest.HMAC_SHA1 ) )
+            if ( algorithm.equals( AssociationType.HMAC_SHA1 ) )
             {
                 b = Crypto.hmacSha1( key, sb.toString().getBytes( "UTF-8" ) );
             }
-            else if ( algorithm.equals( AssociationRequest.HMAC_SHA256 ) )
+            else if ( algorithm.equals( AssociationType.HMAC_SHA256 ) )
             {
                 b = Crypto.hmacSha256( key, sb.toString().getBytes( "UTF-8" ) );
             }
@@ -524,7 +524,7 @@ public class AuthenticationResponse extends Response
     }
 
 
-    public String getAlgo()
+    public AssociationType getAlgo()
     {
         return algo;
     }

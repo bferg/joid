@@ -44,30 +44,10 @@ public class AssociationRequest extends Request
         Map<String,String> map = super.toMap();
 
         map.put( AssociationRequest.OPENID_SESSION_TYPE, sessionType.toString() );
-        map.put( AssociationRequest.OPENID_ASSOCIATION_TYPE,
-            associationType.toString() );
-        map.put( AssociationRequest.OPENID_DH_CONSUMER_PUBLIC,
-            Crypto.convertToString( dhConsumerPublic ) );
+        map.put( AssociationRequest.OPENID_ASSOCIATION_TYPE, associationType.toString() );
+        map.put( AssociationRequest.OPENID_DH_CONSUMER_PUBLIC, Crypto.convertToString( dhConsumerPublic ) );
 
         return map;
-    }
-
-
-    private static BigInteger parseDhModulus( String s )
-    {
-        return Crypto.convertToBigIntegerFromString( s );
-    }
-
-
-    private static BigInteger parseDhGenerator( String s )
-    {
-        return Crypto.convertToBigIntegerFromString( s );
-    }
-
-
-    private static BigInteger parseDhConsumerPublic( String s )
-    {
-        return Crypto.convertToBigIntegerFromString( s );
     }
 
 
@@ -126,15 +106,15 @@ public class AssociationRequest extends Request
             }
             else if ( OPENID_DH_MODULUS.equals( key ) )
             {
-                this.dhModulus = AssociationRequest.parseDhModulus( value );
+                this.dhModulus = Crypto.convertToBigIntegerFromString( value );
             }
             else if ( OPENID_DH_GENERATOR.equals( key ) )
             {
-                this.dhGenerator = AssociationRequest.parseDhGenerator( value );
+                this.dhGenerator = Crypto.convertToBigIntegerFromString( value );
             }
             else if ( OPENID_DH_CONSUMER_PUBLIC.equals( key ) )
             {
-                this.dhConsumerPublic = AssociationRequest.parseDhConsumerPublic( value );
+                this.dhConsumerPublic = Crypto.convertToBigIntegerFromString( value );
             }
         }
         checkInvariants();

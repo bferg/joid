@@ -41,7 +41,7 @@
       </modules>
     </profile>
     <profile>
-      <id>apacheds</id>
+      <id>ldap</id>
       <modules>
         <module>ldap</module>
       </modules>

@@ -15,6 +15,7 @@ package org.verisign.joid;
 
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,13 +37,15 @@ public abstract class Message
 
     static
     {
-        // from section 12 in spec
-        OPENID_RESERVED_WORDS = new HashSet<String>( Arrays.asList( new String[]
+        // from section 12 in specification
+        
+        OPENID_RESERVED_WORDS = Collections.unmodifiableSet( 
+            new HashSet<String>( Arrays.asList( new String[]
             { "assoc_handle", "assoc_type", "claimed_id", "contact", "delegate",
                 "dh_consumer_public", "dh_gen", "dh_modulus", "error", "identity",
                 "invalidate_handle", "mode", "ns", "op_endpoint", "openid", "realm",
                 "reference", "response_nonce", "return_to", "server", "session_type",
-                "sig", "signed", "trust_root" } ) );
+                "sig", "signed", "trust_root" } ) ) );
     }
 
 

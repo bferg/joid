@@ -55,7 +55,7 @@ public class CheckAuthenticationResponse extends Response
 
             if ( OPENID_MODE.equals( key ) )
             {
-                mode = value;
+                mode = Mode.parse( value );
             }
             else if ( OPENID_IS_VALID.equals( key ) )
             {

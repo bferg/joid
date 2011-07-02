@@ -86,12 +86,12 @@ public class AssociationRequest extends Request
         {
             BigInteger pubKey = crypto.getPublicKey();
             Map<String,String> map = new HashMap<String,String>();
-            map.put( "openid.mode", "associate" );
+            map.put( "openid.mode", Mode.ASSOCIATE.toString() );
             map.put( OPENID_ASSOCIATION_TYPE, AssociationType.HMAC_SHA1.toString() );
             map.put( OPENID_SESSION_TYPE, SessionType.DH_SHA1.toString() );
             map.put( OPENID_NS, OPENID_20_NAMESPACE );
             map.put( OPENID_DH_CONSUMER_PUBLIC, Crypto.convertToString( pubKey ) );
-            return new AssociationRequest( map, "associate" );
+            return new AssociationRequest( map, Mode.ASSOCIATE );
         }
         catch ( OpenIdException e )
         {
@@ -100,7 +100,7 @@ public class AssociationRequest extends Request
     }
 
 
-    AssociationRequest( Map<String,String> map, String mode ) throws OpenIdException
+    AssociationRequest( Map<String,String> map, Mode mode ) throws OpenIdException
     {
         super( map, mode );
         this.sessionType = SessionType.NO_ENCRYPTION; //default value

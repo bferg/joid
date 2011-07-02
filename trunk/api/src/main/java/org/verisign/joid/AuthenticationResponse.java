@@ -114,7 +114,7 @@ public class AuthenticationResponse extends Response
         {
             map.put( AuthenticationResponse.OPENID_OP_ENDPOINT, urlEndPoint );
         }
-        map.put( AuthenticationResponse.OPENID_MODE, mode );
+        map.put( AuthenticationResponse.OPENID_MODE, mode.getValue() );
         map.put( AuthenticationResponse.OPENID_IDENTITY, identity );
         map.put( AuthenticationResponse.OPENID_RETURN_TO, returnTo );
         map.put( AuthenticationResponse.OPENID_NONCE, nonce );
@@ -304,7 +304,7 @@ public class AuthenticationResponse extends Response
         throws OpenIdException
     {
         super( null );
-        mode = "id_res";
+        mode = Mode.ID_RES;
         claimed_id = ar.getClaimedIdentity();
         identity = ar.getIdentity();
         returnTo = ar.getReturnTo();
@@ -360,7 +360,7 @@ public class AuthenticationResponse extends Response
 
             if ( AuthenticationResponse.OPENID_MODE.equals( key ) )
             {
-                mode = value;
+                mode = Mode.parse( value );
             }
             else if ( AuthenticationResponse.OPENID_IDENTITY.equals( key ) )
             {

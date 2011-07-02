@@ -41,7 +41,7 @@ public class CheckAuthenticationRequest extends Request
      * @param map the map of incoming openid parameters
      * @param mode always "check_authentication"
      */
-    public CheckAuthenticationRequest( Map<String,String> map, String mode ) throws OpenIdException
+    public CheckAuthenticationRequest( Map<String,String> map, Mode mode ) throws OpenIdException
     {
         super( map, mode );
         ar = new AuthenticationResponse( map );

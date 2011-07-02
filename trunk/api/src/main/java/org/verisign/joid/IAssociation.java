@@ -154,7 +154,7 @@ public interface IAssociation
 
 
     /**
-     * Returns whether the assocation negotiates an encrypted secret.
+     * Returns whether the association negotiates an encrypted secret.
      *
      * @return true if the secret is encrypted; false otherwise.
      */

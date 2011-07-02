@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public abstract class Request extends Message
 {
-    Request( Map<String,String> map, String mode )
+    Request( Map<String,String> map, Mode mode )
     {
         this.mode = mode;
 

@@ -212,7 +212,7 @@ public class JoidConsumer
         {
             // then we have to send a authentication_request (dumb mode) to verify the signature
             CheckAuthenticationRequest checkReq =
-                    new CheckAuthenticationRequest( response.toMap(), RequestFactory.CHECK_AUTHENTICATION_MODE );
+                    new CheckAuthenticationRequest( response.toMap(), Mode.CHECK_AUTHENTICATION );
             props = getPropsByHandle( response.getInvalidateHandle() );
             CheckAuthenticationResponse response2 = ( CheckAuthenticationResponse )
                     Util.send( checkReq, props.getProperty( "idServer" ) );

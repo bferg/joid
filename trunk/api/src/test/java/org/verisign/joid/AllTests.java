@@ -382,7 +382,7 @@ public class AllTests extends TestCase
         // check that we can authenticate the signature
         //
         Map<String,String> map = authr.toMap();
-        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
+        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, Mode.CHECK_AUTHENTICATION );
         assertFalse( carq.isVersion2() );
 
         resp = carq.processUsing( serverInfo );
@@ -444,7 +444,7 @@ public class AllTests extends TestCase
         //
         Map<String, String> map = authr.toMap();
         map.put( "openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=" );
-        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
+        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, Mode.CHECK_AUTHENTICATION );
 
         resp = carq.processUsing( serverInfo );
         assertFalse( resp.isVersion2() );
@@ -515,7 +515,7 @@ public class AllTests extends TestCase
         // check that we can authenticate the signaure
         //
         Map<String,String> map = authr.toMap();
-        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
+        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, Mode.CHECK_AUTHENTICATION );
 
         // Check for sreg namespace
         if ( resp.isVersion2() )
@@ -622,7 +622,7 @@ public class AllTests extends TestCase
         // check that we can authenticate the signature
         //
         Map<String,String> map = authr.toMap();
-        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
+        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, Mode.CHECK_AUTHENTICATION );
 
         resp = carq.processUsing( serverInfo );
         assertTrue( resp.isVersion2() );
@@ -690,7 +690,7 @@ public class AllTests extends TestCase
         //
         Map<String,String> map = authr.toMap();
         map.put( "openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=" );
-        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
+        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, Mode.CHECK_AUTHENTICATION );
         assertTrue( carq.isVersion2() );
 
         resp = carq.processUsing( serverInfo );
@@ -756,7 +756,7 @@ public class AllTests extends TestCase
         // check that we can authenticate the signature
         //
         Map<String,String> map = authr.toMap();
-        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, "check_authentication" );
+        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, Mode.CHECK_AUTHENTICATION );
 
         resp = carq.processUsing( serverInfo );
         assertTrue( resp.isVersion2() );
@@ -1178,7 +1178,7 @@ public class AllTests extends TestCase
             assertTrue( resp instanceof AuthenticationResponse );
             AuthenticationResponse aresp = ( AuthenticationResponse ) resp;
             // Build the check authentication request from the auth response
-            CheckAuthenticationRequest carq = new CheckAuthenticationRequest( aresp.toMap(), "check_authentication" );
+            CheckAuthenticationRequest carq = new CheckAuthenticationRequest( aresp.toMap(), Mode.CHECK_AUTHENTICATION );
             assertFalse( carq.isVersion2() );
             // Now get the check authentication response
             resp = carq.processUsing( serverInfo );
@@ -1227,7 +1227,7 @@ public class AllTests extends TestCase
             assertTrue( resp instanceof AuthenticationResponse );
             AuthenticationResponse aresp = ( AuthenticationResponse ) resp;
             // Build the check authentication request from the auth response
-            CheckAuthenticationRequest carq = new CheckAuthenticationRequest( aresp.toMap(), "check_authentication" );
+            CheckAuthenticationRequest carq = new CheckAuthenticationRequest( aresp.toMap(), Mode.CHECK_AUTHENTICATION );
             assertTrue( carq.isVersion2() );
             // Now get the check authentication response
             resp = carq.processUsing( serverInfo );
@@ -1686,7 +1686,7 @@ public class AllTests extends TestCase
         testMap.put( AuthenticationResponse.OPENID_NONCE, "42" );
         testMap.put( AuthenticationResponse.OPENID_SIG, "siggy" );
 
-        CheckAuthenticationRequest testMessage = new CheckAuthenticationRequest( testMap, "check_authentication" );
+        CheckAuthenticationRequest testMessage = new CheckAuthenticationRequest( testMap, Mode.CHECK_AUTHENTICATION );
         String urlStr = testMessage.toUrlString();
         @SuppressWarnings("unused")
         String compareStr = "openid.assoc_handle=adfasdf&openid.identity=http%3A%2F%2Ffoo&openid.return_to=http%3A%2F%2Fbar&openid.sig=siggy&openid.mode=check_authentication&openid.response_nonce=42";
@@ -1711,7 +1711,7 @@ public class AllTests extends TestCase
         boolean caught = false;
         try
         {
-            CheckAuthenticationRequest testMessage = new CheckAuthenticationRequest( testMap, "check_authentication" );
+            CheckAuthenticationRequest testMessage = new CheckAuthenticationRequest( testMap, Mode.CHECK_AUTHENTICATION );
             @SuppressWarnings("unused")
             String urlStr = testMessage.toUrlString();
         }
@@ -1760,7 +1760,7 @@ public class AllTests extends TestCase
         String nonce = authResp.getNonce();
 
         // and check the response
-        CheckAuthenticationRequest checkReq = new CheckAuthenticationRequest( authResp.toMap(), "check_authentication" );
+        CheckAuthenticationRequest checkReq = new CheckAuthenticationRequest( authResp.toMap(), Mode.CHECK_AUTHENTICATION );
         resp = checkReq.processUsing( serverInfo );
 
         // do it again, using same assoc handle
@@ -1775,7 +1775,7 @@ public class AllTests extends TestCase
         // and check the 2nd response
         // since we didn't get the same nonce in the 2nd response we
         // shouldn't receive an exception claiming this is the case
-        checkReq = new CheckAuthenticationRequest( authResp.toMap(), "check_authentication" );
+        checkReq = new CheckAuthenticationRequest( authResp.toMap(), Mode.CHECK_AUTHENTICATION );
         resp = checkReq.processUsing( serverInfo );
     }
 
@@ -1818,7 +1818,7 @@ public class AllTests extends TestCase
         String nonce = authResp.getNonce();
 
         // and check the response
-        CheckAuthenticationRequest checkReq = new CheckAuthenticationRequest( authResp.toMap(), "check_authentication" );
+        CheckAuthenticationRequest checkReq = new CheckAuthenticationRequest( authResp.toMap(), Mode.CHECK_AUTHENTICATION );
         @SuppressWarnings("unused")
         Response newResp = checkReq.processUsing( serverInfo );
 
@@ -1827,7 +1827,7 @@ public class AllTests extends TestCase
         boolean caught = false;
         try
         {
-            checkReq = new CheckAuthenticationRequest( authResp.toMap(), "check_authentication" );
+            checkReq = new CheckAuthenticationRequest( authResp.toMap(), Mode.CHECK_AUTHENTICATION );
             newResp = checkReq.processUsing( serverInfo );
         }
         catch ( OpenIdException e )

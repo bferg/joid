@@ -345,7 +345,12 @@ public class NonceDaoITest extends AbstractLdapTestUnit
     @Test
     public void testToEntry() throws Exception
     {
-        fail( "Not yet implemented" );
+        Entry entry = dao.toEntry( nonce );
+        assertEquals( entry.get( NonceDao.NONCE_AT ).getString(), nonce.getNonce() );
+        
+        String checkedDate = entry.get( NonceDao.CHECKED_DATE_AT ).getString();
+        GeneralizedTime gt = new GeneralizedTime( checkedDate );
+        assertEquals( gt.getCalendar().getTime(), nonce.getCheckedDate() );
     }
 
 
@@ -356,9 +361,13 @@ public class NonceDaoITest extends AbstractLdapTestUnit
     @Test
     public void testGetEntry() throws Exception
     {
+        testCreate();
         Entry entry = dao.getEntry( nonce.getNonce() );
         assertEquals( entry.get( NonceDao.NONCE_AT ).getString(), nonce.getNonce() );
-        fail( "Not yet implemented" );
+        
+        String checkedDate = entry.get( NonceDao.CHECKED_DATE_AT ).getString();
+        GeneralizedTime gt = new GeneralizedTime( checkedDate );
+        assertEquals( gt.getCalendar().getTime(), nonce.getCheckedDate() );
     }
 
 

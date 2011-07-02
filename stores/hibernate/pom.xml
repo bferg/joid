@@ -53,7 +53,18 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-annotations</artifactId>
+    </dependency>
       
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>jta</artifactId>
+      <scope>test</scope>
+    </dependency>
+
     <dependency>
       <groupId>hsqldb</groupId>
       <artifactId>hsqldb</artifactId>

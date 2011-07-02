@@ -34,10 +34,10 @@ import org.apache.directory.shared.ldap.model.entry.Modification;
 import org.apache.directory.shared.ldap.model.exception.LdapException;
 import org.apache.directory.shared.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.shared.ldap.model.exception.LdapNoSuchObjectException;
-import org.apache.directory.shared.ldap.model.message.SearchResultEntry;
 import org.apache.directory.shared.ldap.model.message.SearchScope;
 import org.apache.directory.shared.ldap.model.name.Dn;
 import org.apache.directory.shared.util.GeneralizedTime;
+import org.verisign.joid.AssociationType;
 import org.verisign.joid.IAssociation;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.OpenIdRuntimeException;
@@ -242,21 +242,28 @@ class AssociationDao implements LdapDao<IAssociation, String>
     public IAssociation read( String handle ) throws OpenIdException
     {
         LdapConnection conn = connMan.acquireConnection();
-        StringBuilder sb = new StringBuilder( '(' );
+        StringBuilder sb = new StringBuilder( "(" );
         sb.append( HANDLE_AT );
         sb.append( '=' ).append( handle ).append( ')' );
 
         try
         {
             EntryCursor cursor = conn.search( baseDn, sb.toString(), SearchScope.ONELEVEL, "*" );
-            SearchResultEntry response = ( SearchResultEntry ) cursor.get();
-
-            if ( cursor.next() == true )
+            Entry response = null;
+            
+            if ( cursor.next() )
             {
-                throw new OpenIdException( "Did not expect to get more than one association back." );
+                response = ( Entry ) cursor.get();
+
+                if ( cursor.next() == true )
+                {
+                    throw new OpenIdException( "Did not expect to get more than one association back." );
+                }
+
+                return toObject( response );
             }
 
-            return toObject( response.getEntry() );
+            return null;
         }
         catch ( Exception e )
         {
@@ -322,7 +329,8 @@ class AssociationDao implements LdapDao<IAssociation, String>
     public IAssociation toObject( Entry entry ) throws OpenIdException
     {
         Association association = new Association();
-        association.setAssociationType( entry.get( ASSOCIATION_TYPE_AT ).get().toString() );
+        association.setAssociationType( AssociationType.parse( 
+            entry.get( ASSOCIATION_TYPE_AT ).get().toString() ) );
         association.setHandle( entry.get( HANDLE_AT ).get().toString() );
 
         GeneralizedTime gt = null;
@@ -353,14 +361,15 @@ class AssociationDao implements LdapDao<IAssociation, String>
     public Entry toEntry( IAssociation association ) throws OpenIdException
     {
         Entry entry = new DefaultEntry( getDn( association.getHandle() ) );
-       
+        
         try
         {
             entry.add( SchemaConstants.OBJECT_CLASS_AT, ASSOCIATION_OC );
-            entry.add( ASSOCIATION_TYPE_AT, association.getAssociationType() );
+            entry.add( MODE_AT, association.getMode() );
+            entry.add( ASSOCIATION_TYPE_AT, association.getAssociationType().toString() );
             entry.add( HANDLE_AT, association.getHandle() );
             entry.add( LIFETIME_AT, Long.toString( association.getLifetime() ) );
-            entry.add( SECRET_AT, association.getMacKey() );
+            entry.add( SECRET_AT, association.getSecret() );
             
             Calendar calendar = Calendar.getInstance();
             calendar.setTime( association.getIssuedDate() );

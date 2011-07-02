@@ -1,6 +1,7 @@
 package org.verisign.joid.examples.consumer;
 
 
+import org.verisign.joid.AssociationType;
 import org.verisign.joid.AuthenticationRequest;
 import org.verisign.joid.AuthenticationResponse;
 import org.verisign.joid.Crypto;
@@ -66,7 +67,7 @@ public class Authenticate
         System.out.println( "Server's signature: " + signature );
 
         String sigList = authr.getSignedList();
-        String reSigned = authr.sign( "HMAC-SHA1", clearKey, sigList );
+        String reSigned = authr.sign( AssociationType.HMAC_SHA1, clearKey, sigList );
         System.out.println( "Our signature:      " + reSigned );
     }
 }

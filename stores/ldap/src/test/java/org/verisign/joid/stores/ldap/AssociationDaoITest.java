@@ -53,6 +53,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.verisign.joid.AssociationType;
 import org.verisign.joid.IAssociation;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.server.Association;
@@ -152,13 +153,13 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
     /**
      * Utility method to generate and reuse an Association.
      *
-     * @return the generated random assocation.
+     * @return the generated random association.
      * @throws OpenIdException
      */
     private static IAssociation generateAssociation() throws OpenIdException
     {
         Association association = new Association();
-        association.setAssociationType( "HMAC-SHA1" );
+        association.setAssociationType( AssociationType.HMAC_SHA1 );
         association.setEncryptedMacKey( RandomStringUtils.randomAlphanumeric( 16 ).getBytes() );
         association.setIssuedDate( new Date() );
         association.setLifetime( 600L );
@@ -207,12 +208,8 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
         
         assertEquals( reloaded.getHandle(), association.getHandle() );
         assertEquals( reloaded.getAssociationType(), association.getAssociationType() );
-        assertEquals( reloaded.getEncryptedMacKey(), association.getEncryptedMacKey() );
         assertEquals( reloaded.getIssuedDate(), association.getIssuedDate() );
         assertEquals( reloaded.getLifetime(), association.getLifetime() );
-        assertEquals( reloaded.getMacKey(), association.getMacKey() );
-        assertEquals( reloaded.getPublicDhKey(), association.getPublicDhKey() );
-        assertEquals( reloaded.getSessionType(), association.getSessionType() );
     }
 
 
@@ -380,6 +377,7 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
     @Test
     public void testGetEntry() throws Exception
     {
+        testCreate();
         Entry entry = dao.getEntry( association.getHandle() );
         assertEquals( entry.get( AssociationDao.HANDLE_AT ).getString(), association.getHandle() );
         fail( "Not yet implemented" );

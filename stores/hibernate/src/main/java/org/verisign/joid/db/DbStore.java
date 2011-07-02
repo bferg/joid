@@ -55,7 +55,7 @@ public class DbStore implements IStore
         byte[] secret = null;
         if ( req.isNotEncrypted() )
         {
-            secret = crypto.generateSecret( req.getAssociationType() );
+            secret = crypto.generateSecret( req.getAssociationType().toString() );
         }
         else
         {

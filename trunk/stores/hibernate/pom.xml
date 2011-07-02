@@ -31,6 +31,7 @@
 
   <description>Joid Hibernate store implementation</description>
 
+  <!--
   <repositories>
     <repository>
       <id>maven2-repository.dev.java.net</id>
@@ -39,6 +40,7 @@
       <layout>default</layout>       
     </repository>
   </repositories>
+  -->
 
   <dependencies>
 

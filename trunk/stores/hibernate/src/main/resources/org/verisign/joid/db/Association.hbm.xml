@@ -13,6 +13,13 @@
     <property name="secret" type="string"/>
     <property name="issuedDate" type="timestamp"/>
     <property name="lifetime" type="long"/>
-    <property name="associationType" type="string"/>
+    
+    <property name="associationType">
+       <type name="org.hibernate.type.EnumType">
+          <param name="enumClass">org.verisign.joid.AssociationType</param>
+       </type>
+    </property>
   </class>
+  
+  
 </hibernate-mapping>

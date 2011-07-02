@@ -176,7 +176,7 @@ public class LdapStore implements IStore
         }
         else
         {
-            secret = crypto.generateSecret( req.getSessionType() );
+            secret = crypto.generateSecret( req.getSessionType().toString() );
             crypto.setDiffieHellman( req.getDhModulus(), req.getDhGenerator() );
             byte[] encryptedSecret = crypto.encryptSecret( req.getDhConsumerPublic(), secret );
             a.setEncryptedMacKey( encryptedSecret );

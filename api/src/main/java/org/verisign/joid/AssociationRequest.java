@@ -26,7 +26,7 @@ import java.util.Set;
  */
 public class AssociationRequest extends Request
 {
-    private String sessionType;
+    private SessionType sessionType;
     private AssociationType associationType;
     private BigInteger dhModulus;
     private BigInteger dhGenerator;
@@ -38,77 +38,18 @@ public class AssociationRequest extends Request
     private static String OPENID_DH_GENERATOR = "openid.dh_gen";
     private static String OPENID_DH_CONSUMER_PUBLIC = "openid.dh_consumer_public";
 
-    /** <code>no-encryption</code> as per the specification. */
-    public static String NO_ENCRYPTION = "no-encryption";
-
-    /** <code>DH-SHA256</code> as per the specification. */
-    public static String DH_SHA1 = "DH-SHA1";
-
-    /** <code>DH-SHA256</code> as per the specification. */
-    public static String DH_SHA256 = "DH-SHA256";
-
-    /**
-     * Returns a ref to the static strings for subsequent
-     * reference equality check (that is, no 
-     * <code>.equals()</code> needed)
-     */
-    static String parseSessionType( String s )
-    {
-        if ( NO_ENCRYPTION.equals( s ) )
-        {
-            return NO_ENCRYPTION;
-        }
-        else if ( DH_SHA1.equals( s ) )
-        {
-            return DH_SHA1;
-        }
-        else if ( DH_SHA256.equals( s ) )
-        {
-            return DH_SHA256;
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Cannot parse session type: "
-                           + s );
-        }
-    }
-
 
     Map<String,String> toMap()
     {
         Map<String,String> map = super.toMap();
 
-        map.put( AssociationRequest.OPENID_SESSION_TYPE, sessionType );
+        map.put( AssociationRequest.OPENID_SESSION_TYPE, sessionType.toString() );
         map.put( AssociationRequest.OPENID_ASSOCIATION_TYPE,
             associationType.toString() );
         map.put( AssociationRequest.OPENID_DH_CONSUMER_PUBLIC,
             Crypto.convertToString( dhConsumerPublic ) );
 
         return map;
-    }
-
-
-    /**
-     * Returns a ref to the static strings for subsequent
-     * reference equality check (that is, no 
-     * <code>.equals()</code> needed)
-     * 
-     * @TODO this should just be return the AssociationType not a string
-     */
-    static AssociationType parseAssociationType( String s )
-    {
-        if ( AssociationType.HMAC_SHA1.getName().equals( s ) )
-        {
-            return AssociationType.HMAC_SHA1;
-        }
-        else if ( AssociationType.HMAC_SHA256.getName().equals( s ) )
-        {
-            return AssociationType.HMAC_SHA256;
-        }
-        else
-        {
-            throw new IllegalArgumentException( "Cannot parse association type: " + s );
-        }
     }
 
 
@@ -147,7 +88,7 @@ public class AssociationRequest extends Request
             Map<String,String> map = new HashMap<String,String>();
             map.put( "openid.mode", "associate" );
             map.put( OPENID_ASSOCIATION_TYPE, AssociationType.HMAC_SHA1.toString() );
-            map.put( OPENID_SESSION_TYPE, DH_SHA1 );
+            map.put( OPENID_SESSION_TYPE, SessionType.DH_SHA1.toString() );
             map.put( OPENID_NS, OPENID_20_NAMESPACE );
             map.put( OPENID_DH_CONSUMER_PUBLIC, Crypto.convertToString( pubKey ) );
             return new AssociationRequest( map, "associate" );
@@ -162,7 +103,7 @@ public class AssociationRequest extends Request
     AssociationRequest( Map<String,String> map, String mode ) throws OpenIdException
     {
         super( map, mode );
-        this.sessionType = NO_ENCRYPTION; //default value
+        this.sessionType = SessionType.NO_ENCRYPTION; //default value
         this.associationType = AssociationType.HMAC_SHA1; //default value
 
         this.dhModulus = DiffieHellman.DEFAULT_MODULUS;
@@ -177,11 +118,11 @@ public class AssociationRequest extends Request
 
             if ( OPENID_SESSION_TYPE.equals( key ) )
             {
-                this.sessionType = AssociationRequest.parseSessionType( value );
+                this.sessionType = SessionType.parse( value );
             }
             else if ( OPENID_ASSOCIATION_TYPE.equals( key ) )
             {
-                this.associationType = AssociationRequest.parseAssociationType( value );
+                this.associationType = AssociationType.parse( value );
             }
             else if ( OPENID_DH_MODULUS.equals( key ) )
             {
@@ -207,7 +148,7 @@ public class AssociationRequest extends Request
      */
     public boolean isNotEncrypted()
     {
-        return ( AssociationRequest.NO_ENCRYPTION.equals( sessionType ) );
+        return SessionType.NO_ENCRYPTION == sessionType;
     }
 
 
@@ -226,17 +167,16 @@ public class AssociationRequest extends Request
             throw new OpenIdException( "Missing session type" );
         }
 
-        if ( ( ( sessionType.equals( AssociationRequest.DH_SHA1 ) ) &&
+        if ( ( sessionType == SessionType.DH_SHA1 &&
             ( !associationType.equals( AssociationType.HMAC_SHA1 ) ) )
             ||
-            ( ( sessionType.equals( AssociationRequest.DH_SHA256 ) ) &&
+            ( sessionType == SessionType.DH_SHA256 &&
             ( !associationType.equals( AssociationType.HMAC_SHA256 ) ) ) )
         {
             throw new OpenIdException( "Mismatch " + OPENID_SESSION_TYPE
                       + " and " + OPENID_ASSOCIATION_TYPE );
         }
-        if ( ( sessionType.equals( AssociationRequest.DH_SHA1 ) )
-            || ( sessionType.equals( AssociationRequest.DH_SHA256 ) ) )
+        if ( sessionType == SessionType.DH_SHA1 || sessionType == SessionType.DH_SHA256 )
         {
             if ( dhConsumerPublic == null )
             {
@@ -295,7 +235,7 @@ public class AssociationRequest extends Request
      *
      * @return the association session type.
      */
-    public String getSessionType()
+    public SessionType getSessionType()
     {
         return this.sessionType;
     }
@@ -316,8 +256,8 @@ public class AssociationRequest extends Request
     {
         return "[AssociationRequest "
             + super.toString()
-            + ", session type=" + sessionType
-            + ", association type=" + associationType
+            + ", session type=" + sessionType.toString()
+            + ", association type=" + associationType.toString()
             + "]";
     }
 }

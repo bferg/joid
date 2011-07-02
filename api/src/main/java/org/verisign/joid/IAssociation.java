@@ -118,7 +118,7 @@ public interface IAssociation
      *
      * @return the session type.
      */
-    public String getSessionType();
+    public SessionType getSessionType();
 
 
     /**
@@ -126,7 +126,7 @@ public interface IAssociation
      *
      * @param sessionType the session type.
      */
-    public void setSessionType( String sessionType );
+    public void setSessionType( SessionType sessionType );
 
 
     /**

@@ -185,7 +185,7 @@ public class AllTests extends TestCase
         assertTrue( resp2 instanceof AssociationResponse );
         AssociationResponse ar = ( AssociationResponse ) resp2;
 
-        assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
+        assertTrue( ar.getSessionType().toString(), SessionType.DH_SHA1 == ar.getSessionType() );
         assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getMacKey() );
@@ -337,7 +337,7 @@ public class AllTests extends TestCase
         AssociationResponse ar = associate( dh );
         assertFalse( ar.isVersion2() );
 
-        assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
+        assertTrue( ar.getSessionType().toString(), SessionType.DH_SHA1 == ar.getSessionType() );
         assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
@@ -399,7 +399,7 @@ public class AllTests extends TestCase
         AssociationResponse ar = associate( dh );
         assertFalse( ar.isVersion2() );
 
-        assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
+        assertTrue( ar.getSessionType().toString(), SessionType.DH_SHA1 == ar.getSessionType() );
         assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
@@ -459,7 +459,7 @@ public class AllTests extends TestCase
         DiffieHellman dh = new DiffieHellman( p, g );
         AssociationResponse ar = associate( dh );
 
-        assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
+        assertTrue( ar.getSessionType().toString(), SessionType.DH_SHA1 == ar.getSessionType() );
         assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
@@ -555,7 +555,7 @@ public class AllTests extends TestCase
 
         AssociationResponse ar = ( AssociationResponse ) resp2;
 
-        assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
+        assertTrue( ar.getSessionType().toString(), SessionType.DH_SHA1 == ar.getSessionType() );
         assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getMacKey() );
@@ -571,7 +571,7 @@ public class AllTests extends TestCase
         DiffieHellman dh = new DiffieHellman( p, g );
         AssociationResponse ar = associate( dh );
 
-        assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
+        assertTrue( ar.getSessionType().toString(), SessionType.DH_SHA1 == ar.getSessionType() );
         assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
@@ -637,7 +637,7 @@ public class AllTests extends TestCase
         DiffieHellman dh = new DiffieHellman( p, g );
         AssociationResponse ar = associate( dh );
 
-        assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
+        assertTrue( ar.getSessionType().toString(), SessionType.DH_SHA1 == ar.getSessionType() );
         assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );
@@ -705,7 +705,7 @@ public class AllTests extends TestCase
         DiffieHellman dh = new DiffieHellman( p, g );
         AssociationResponse ar = associate( dh );
 
-        assertTrue( ar.getSessionType(), "DH-SHA1".equals( ar.getSessionType() ) );
+        assertTrue( ar.getSessionType().toString(), SessionType.DH_SHA1 == ar.getSessionType() );
         assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
         assertTrue( defaultLifespan == ar.getExpiresIn() );
         assertTrue( null == ar.getErrorCode() );

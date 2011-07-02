@@ -26,7 +26,6 @@ import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
@@ -344,6 +343,10 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
         Entry entry = new DefaultEntry( new Dn( AssociationDao.HANDLE_AT + "=" + association.getHandle() ) );
         entry.add( SchemaConstants.OBJECT_CLASS_AT, AssociationDao.ASSOCIATION_OC );
         entry.add( AssociationDao.HANDLE_AT, association.getHandle() );
+        entry.add( AssociationDao.SECRET_AT, association.getSecret() );
+        entry.add( AssociationDao.ASSOCIATION_TYPE_AT, association.getAssociationType().toString() );
+        entry.add( AssociationDao.LIFETIME_AT, association.getLifetime().toString() );
+        entry.add( AssociationDao.MODE_AT, association.getMode().toString() );
         
         Calendar calendar = Calendar.getInstance();
         calendar.setTime( association.getIssuedDate() );
@@ -353,8 +356,10 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
         IAssociation generated = dao.toObject( entry );
         assertEquals( generated.getHandle(), association.getHandle() );
         assertEquals( generated.getIssuedDate().getTime(), association.getIssuedDate().getTime() );
-        
-        throw new NotImplementedException();
+        assertEquals( generated.getSecret(), association.getSecret() );
+        assertEquals( generated.getAssociationType(), association.getAssociationType() );
+        assertEquals( generated.getLifetime(), association.getLifetime() );
+        assertEquals( generated.getMode(), association.getMode() );
     }
 
 
@@ -365,7 +370,21 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
     @Test
     public void testToEntry() throws Exception
     {
-        fail( "Not yet implemented" );
+        Entry entry = dao.toEntry( association );
+        assertEquals( entry.get( AssociationDao.ASSOCIATION_TYPE_AT ).getString(),
+            association.getAssociationType().toString() );
+        assertEquals( entry.get( AssociationDao.HANDLE_AT ).getString(), 
+            association.getHandle() );
+        assertEquals( entry.get( AssociationDao.LIFETIME_AT).getString(), 
+            association.getLifetime().toString() );
+        assertEquals( entry.get( AssociationDao.MODE_AT ).getString(), 
+            association.getMode() );
+        assertEquals( entry.get( AssociationDao.SECRET_AT ).getString(), 
+            association.getSecret() );
+        
+        String issuedDate = entry.get( AssociationDao.ISSUED_DATE_AT ).getString();
+        GeneralizedTime gt = new GeneralizedTime( issuedDate );
+        assertEquals( gt.getCalendar().getTime(), association.getIssuedDate() );
     }
 
 
@@ -379,8 +398,20 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
     {
         testCreate();
         Entry entry = dao.getEntry( association.getHandle() );
-        assertEquals( entry.get( AssociationDao.HANDLE_AT ).getString(), association.getHandle() );
-        fail( "Not yet implemented" );
+        assertEquals( entry.get( AssociationDao.ASSOCIATION_TYPE_AT ).getString(),
+            association.getAssociationType().toString() );
+        assertEquals( entry.get( AssociationDao.HANDLE_AT ).getString(), 
+            association.getHandle() );
+        assertEquals( entry.get( AssociationDao.LIFETIME_AT).getString(), 
+            association.getLifetime().toString() );
+        assertEquals( entry.get( AssociationDao.MODE_AT ).getString(), 
+            association.getMode() );
+        assertEquals( entry.get( AssociationDao.SECRET_AT ).getString(), 
+            association.getSecret() );
+        
+        String issuedDate = entry.get( AssociationDao.ISSUED_DATE_AT ).getString();
+        GeneralizedTime gt = new GeneralizedTime( issuedDate );
+        assertEquals( gt.getCalendar().getTime(), association.getIssuedDate() );
     }
 
 

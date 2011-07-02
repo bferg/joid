@@ -23,7 +23,7 @@ public class Association implements org.verisign.joid.IAssociation
 
     private final static Log log = LogFactory.getLog( Association.class );
     private Long id;
-    private String mode = "DH-SHA1";
+    private String mode;
     private String handle;
     private String secret;
     private Date issuedDate;

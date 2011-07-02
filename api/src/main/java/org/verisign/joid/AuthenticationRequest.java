@@ -50,8 +50,6 @@ public class AuthenticationRequest extends Request
     public final static String OPENID_ASSOC_HANDLE = "openid.assoc_handle";
 
     public final static String ID_SELECT = "http://specs.openid.net/auth/2.0/identifier_select";
-    public final static String CHECKID_IMMEDIATE = "checkid_immediate";
-    public final static String CHECKID_SETUP = "checkid_setup";
 
     public final static String OPENID_RETURN_TO = "openid.return_to";
     /**
@@ -80,7 +78,7 @@ public class AuthenticationRequest extends Request
         {
             // the request mode is irrelevant
             //
-            statelessAr = new AssociationRequest( statelessMap, "" );
+            statelessAr = new AssociationRequest( statelessMap, Mode.ASSOCIATE );
         }
         catch ( OpenIdException e )
         {
@@ -106,7 +104,7 @@ public class AuthenticationRequest extends Request
             throws OpenIdException
     {
         Map<String,String> map = new HashMap<String,String>();
-        map.put( "openid.mode", CHECKID_SETUP );
+        map.put( "openid.mode", Mode.CHECKID_SETUP.toString() );
         map.put( OPENID_IDENTITY, identity );
         map.put( OPENID_CLAIMED_ID, identity );
         map.put( OPENID_RETURN_TO, returnTo );
@@ -114,11 +112,11 @@ public class AuthenticationRequest extends Request
         map.put( OPENID_REALM, trustRoot );
         map.put( OPENID_NS, OPENID_20_NAMESPACE );
         map.put( OPENID_ASSOC_HANDLE, assocHandle );
-        return new AuthenticationRequest( map, CHECKID_SETUP );
+        return new AuthenticationRequest( map, Mode.CHECKID_SETUP );
     }
 
 
-    AuthenticationRequest( Map<String,String> map, String mode ) throws OpenIdException
+    AuthenticationRequest( Map<String,String> map, Mode mode ) throws OpenIdException
     {
         super( map, mode );
         Set<Map.Entry<String, String>> set = map.entrySet();
@@ -215,8 +213,7 @@ public class AuthenticationRequest extends Request
      */
     public boolean isImmediate()
     {
-        return AuthenticationRequest.CHECKID_IMMEDIATE
-                .equals( this.mode );
+        return Mode.CHECKID_IMMEDIATE == this.mode;
     }
 
 

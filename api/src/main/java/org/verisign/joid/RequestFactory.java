@@ -34,10 +34,6 @@ public class RequestFactory
 
     
     public static String OPENID_MODE = "openid.mode";
-    public static String ASSOCIATE_MODE = "associate";
-    public static String CHECKID_IMMEDIATE_MODE = "checkid_immediate";
-    public static String CHECKID_SETUP_MODE = "checkid_setup";
-    public static String CHECK_AUTHENTICATION_MODE = "check_authentication";
 
 
     /**
@@ -63,18 +59,19 @@ public class RequestFactory
                       + e.toString() );
         }
 
-        String s = map.get( OPENID_MODE );
-        if ( ASSOCIATE_MODE.equals( s ) )
+        Mode mode = Mode.parse( map.get( OPENID_MODE ) );
+        
+        if ( Mode.ASSOCIATE == mode )
         {
-            return new AssociationRequest( map, s );
+            return new AssociationRequest( map, Mode.ASSOCIATE );
         }
-        else if ( CHECKID_IMMEDIATE_MODE.equals( s ) || CHECKID_SETUP_MODE.equals( s ) )
+        else if ( Mode.CHECKID_IMMEDIATE == mode || Mode.CHECKID_SETUP == mode ) 
         {
-            return new AuthenticationRequest( map, s );
+            return new AuthenticationRequest( map, mode );
         }
-        else if ( CHECK_AUTHENTICATION_MODE.equals( s ) )
+        else if ( Mode.CHECK_AUTHENTICATION == mode )
         {
-            return new CheckAuthenticationRequest( map, s );
+            return new CheckAuthenticationRequest( map, Mode.CHECK_AUTHENTICATION );
         }
         else
         {

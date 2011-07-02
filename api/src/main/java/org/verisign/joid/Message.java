@@ -27,7 +27,7 @@ import java.util.Set;
  */
 public abstract class Message
 {
-    String mode;
+    Mode mode;
     String ns;
 
     static String OPENID_20_NAMESPACE = "http://specs.openid.net/auth/2.0";
@@ -49,7 +49,7 @@ public abstract class Message
     }
 
 
-    Message()
+    Message() 
     {
     }
 
@@ -84,20 +84,23 @@ public abstract class Message
      */
     public String toString()
     {
-        String s = "version=";
+        StringBuilder sb = new StringBuilder( "version=" );
+
         if ( isVersion2() )
         {
-            s += "2.0";
+            sb.append( "2.0" );
         }
         else
         {
-            s += "1.x";
+            sb.append( "1.x" );
         }
+        
         if ( ns != null )
         {
-            s += ", namespace=" + ns;
+            sb.append( ", namespace=" ).append( ns );
         }
-        return s;
+        
+        return sb.toString();
     }
 
 
@@ -135,7 +138,7 @@ public abstract class Message
         }
         if ( mode != null )
         {
-            map.put( Message.OPENID_MODE, mode );
+            map.put( Message.OPENID_MODE, mode.toString() );
         }
         return map;
     }

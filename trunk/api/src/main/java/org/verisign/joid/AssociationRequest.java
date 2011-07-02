@@ -167,11 +167,9 @@ public class AssociationRequest extends Request
             throw new OpenIdException( "Missing session type" );
         }
 
-        if ( ( sessionType == SessionType.DH_SHA1 &&
-            ( !associationType.equals( AssociationType.HMAC_SHA1 ) ) )
+        if ( ( sessionType == SessionType.DH_SHA1 && associationType != AssociationType.HMAC_SHA1 )
             ||
-            ( sessionType == SessionType.DH_SHA256 &&
-            ( !associationType.equals( AssociationType.HMAC_SHA256 ) ) ) )
+             ( sessionType == SessionType.DH_SHA256 && associationType != AssociationType.HMAC_SHA256 ) )
         {
             throw new OpenIdException( "Mismatch " + OPENID_SESSION_TYPE
                       + " and " + OPENID_ASSOCIATION_TYPE );
@@ -180,8 +178,7 @@ public class AssociationRequest extends Request
         {
             if ( dhConsumerPublic == null )
             {
-                throw new OpenIdException( "Missing "
-                      + OPENID_DH_CONSUMER_PUBLIC );
+                throw new OpenIdException( "Missing " + OPENID_DH_CONSUMER_PUBLIC );
             }
         }
     }
@@ -254,10 +251,9 @@ public class AssociationRequest extends Request
 
     public String toString()
     {
-        return "[AssociationRequest "
-            + super.toString()
-            + ", session type=" + sessionType.toString()
-            + ", association type=" + associationType.toString()
-            + "]";
+        StringBuilder sb = new StringBuilder( "[AssociationRequest " );
+        sb.append( super.toString() ).append( ", session type=" ).append( sessionType.toString() );
+        sb.append( ", association type=" ).append( associationType.toString() ).append( "]" );
+        return sb.toString();
     }
 }

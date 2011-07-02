@@ -258,31 +258,32 @@ public class AssociationResponse extends Response
 
     public String toString()
     {
-        String s = "[AssociationResponse "
-            + super.toString()
-            + ", session type=" + sessionType
-            + ", association type=" + associationType
-            + ", association handle=" + associationHandle
-            + ", expires in=" + expiresIn;
+        StringBuilder sb = new StringBuilder( "[AssociationResponse " );
+        sb.append( super.toString() ).append( ", session type=" );
+        sb.append( sessionType.toString() ).append( ", association type=" ); 
+        sb.append( associationType.toString() ).append( ", association handle=" );
+        sb.append( associationHandle ).append( ", expires in=" );
+        sb.append( expiresIn );
+        
         if ( dhServerPublic != null )
         {
-            s += ", server public key=" + Crypto.convertToString( dhServerPublic );
+            sb.append( ", server public key=" ).append( Crypto.convertToString( dhServerPublic ) );
         }
         if ( macKey != null )
         {
-            s += ", MAC key=" + Crypto.convertToString( macKey );
+            sb.append( ", MAC key=" ).append( Crypto.convertToString( macKey ) );
         }
         if ( encryptedMacKey != null )
         {
-            s += ", encrypted MAC key="
-                + Crypto.convertToString( encryptedMacKey );
+            sb.append( ", encrypted MAC key=" ).append( Crypto.convertToString( encryptedMacKey ) );
         }
         if ( errorCode != null )
         {
-            s += ", error code=" + errorCode;
+            sb.append( ", error code=" ).append( errorCode );
         }
-        s += "]";
-        return s;
+        
+        sb.append( "]" );
+        return sb.toString();
     }
 
 }

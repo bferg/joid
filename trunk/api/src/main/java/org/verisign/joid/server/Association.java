@@ -14,16 +14,13 @@ import java.text.SimpleDateFormat;
 
 
 /**
- * User: treeder
- * Date: Jul 19, 2007
- * Time: 4:39:09 PM
+ * An OpenID Association implementation.
  */
 public class Association implements org.verisign.joid.IAssociation
 {
 
     private final static Log log = LogFactory.getLog( Association.class );
     private Long id;
-    private String mode;
     private String handle;
     private String secret;
     private Date issuedDate;
@@ -76,20 +73,6 @@ public class Association implements org.verisign.joid.IAssociation
     public void setId( Long id )
     {
         this.id = id;
-    }
-
-
-    /** Hibernate mapping. */
-    public String getMode()
-    {
-        return mode;
-    }
-
-
-    /** Hibernate mapping. */
-    public void setMode( String s )
-    {
-        mode = s;
     }
 
 

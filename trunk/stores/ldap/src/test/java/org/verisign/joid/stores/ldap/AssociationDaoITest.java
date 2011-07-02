@@ -347,7 +347,6 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
         entry.add( AssociationDao.SECRET_AT, association.getSecret() );
         entry.add( AssociationDao.ASSOCIATION_TYPE_AT, association.getAssociationType().toString() );
         entry.add( AssociationDao.LIFETIME_AT, association.getLifetime().toString() );
-        entry.add( AssociationDao.MODE_AT, association.getMode().toString() );
         
         Calendar calendar = Calendar.getInstance();
         calendar.setTime( association.getIssuedDate() );
@@ -360,7 +359,6 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
         assertEquals( generated.getSecret(), association.getSecret() );
         assertEquals( generated.getAssociationType(), association.getAssociationType() );
         assertEquals( generated.getLifetime(), association.getLifetime() );
-        assertEquals( generated.getMode(), association.getMode() );
     }
 
 
@@ -378,8 +376,6 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
             association.getHandle() );
         assertEquals( entry.get( AssociationDao.LIFETIME_AT).getString(), 
             association.getLifetime().toString() );
-        assertEquals( entry.get( AssociationDao.MODE_AT ).getString(), 
-            association.getMode() );
         assertEquals( entry.get( AssociationDao.SECRET_AT ).getString(), 
             association.getSecret() );
         
@@ -405,8 +401,6 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
             association.getHandle() );
         assertEquals( entry.get( AssociationDao.LIFETIME_AT).getString(), 
             association.getLifetime().toString() );
-        assertEquals( entry.get( AssociationDao.MODE_AT ).getString(), 
-            association.getMode() );
         assertEquals( entry.get( AssociationDao.SECRET_AT ).getString(), 
             association.getSecret() );
         

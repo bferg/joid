@@ -160,12 +160,6 @@ public interface IAssociation
      */
     public boolean isEncrypted();
 
-
-    public void setMode( String mode );
-    
-    
-    public String getMode();
-    
     
     /**
      * Sets the encrypted MAC key for this association.

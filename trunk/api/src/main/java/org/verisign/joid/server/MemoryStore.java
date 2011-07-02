@@ -27,7 +27,6 @@ public class MemoryStore implements IStore
     {
         // boldly reusing the db implementation of Association
         Association a = new Association();
-        a.setMode( "unused" );
         a.setHandle( Crypto.generateHandle() );
         a.setSessionType( req.getSessionType() );
 

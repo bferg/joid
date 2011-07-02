@@ -48,7 +48,6 @@ public class DbStore implements IStore
         throws OpenIdException
     {
         Association a = new Association();
-        a.setMode( "unused" );
         a.setHandle( Crypto.generateHandle() );
         a.setSessionType( req.getSessionType() );
 

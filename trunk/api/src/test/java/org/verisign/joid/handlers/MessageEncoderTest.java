@@ -39,8 +39,8 @@ import org.verisign.joid.handlers.MessageEncoder;
  */
 public class MessageEncoderTest
 {
-    private Message message;
-    private MessageEncoder encoder;
+    private MyMessage message;
+    private MessageEncoder<MyMessage> encoder;
     
     
     private class MyMessage extends Message
@@ -62,7 +62,7 @@ public class MessageEncoderTest
     public void setUp() throws Exception
     {
         message = new MyMessage();
-        encoder = new MessageEncoder();
+        encoder = new MessageEncoder<MyMessage>();
     }
 
 

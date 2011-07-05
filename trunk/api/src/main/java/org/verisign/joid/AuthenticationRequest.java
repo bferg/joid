@@ -110,7 +110,7 @@ public class AuthenticationRequest extends Request
         map.put( OPENID_RETURN_TO, returnTo );
         map.put( OPENID_TRUST_ROOT, trustRoot );
         map.put( OPENID_REALM, trustRoot );
-        map.put( OPENID_NS, OPENID_20_NAMESPACE );
+        map.put( OpenIdConstants.OPENID_NS, OpenIdConstants.OPENID_20_NAMESPACE );
         map.put( OPENID_ASSOC_HANDLE, assocHandle );
         return new AuthenticationRequest( map, Mode.CHECKID_SETUP );
     }
@@ -127,7 +127,7 @@ public class AuthenticationRequest extends Request
             String key = mapEntry.getKey();
             String value = mapEntry.getValue();
 
-            if ( OPENID_NS.equals( key ) )
+            if ( OpenIdConstants.OPENID_NS.equals( key ) )
             {
                 setNamespace( value );
             }
@@ -155,7 +155,7 @@ public class AuthenticationRequest extends Request
             else if ( key != null && key.startsWith( "openid." ) )
             {
                 String foo = key.substring( 7 ); // remove "openid."
-                if ( ( !( OPENID_RESERVED_WORDS.contains( foo ) ) )
+                if ( ( !( OpenIdConstants.OPENID_RESERVED_WORDS.contains( foo ) ) )
                         && ( !foo.startsWith( "sreg." ) ) )
                 {
                     extendedMap.put( foo, value );
@@ -257,7 +257,7 @@ public class AuthenticationRequest extends Request
             if ( key.startsWith( "ns." ) )
             {
                 key = key.substring( 3 );
-                if ( OPENID_RESERVED_WORDS.contains( key ) )
+                if ( OpenIdConstants.OPENID_RESERVED_WORDS.contains( key ) )
                 {
                     throw new OpenIdException( "Cannot redefine: " + key );
                 }

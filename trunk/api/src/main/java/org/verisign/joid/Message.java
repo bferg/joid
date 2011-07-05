@@ -13,12 +13,8 @@
 package org.verisign.joid;
 
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 
 /**
@@ -26,25 +22,6 @@ import java.util.Set;
  */
 public abstract class Message
 {
-    public static final String ENCODED_NS_VERSION2 = "http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0";
-    public static final String OPENID_20_NAMESPACE = "http://specs.openid.net/auth/2.0";
-    public static final String OPENID_NS = "openid.ns";
-    public static final String OPENID_MODE = "openid.mode";
-    public static final Set<String> OPENID_RESERVED_WORDS;
-
-    static
-    {
-        // from section 12 in specification
-        
-        OPENID_RESERVED_WORDS = Collections.unmodifiableSet( 
-            new HashSet<String>( Arrays.asList( new String[]
-            { "assoc_handle", "assoc_type", "claimed_id", "contact", "delegate",
-                "dh_consumer_public", "dh_gen", "dh_modulus", "error", "identity",
-                "invalidate_handle", "mode", "ns", "op_endpoint", "openid", "realm",
-                "reference", "response_nonce", "return_to", "server", "session_type",
-                "sig", "signed", "trust_root" } ) ) );
-    }
-
     private Mode mode;
     private String ns;
     private Boolean version2 = null;
@@ -59,7 +36,7 @@ public abstract class Message
     {
         if ( version2 == null )
         {
-            version2 = OPENID_20_NAMESPACE.equals( this.ns );
+            version2 = OpenIdConstants.OPENID_20_NAMESPACE.equals( this.ns );
         }
         
         return version2;
@@ -160,11 +137,11 @@ public abstract class Message
         Map<String,String> map = new HashMap<String,String>();
         if ( ns != null )
         {
-            map.put( Message.OPENID_NS, ns );
+            map.put( OpenIdConstants.OPENID_NS, ns );
         }
         if ( mode != null )
         {
-            map.put( Message.OPENID_MODE, mode.toString() );
+            map.put( OpenIdConstants.OPENID_MODE, mode.toString() );
         }
         return map;
     }

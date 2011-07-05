@@ -17,7 +17,9 @@ import java.util.Map;
 
 
 /**
- * Represents an OpenID response. Valid for OpenID 1.1 and 2.0 namespace.
+ * Represents an OpenID response. Valid for OpenID 1.1 and 2.0 namespace. Adds
+ * a simple error property in addition to standard {@link Message} properties
+ * and this is to handle openid.mode=error type messages.
  */
 public abstract class Response extends Message
 {
@@ -32,19 +34,25 @@ public abstract class Response extends Message
     }
 
 
+    /**
+     * @TODO delete this after re-factoring
+     */
     Map<String,String> toMap()
     {
         return super.toMap();
     }
 
 
+    /**
+     * @TODO delete this after re-factoring
+     */
     Response( Map<String,String> map )
     {
         if ( map != null )
         {
             if ( map != null )
             {
-                setNamespace( ( String ) map.get( Message.OPENID_NS ) );
+                setNamespace( ( String ) map.get( OpenIdConstants.OPENID_NS ) );
             }
 
             this.error = ( String ) map.get( Response.OPENID_ERROR );

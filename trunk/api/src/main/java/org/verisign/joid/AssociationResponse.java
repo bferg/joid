@@ -136,11 +136,11 @@ public class AssociationResponse extends Response
 
         // remove "openid.ns" from map and replace with just "ns"
         // openid prefix is invalid for association responses
-        String ns = ( String ) map.get( Message.OPENID_NS );
+        String ns = ( String ) map.get( OpenIdConstants.OPENID_NS );
         if ( ns != null )
         {
             map.put( OPENID_ASSOC_NS, ns );
-            map.remove( Message.OPENID_NS );
+            map.remove( OpenIdConstants.OPENID_NS );
         }
 
         if ( errorCode != null )

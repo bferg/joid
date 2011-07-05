@@ -163,6 +163,9 @@ public class AssociationRequest extends Request
     }
 
 
+    /**
+     * @TODO delete this while refactoring.
+     */
     public Response processUsing( ServerInfo si ) throws OpenIdException
     {
         IStore store = si.getStore();

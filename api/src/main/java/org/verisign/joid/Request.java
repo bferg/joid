@@ -22,17 +22,23 @@ import java.util.Map;
  */
 public abstract class Request extends Message
 {
+    /**
+     * @TODO delete this after re-factoring
+     */
     Request( Map<String,String> map, Mode mode )
     {
         setMode( mode );
 
         if ( map != null )
         {
-            setNamespace( ( String ) map.get( Message.OPENID_NS ) );
+            setNamespace( ( String ) map.get( OpenIdConstants.OPENID_NS ) );
         }
     }
 
 
+    /**
+     * @TODO delete this after re-factoring
+     */
     Map<String,String> toMap()
     {
         return super.toMap();
@@ -40,6 +46,8 @@ public abstract class Request extends Message
 
 
     /**
+     * @TODO delete this after re-factoring
+     * 
      * Processes this request using the given store and crypto implementations.
      * This processing step should produce a valid response that can be
      * sent back to the requestor. Associations may be read from, written to,

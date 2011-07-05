@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.verisign.joid.Message;
 import org.verisign.joid.Mode;
+import org.verisign.joid.OpenIdConstants;
 import org.verisign.joid.handlers.EncodingMode;
 import org.verisign.joid.handlers.MessageEncoder;
 
@@ -47,7 +48,7 @@ public class MessageEncoderTest
         public MyMessage()
         {
             setMode( Mode.ASSOCIATE );
-            setNamespace( Message.OPENID_20_NAMESPACE );
+            setNamespace( OpenIdConstants.OPENID_20_NAMESPACE );
         }
     }
 

@@ -32,26 +32,25 @@ public class AssociationRequest extends Request
     private BigInteger dhGenerator;
     private BigInteger dhConsumerPublic;
 
-    private static String OPENID_SESSION_TYPE = "openid.session_type";
-    private static String OPENID_ASSOCIATION_TYPE = "openid.assoc_type";
-    private static String OPENID_DH_MODULUS = "openid.dh_modulus";
-    private static String OPENID_DH_GENERATOR = "openid.dh_gen";
-    private static String OPENID_DH_CONSUMER_PUBLIC = "openid.dh_consumer_public";
-
-
+    /**
+     * @TODO Delete this after re-factoring.
+     */
     Map<String,String> toMap()
     {
         Map<String,String> map = super.toMap();
 
-        map.put( AssociationRequest.OPENID_SESSION_TYPE, sessionType.toString() );
-        map.put( AssociationRequest.OPENID_ASSOCIATION_TYPE, associationType.toString() );
-        map.put( AssociationRequest.OPENID_DH_CONSUMER_PUBLIC, Crypto.convertToString( dhConsumerPublic ) );
+        map.put( OpenIdConstants.OPENID_SESSION_TYPE, sessionType.toString() );
+        map.put( OpenIdConstants.OPENID_ASSOCIATION_TYPE, associationType.toString() );
+        map.put( OpenIdConstants.OPENID_DH_CONSUMER_PUBLIC, getDhConsumerPublicString() );
 
         return map;
     }
 
 
     /**
+     * @TODO this looks like it is used only by the client/consumer and should
+     * go somewhere else.
+     * 
      * Creates a standard association request. Default values are
      * <code>HMAC-SHA1</code> for association type, and <code>DH-SHA1</code>
      * for session type.
@@ -66,11 +65,11 @@ public class AssociationRequest extends Request
         {
             BigInteger pubKey = crypto.getPublicKey();
             Map<String,String> map = new HashMap<String,String>();
-            map.put( "openid.mode", Mode.ASSOCIATE.toString() );
-            map.put( OPENID_ASSOCIATION_TYPE, AssociationType.HMAC_SHA1.toString() );
-            map.put( OPENID_SESSION_TYPE, SessionType.DH_SHA1.toString() );
-            map.put( OPENID_NS, OPENID_20_NAMESPACE );
-            map.put( OPENID_DH_CONSUMER_PUBLIC, Crypto.convertToString( pubKey ) );
+            map.put( OpenIdConstants.OPENID_MODE, Mode.ASSOCIATE.toString() );
+            map.put( OpenIdConstants.OPENID_ASSOCIATION_TYPE, AssociationType.HMAC_SHA1.toString() );
+            map.put( OpenIdConstants.OPENID_SESSION_TYPE, SessionType.DH_SHA1.toString() );
+            map.put( OpenIdConstants.OPENID_NS, OpenIdConstants.OPENID_20_NAMESPACE );
+            map.put( OpenIdConstants.OPENID_DH_CONSUMER_PUBLIC, Crypto.convertToString( pubKey ) );
             return new AssociationRequest( map, Mode.ASSOCIATE );
         }
         catch ( OpenIdException e )
@@ -96,23 +95,23 @@ public class AssociationRequest extends Request
             String key = mapEntry.getKey();
             String value = mapEntry.getValue();
 
-            if ( OPENID_SESSION_TYPE.equals( key ) )
+            if ( OpenIdConstants.OPENID_SESSION_TYPE.equals( key ) )
             {
                 this.sessionType = SessionType.parse( value );
             }
-            else if ( OPENID_ASSOCIATION_TYPE.equals( key ) )
+            else if ( OpenIdConstants.OPENID_ASSOCIATION_TYPE.equals( key ) )
             {
                 this.associationType = AssociationType.parse( value );
             }
-            else if ( OPENID_DH_MODULUS.equals( key ) )
+            else if ( OpenIdConstants.OPENID_DH_MODULUS.equals( key ) )
             {
                 this.dhModulus = Crypto.convertToBigIntegerFromString( value );
             }
-            else if ( OPENID_DH_GENERATOR.equals( key ) )
+            else if ( OpenIdConstants.OPENID_DH_GENERATOR.equals( key ) )
             {
                 this.dhGenerator = Crypto.convertToBigIntegerFromString( value );
             }
-            else if ( OPENID_DH_CONSUMER_PUBLIC.equals( key ) )
+            else if ( OpenIdConstants.OPENID_DH_CONSUMER_PUBLIC.equals( key ) )
             {
                 this.dhConsumerPublic = Crypto.convertToBigIntegerFromString( value );
             }
@@ -151,14 +150,14 @@ public class AssociationRequest extends Request
             ||
              ( sessionType == SessionType.DH_SHA256 && associationType != AssociationType.HMAC_SHA256 ) )
         {
-            throw new OpenIdException( "Mismatch " + OPENID_SESSION_TYPE
-                      + " and " + OPENID_ASSOCIATION_TYPE );
+            throw new OpenIdException( "Mismatch " + OpenIdConstants.OPENID_SESSION_TYPE
+                      + " and " + OpenIdConstants.OPENID_ASSOCIATION_TYPE );
         }
         if ( sessionType == SessionType.DH_SHA1 || sessionType == SessionType.DH_SHA256 )
         {
             if ( dhConsumerPublic == null )
             {
-                throw new OpenIdException( "Missing " + OPENID_DH_CONSUMER_PUBLIC );
+                throw new OpenIdException( "Missing " + OpenIdConstants.OPENID_DH_CONSUMER_PUBLIC );
             }
         }
     }
@@ -206,6 +205,12 @@ public class AssociationRequest extends Request
         return this.dhConsumerPublic;
     }
 
+    
+    public String getDhConsumerPublicString()
+    {
+        return Crypto.convertToString( dhConsumerPublic );
+    }
+    
 
     /**
      * Returns the association session type.

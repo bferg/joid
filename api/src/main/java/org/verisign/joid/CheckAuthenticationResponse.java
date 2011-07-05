@@ -117,7 +117,7 @@ public class CheckAuthenticationResponse extends Response
         map = new HashMap<String,String>();
         if ( isVersion2() )
         {
-            map.put( OPENID_NS, OPENID_20_NAMESPACE );
+            map.put( OPENID_NS, OpenIdConstants.OPENID_20_NAMESPACE );
         }
 
         if ( a != null )

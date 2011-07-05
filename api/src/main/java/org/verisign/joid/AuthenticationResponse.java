@@ -114,7 +114,7 @@ public class AuthenticationResponse extends Response
         {
             map.put( AuthenticationResponse.OPENID_OP_ENDPOINT, urlEndPoint );
         }
-        map.put( AuthenticationResponse.OPENID_MODE, getMode().getValue() );
+        map.put( OpenIdConstants.OPENID_MODE, getMode().getValue() );
         map.put( AuthenticationResponse.OPENID_IDENTITY, identity );
         map.put( AuthenticationResponse.OPENID_RETURN_TO, returnTo );
         map.put( AuthenticationResponse.OPENID_NONCE, nonce );
@@ -149,7 +149,7 @@ public class AuthenticationResponse extends Response
         }
         if ( !set.isEmpty() && isVersion2() )
         {
-            map.put( Message.OPENID_NS + ".sreg", sreg.getNamespace() );
+            map.put( OpenIdConstants.OPENID_NS + ".sreg", sreg.getNamespace() );
         }
 
         if ( extendedMap != null && !extendedMap.isEmpty() )
@@ -189,12 +189,12 @@ public class AuthenticationResponse extends Response
     public static String toUrlStringResponse( Request req, OpenIdException e )
     {
         Map<String,String> map = new HashMap<String,String>();
-        map.put( AuthenticationResponse.OPENID_MODE, "error" );
+        map.put( OpenIdConstants.OPENID_MODE, "error" );
         if ( req != null )
         {
             if ( req.isVersion2() )
             {
-                map.put( AuthenticationResponse.OPENID_NS, req.getNamespace() );
+                map.put( OpenIdConstants.OPENID_NS, req.getNamespace() );
             }
             map.put( AuthenticationResponse.OPENID_ERROR, e.getMessage() );
         }
@@ -358,7 +358,7 @@ public class AuthenticationResponse extends Response
             String key = ( String ) mapEntry.getKey();
             String value = ( String ) mapEntry.getValue();
 
-            if ( AuthenticationResponse.OPENID_MODE.equals( key ) )
+            if ( OpenIdConstants.OPENID_MODE.equals( key ) )
             {
                 setMode( Mode.parse( value ) );
             }
@@ -405,13 +405,13 @@ public class AuthenticationResponse extends Response
                 // (op_endpoint isn't allowed in 1.x responses)
                 if ( getNamespace() == null )
                 {
-                    setNamespace( OPENID_20_NAMESPACE );
+                    setNamespace( OpenIdConstants.OPENID_20_NAMESPACE );
                 }
             }
             else if ( key != null && key.startsWith( "openid." ) )
             {
                 String foo = key.substring( 7 ); // remove "openid."
-                if ( ( !( OPENID_RESERVED_WORDS.contains( foo ) ) )
+                if ( ( !( OpenIdConstants.OPENID_RESERVED_WORDS.contains( foo ) ) )
                     && ( !foo.startsWith( "sreg." ) ) )
                 {
                     extendedMap.put( foo, value );

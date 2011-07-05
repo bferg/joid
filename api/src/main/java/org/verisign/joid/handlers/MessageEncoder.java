@@ -26,6 +26,7 @@ import java.net.URLEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.verisign.joid.Message;
+import org.verisign.joid.OpenIdConstants;
 
 
 /**
@@ -58,11 +59,11 @@ public class MessageEncoder implements Encoder<Message>
         }
 
         // append the openid.mode key value pair
-        sb.append( Message.OPENID_MODE ).append( mode.getKvDelim() ).append( message.getMode().toString() );        
+        sb.append( OpenIdConstants.OPENID_MODE ).append( mode.getKvDelim() ).append( message.getMode().toString() );        
         sb.append( mode.getNewLine() );
         
         // append the openid.ns key value pair
-        sb.append( Message.OPENID_NS ).append( mode.getKvDelim() );
+        sb.append( OpenIdConstants.OPENID_NS ).append( mode.getKvDelim() );
         if ( mode == EncodingMode.POST_STRING )
         {
             sb.append( message.getNamespace() );
@@ -71,7 +72,7 @@ public class MessageEncoder implements Encoder<Message>
         {
             if ( message.isVersion2() )
             {
-                sb.append( Message.ENCODED_NS_VERSION2 );
+                sb.append( OpenIdConstants.ENCODED_NS_VERSION2 );
             }
             else
             {

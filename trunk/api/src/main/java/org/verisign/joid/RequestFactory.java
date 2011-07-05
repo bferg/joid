@@ -15,8 +15,6 @@ package org.verisign.joid;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 
 
 /**
@@ -24,15 +22,6 @@ import org.apache.commons.logging.Log;
  */
 public class RequestFactory
 {
-    private final static Log LOG = LogFactory.getLog( RequestFactory.class );
-
-
-    private RequestFactory()
-    {
-        LOG.debug( "New instance created." );
-    }
-
-    
     public static String OPENID_MODE = "openid.mode";
 
 
@@ -55,8 +44,7 @@ public class RequestFactory
         }
         catch ( UnsupportedEncodingException e )
         {
-            throw new OpenIdException( "Error parsing " + query + ": "
-                      + e.toString() );
+            throw new OpenIdException( "Error parsing " + query + ": " + e.toString() );
         }
 
         Mode mode = Mode.parse( map.get( OPENID_MODE ) );

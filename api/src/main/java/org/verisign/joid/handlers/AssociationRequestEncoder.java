@@ -19,34 +19,27 @@
  */
 package org.verisign.joid.handlers;
 
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.verisign.joid.Message;
+import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.OpenIdConstants;
 import org.verisign.joid.OpenIdException;
 
 
 /**
- * An encoder for general messages adding their common attributes to the query 
- * string.
+ * An encoder for AssociationRequests.
  *
- * @author <a href="mailto:birkan.duman@gmail.com">Birkan Duman</a>
  * @author <a href="mailto:akarasulu@apache.org">Alex Karasulu</a>
  */
-public class MessageEncoder<E extends Message> implements Encoder<E>
+public final class AssociationRequestEncoder extends MessageEncoder<AssociationRequest>
 {
-    private static final Logger LOG = LoggerFactory.getLogger( MessageEncoder.class );
+    private final static Logger LOG = LoggerFactory.getLogger( AssociationRequestEncoder.class );
     
     
-    /**
-     * {@inheritDoc}
-     * @throws OpenIdException 
-     */
-    public StringBuilder encode( E message, EncodingMode mode, StringBuilder sb ) throws OpenIdException
+    public final StringBuilder encode( AssociationRequest message, EncodingMode mode, StringBuilder sb ) throws OpenIdException
     {
         if ( sb == null )
         {
@@ -59,33 +52,40 @@ public class MessageEncoder<E extends Message> implements Encoder<E>
                 sb.append( mode.getNewLine() );
             }
         }
-
-        // append the openid.mode key value pair
-        sb.append( OpenIdConstants.OPENID_MODE ).append( mode.getKvDelim() ).append( message.getMode().toString() );        
-        sb.append( mode.getNewLine() );
         
-        // append the openid.ns key value pair
-        sb.append( OpenIdConstants.OPENID_NS ).append( mode.getKvDelim() );
-        if ( mode == EncodingMode.POST_STRING )
+        super.encode( message, mode, sb );
+        
+        // append the session type
+        sb.append( OpenIdConstants.OPENID_SESSION_TYPE );
+        sb.append( mode.getKvDelim() );
+        sb.append( message.getSessionType().toString() );        
+        sb.append( mode.getNewLine() );
+
+        // append the association type
+        sb.append( OpenIdConstants.OPENID_ASSOCIATION_TYPE );
+        sb.append( mode.getKvDelim() );
+        sb.append( message.getAssociationType().toString() );        
+        sb.append( mode.getNewLine() );
+
+        // append the consumer's DH public key as a string
+        sb.append( OpenIdConstants.OPENID_DH_CONSUMER_PUBLIC );
+        sb.append( mode.getKvDelim() );
+        if ( mode == EncodingMode.URL_STRING )
         {
-            sb.append( message.getNamespace() );
+            sb.append( message.getDhConsumerPublicString() );        
         }
         else
         {
-            if ( message.isVersion2() )
+            try
             {
-                sb.append( OpenIdConstants.ENCODED_NS_VERSION2 );
+                sb.append( URLEncoder.encode( message.getDhConsumerPublicString(), "UTF-8" ) );
             }
-            else
+            catch ( UnsupportedEncodingException e )
             {
-                try
-                {
-                    sb.append( URLEncoder.encode( message.getNamespace(), "UTF-8" ) );
-                }
-                catch ( UnsupportedEncodingException e )
-                {
-                    LOG.error( "This error to decode pre-set URL should never fail.", e );
-                }
+                String msg = "Failed to URL encode the " + OpenIdConstants.OPENID_DH_CONSUMER_PUBLIC
+                    + " key's value of '" + message.getDhConsumerPublicString() + "'";
+                LOG.error( msg, e );
+                throw new OpenIdException( msg, e );
             }
         }
         

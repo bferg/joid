@@ -20,6 +20,7 @@
 package org.verisign.joid.handlers;
 
 import org.verisign.joid.Message;
+import org.verisign.joid.OpenIdException;
 
 
 /**
@@ -29,5 +30,5 @@ import org.verisign.joid.Message;
  */
 public interface Encoder<E extends Message>
 {
-    StringBuilder encode( E message, EncodingMode mode, StringBuilder sb  );
+    StringBuilder encode( E message, EncodingMode mode, StringBuilder sb  ) throws OpenIdException;
 }

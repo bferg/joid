@@ -237,7 +237,7 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
 
         // now set the reloaded instance's date to UNIX start 
         Date newDate = new Date( 0 );
-        reloaded.setIssuedDate( newDate );
+        ( ( Association ) reloaded ).setIssuedDate( newDate );
 
         // the reloaded no longer has the same issued date as the original association instance
         assertFalse( reloaded.getIssuedDate().equals( association.getIssuedDate() ) );
@@ -269,7 +269,7 @@ public class AssociationDaoITest extends AbstractLdapTestUnit
 
         // now set the reloaded instance's date to UNIX start 
         Date newDate = new Date( 0 );
-        reloaded.setIssuedDate( newDate );
+        ( ( Association ) reloaded ).setIssuedDate( newDate );
 
         // the reloaded no longer has the same issued date as the original association
         assertFalse( reloaded.getIssuedDate().equals( association.getIssuedDate() ) );

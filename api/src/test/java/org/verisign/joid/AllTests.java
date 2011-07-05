@@ -147,8 +147,8 @@ public class AllTests extends TestCase
     public void testAssociationLifeLength() throws Exception
     {
         IAssociation a = new Association();
-        a.setIssuedDate( new Date() );
-        a.setLifetime( new Long( 1 ) );
+        ( ( Association ) a ).setIssuedDate( new Date() );
+        ( ( Association ) a ).setLifetime( new Long( 1 ) );
         assertFalse( a.hasExpired() );
         Thread.sleep( 1200 );
         assertTrue( a.hasExpired() );

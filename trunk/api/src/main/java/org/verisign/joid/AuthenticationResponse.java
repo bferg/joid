@@ -114,7 +114,7 @@ public class AuthenticationResponse extends Response
         {
             map.put( AuthenticationResponse.OPENID_OP_ENDPOINT, urlEndPoint );
         }
-        map.put( AuthenticationResponse.OPENID_MODE, mode.getValue() );
+        map.put( AuthenticationResponse.OPENID_MODE, getMode().getValue() );
         map.put( AuthenticationResponse.OPENID_IDENTITY, identity );
         map.put( AuthenticationResponse.OPENID_RETURN_TO, returnTo );
         map.put( AuthenticationResponse.OPENID_NONCE, nonce );
@@ -304,11 +304,11 @@ public class AuthenticationResponse extends Response
         throws OpenIdException
     {
         super( null );
-        mode = Mode.ID_RES;
+        setMode( Mode.ID_RES );
         claimed_id = ar.getClaimedIdentity();
         identity = ar.getIdentity();
         returnTo = ar.getReturnTo();
-        ns = ar.getNamespace();
+        setNamespace( ar.getNamespace() );
         nonce = generateNonce();
         this.urlEndPoint = serverInfo.getUrlEndPoint();
         this.invalidateHandle = invalidateHandle; //may be null
@@ -360,7 +360,7 @@ public class AuthenticationResponse extends Response
 
             if ( AuthenticationResponse.OPENID_MODE.equals( key ) )
             {
-                mode = Mode.parse( value );
+                setMode( Mode.parse( value ) );
             }
             else if ( AuthenticationResponse.OPENID_IDENTITY.equals( key ) )
             {
@@ -403,9 +403,9 @@ public class AuthenticationResponse extends Response
                 // signature we need to set version 2 explicitly or we
                 // won't include the op_endpoint in the map
                 // (op_endpoint isn't allowed in 1.x responses)
-                if ( ns == null )
+                if ( getNamespace() == null )
                 {
-                    ns = OPENID_20_NAMESPACE;
+                    setNamespace( OPENID_20_NAMESPACE );
                 }
             }
             else if ( key != null && key.startsWith( "openid." ) )
@@ -474,7 +474,7 @@ public class AuthenticationResponse extends Response
         {
             s += ", sreg=" + sreg;
         }
-        s += ", mode=" + mode
+        s += ", mode=" + getMode()
             + ", algo=" + algo
             + ", nonce=" + nonce
             + ", association handle=" + associationHandle

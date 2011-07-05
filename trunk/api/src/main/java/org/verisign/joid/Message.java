@@ -10,7 +10,6 @@
 // Distributed under an Apache License
 // http://www.apache.org/licenses/LICENSE-2.0
 //
-
 package org.verisign.joid;
 
 
@@ -27,13 +26,11 @@ import java.util.Set;
  */
 public abstract class Message
 {
-    Mode mode;
-    String ns;
-
-    static String OPENID_20_NAMESPACE = "http://specs.openid.net/auth/2.0";
-    static String OPENID_NS = "openid.ns";
-    static String OPENID_MODE = "openid.mode";
-    static Set<String> OPENID_RESERVED_WORDS;
+    public static final String ENCODED_NS_VERSION2 = "http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0";
+    public static final String OPENID_20_NAMESPACE = "http://specs.openid.net/auth/2.0";
+    public static final String OPENID_NS = "openid.ns";
+    public static final String OPENID_MODE = "openid.mode";
+    public static final Set<String> OPENID_RESERVED_WORDS;
 
     static
     {
@@ -48,10 +45,9 @@ public abstract class Message
                 "sig", "signed", "trust_root" } ) ) );
     }
 
-
-    Message() 
-    {
-    }
+    private Mode mode;
+    private String ns;
+    private Boolean version2 = null;
 
 
     /**
@@ -61,7 +57,24 @@ public abstract class Message
      */
     public boolean isVersion2()
     {
-        return OPENID_20_NAMESPACE.equals( this.ns );
+        if ( version2 == null )
+        {
+            version2 = OPENID_20_NAMESPACE.equals( this.ns );
+        }
+        
+        return version2;
+    }
+    
+    
+    public Mode getMode()
+    {
+        return mode;
+    }
+    
+    
+    protected void setMode( Mode mode )
+    {
+        this.mode = mode;
     }
 
 
@@ -76,6 +89,12 @@ public abstract class Message
         return ns;
     }
 
+    
+    protected void setNamespace( String ns )
+    {
+        this.ns = ns;
+    }
+    
 
     /** 
      * Returns a string representation of this message.
@@ -105,6 +124,7 @@ public abstract class Message
 
 
     /**
+     * TODO delete me after re-factoring.
      * Unrolls this message as a string. This string will use the
      * <code>name:value</code> format of the specification. See also
      * {@link #toUrlString()}.
@@ -118,6 +138,7 @@ public abstract class Message
 
 
     /**
+     * TODO delete me after re-factoring.
      * Unrolls this message as a string. This string will use encoding
      * suitable for URLs. See also {@link #toPostString()}.
      *
@@ -129,6 +150,11 @@ public abstract class Message
     }
 
 
+    /**
+     * TODO delete me after re-factoring.
+     *
+     * @return
+     */
     Map<String,String> toMap()
     {
         Map<String,String> map = new HashMap<String,String>();

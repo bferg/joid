@@ -55,7 +55,7 @@ public class CheckAuthenticationResponse extends Response
 
             if ( OPENID_MODE.equals( key ) )
             {
-                mode = Mode.parse( value );
+                setMode( Mode.parse( value ) );
             }
             else if ( OPENID_IS_VALID.equals( key ) )
             {
@@ -67,7 +67,7 @@ public class CheckAuthenticationResponse extends Response
             }
             else if ( OPENID_NS.equals( key ) )
             {
-                ns = value;
+                setNamespace( value );
             }
         }
     }
@@ -112,7 +112,7 @@ public class CheckAuthenticationResponse extends Response
     {
         super( Collections.<String,String>emptyMap() );
         this.ar = ar;
-        this.ns = ar.getNamespace();
+        setNamespace( ar.getNamespace() );
 
         map = new HashMap<String,String>();
         if ( isVersion2() )

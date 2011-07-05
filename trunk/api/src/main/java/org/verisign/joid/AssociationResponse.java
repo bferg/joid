@@ -180,7 +180,7 @@ public class AssociationResponse extends Response
     AssociationResponse( AssociationRequest ar, IAssociation a, Crypto crypto )
     {
         super( null );
-        this.ns = ar.getNamespace();
+        setNamespace( ar.getNamespace() );
         if ( a.isSuccessful() )
         {
             this.sessionType = a.getSessionType();
@@ -250,7 +250,7 @@ public class AssociationResponse extends Response
             // set namespace using association ns key
             else if ( OPENID_ASSOC_NS.equals( key ) )
             {
-                ns = value;
+                setNamespace( value );
             }
         }
     }

@@ -42,7 +42,11 @@ public abstract class Response extends Message
     {
         if ( map != null )
         {
-            this.ns = ( String ) map.get( Message.OPENID_NS );
+            if ( map != null )
+            {
+                setNamespace( ( String ) map.get( Message.OPENID_NS ) );
+            }
+
             this.error = ( String ) map.get( Response.OPENID_ERROR );
         }
     }

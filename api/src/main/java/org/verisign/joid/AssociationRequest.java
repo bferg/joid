@@ -134,7 +134,7 @@ public class AssociationRequest extends Request
 
     private void checkInvariants() throws OpenIdException
     {
-        if ( mode == null )
+        if ( getMode() == null )
         {
             throw new OpenIdException( "Missing mode" );
         }

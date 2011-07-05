@@ -24,11 +24,11 @@ public abstract class Request extends Message
 {
     Request( Map<String,String> map, Mode mode )
     {
-        this.mode = mode;
+        setMode( mode );
 
         if ( map != null )
         {
-            this.ns = ( String ) map.get( Message.OPENID_NS );
+            setNamespace( ( String ) map.get( Message.OPENID_NS ) );
         }
     }
 

@@ -201,6 +201,7 @@ public class OpenId
             log.warn( "exception=" + e );
             throw new OpenIdException( e );
         }
+        
         Response resp = req.processUsing( serverInfo );
         if ( req instanceof AuthenticationRequest )
         {

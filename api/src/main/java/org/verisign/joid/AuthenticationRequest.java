@@ -129,7 +129,7 @@ public class AuthenticationRequest extends Request
 
             if ( OPENID_NS.equals( key ) )
             {
-                this.ns = value;
+                setNamespace( value );
             }
             else if ( OPENID_IDENTITY.equals( key ) )
             {
@@ -213,13 +213,13 @@ public class AuthenticationRequest extends Request
      */
     public boolean isImmediate()
     {
-        return Mode.CHECKID_IMMEDIATE == this.mode;
+        return Mode.CHECKID_IMMEDIATE == getMode();
     }
 
 
     private void checkInvariants() throws OpenIdException
     {
-        if ( mode == null )
+        if ( getMode() == null )
         {
             throw new OpenIdException( "Missing mode" );
         }

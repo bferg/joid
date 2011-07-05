@@ -19,19 +19,17 @@ import java.util.Date;
 
 
 /**
- * An association.
+ * An association between a relying party and an OpenID provider.
  *
  * Implement this interface to represent an OpenID association.
  */
-
 public interface IAssociation
 {
-    /**
-     * Returns whether this association is valid (was successful)
+    /** Returns whether this association is valid (was successful).
      *
      * @return true is successful; false otherwise.
      */
-    public boolean isSuccessful();
+    boolean isSuccessful();
 
 
     /**
@@ -39,7 +37,7 @@ public interface IAssociation
      *
      * @return error as a string, null if no error.
      */
-    public String getError();
+    String getError();
 
 
     /**
@@ -47,11 +45,15 @@ public interface IAssociation
      *
      * @return error code as a string, null if no error string.
      */
-    public String getErrorCode();
+    String getErrorCode();
+
     
-    public String getSecret();
-    
-    public void setSecret( String secret );
+    /**
+     * Get's the secret for this IAssociation.
+     *
+     * @return the secret
+     */
+    String getSecret();
 
 
     /**
@@ -60,32 +62,7 @@ public interface IAssociation
      *
      * @return handle as a string, null if no handle yet available.
      */
-    public String getHandle();
-
-
-    /**
-     * Sets the association's handle. This handle should be suitable
-     * to put on the wire as part of the OpenID protocol.
-     *
-     * @param s handle as a string.
-     */
-    public void setHandle( String s );
-
-
-    /**
-     * Sets the date this association was issued.
-     *
-     * @param issuedDate the timestamp of issucance.
-     */
-    public void setIssuedDate( Date issuedDate );
-
-
-    /**
-     * Sets the lifetime of this association.
-     *
-     * @param lifetime the lifetime in seconds.
-     */
-    public void setLifetime( Long lifetime );
+    String getHandle();
 
 
     /**
@@ -94,7 +71,7 @@ public interface IAssociation
      *
      * @return lifetime the lifetime in seconds.
      */
-    public Long getLifetime();
+    Long getLifetime();
 
 
     /**
@@ -102,15 +79,7 @@ public interface IAssociation
      *
      * @return the association type.
      */
-    public AssociationType getAssociationType();
-
-
-    /**
-     * Sets the OpenID protocol association type, for example "HMAC-SHA1".
-     *
-     * @param s the association type.
-     */
-    public void setAssociationType( AssociationType at );
+    AssociationType getAssociationType();
 
 
     /**
@@ -118,15 +87,7 @@ public interface IAssociation
      *
      * @return the session type.
      */
-    public SessionType getSessionType();
-
-
-    /**
-     * Sets the OpenID protocol session type, for example "DH-SHA1".
-     *
-     * @param sessionType the session type.
-     */
-    public void setSessionType( SessionType sessionType );
+    SessionType getSessionType();
 
 
     /**
@@ -134,7 +95,7 @@ public interface IAssociation
      *
      * @return the MAC key; null if key doesn't exist.
      */
-    public byte[] getMacKey();
+    byte[] getMacKey();
 
 
     /**
@@ -142,15 +103,7 @@ public interface IAssociation
      *
      * @return the DH key.
      */
-    public BigInteger getPublicDhKey();
-
-
-    /**
-     * Sets the public Diffie-Hellman key in use.
-     *
-     * @param pk the public DH key.
-     */
-    public void setPublicDhKey( BigInteger pk );
+    BigInteger getPublicDhKey();
 
 
     /**
@@ -158,15 +111,7 @@ public interface IAssociation
      *
      * @return true if the secret is encrypted; false otherwise.
      */
-    public boolean isEncrypted();
-
-    
-    /**
-     * Sets the encrypted MAC key for this association.
-     *
-     * @param encryptedSecret the encrypted MAC key.
-     */
-    public void setEncryptedMacKey( byte[] encryptedSecret );
+    boolean isEncrypted();
 
 
     /**
@@ -174,7 +119,7 @@ public interface IAssociation
      *
      * @return the encrypted MAC key; null if key doesn't exist.
      */
-    public byte[] getEncryptedMacKey();
+    byte[] getEncryptedMacKey();
 
 
     /**
@@ -182,8 +127,8 @@ public interface IAssociation
      *
      * @return whether this association has expired.
      */
-    public boolean hasExpired();
+    boolean hasExpired();
 
 
-    public Date getIssuedDate();
+    Date getIssuedDate();
 }

@@ -49,7 +49,7 @@ public abstract class Message
     }
     
     
-    protected void setMode( Mode mode )
+    public void setMode( Mode mode )
     {
         this.mode = mode;
     }
@@ -67,7 +67,7 @@ public abstract class Message
     }
 
     
-    protected void setNamespace( String ns )
+    public void setNamespace( String ns )
     {
         this.ns = ns;
     }

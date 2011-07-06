@@ -31,7 +31,7 @@ import org.apache.commons.logging.Log;
 /**
  * Parses an OpenID message. 
  */
-class MessageParser
+public class MessageParser
 {
     private final static Log LOG = LogFactory.getLog( MessageParser.class );
     static char newline = '\n';
@@ -156,7 +156,7 @@ class MessageParser
     }
 
 
-    static Map<String,String> postedToMap( String query ) throws IOException
+    public static Map<String,String> postedToMap( String query ) throws IOException
     {
         Map<String,String> map = new HashMap<String, String>();
         if ( query == null )

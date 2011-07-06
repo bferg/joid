@@ -21,14 +21,22 @@ package org.verisign.joid.handlers;
 
 
 import org.verisign.joid.Message;
+import org.verisign.joid.Mode;
+import org.verisign.joid.OpenIdConstants;
 
 
 /**
- * A {@link Message} decoder.
+ * TODO MessageDecoder.
  *
  * @author <a href="mailto:akarasulu@apache.org">Alex Karasulu</a>
  */
-public interface Decoder<E extends Message>
+public class MessageDecoder<E extends Message> implements Decoder<E>
 {
-    void decode( DecoderContext<E> context );
+    public void decode( DecoderContext<E> context )
+    {
+        E message = context.getMessage();
+        
+        message.setMode( Mode.parse( context.getMap().get( OpenIdConstants.OPENID_MODE ) ) );
+        message.setNamespace( context.getMap().get( OpenIdConstants.OPENID_NS ) );
+    }
 }

@@ -244,4 +244,29 @@ public class AssociationRequest extends Request
         sb.append( ", association type=" ).append( associationType.toString() ).append( "]" );
         return sb.toString();
     }
+    
+    public void setAssociationType( AssociationType associationType )
+    {
+        this.associationType = associationType;
+    }
+    
+    public void setDhConsumerPublic( BigInteger dhConsumerPublic )
+    {
+        this.dhConsumerPublic = dhConsumerPublic;
+    }
+    
+    public void setDhModulus( BigInteger dhModulus )
+    {
+        this.dhModulus = dhModulus;
+    }
+    
+    public void setSessionType( SessionType sessionType )
+    {
+        this.sessionType = sessionType;
+    }
+    
+    public void setDhGenerator( BigInteger dhGenerator )
+    {
+        this.dhGenerator = dhGenerator;
+    }
 }

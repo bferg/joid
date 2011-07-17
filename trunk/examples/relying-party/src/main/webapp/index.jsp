@@ -6,7 +6,7 @@ This page is a sample for consumers to use, but also serves as a testing page fo
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%
     String returnTo = UrlUtils.getBaseUrl( request );
-    String trustRoot = "http://localhost:8180";//@TODO make as an init param
+    String openIdServer = "http://localhost:8180";
 	
 %>
 <html>
@@ -36,8 +36,13 @@ This page is a sample for consumers to use, but also serves as a testing page fo
 	<div>
 		<form action="/relying-party" method="post" id="openid_form" accept-charset="utf-8">
 			<input type="hidden" name="signin" value="true" /> 
+            
 			<b>Login with your OpenID URL:</b> 
-			<input type="text" size="30" value="<%=trustRoot + "/user/austinpowers"%>" name="openid_url" id="openid_url" /> 
+			<input type="text" size="30" value="<%=openIdServer + "/user/austinpowers"%>" name="openid_url" id="openid_url" /> 
+      <br/>
+      <b>Trust Root:</b> 
+            <input type="text" name="trustRoot" value="http://localhost:8080" /> 
+            <br/>
 			<input type="submit" value="Login" /><br /> 
 			<i>For example: <tt>someone.bloghost.com</tt> </i>
 		</form>

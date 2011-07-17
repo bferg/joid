@@ -57,7 +57,6 @@ public class RelyingPartyServlet extends HttpServlet
         LOG.debug( "doPost()" );
 
         String returnTo = UrlUtils.getBaseUrl( req );
-        String trustRoot = "http://localhost:8180";//@TODO make as an init param
 
         try
         {
@@ -66,6 +65,8 @@ public class RelyingPartyServlet extends HttpServlet
             {
                 id = "http://" + id;
             }
+            
+            String trustRoot = req.getParameter( "trustRoot" );
 
             String s = OpenIdFilter.joid().getAuthUrl( id, returnTo, trustRoot );
             resp.sendRedirect( s );

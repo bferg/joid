@@ -90,6 +90,8 @@ public class OpenIdServlet extends HttpServlet
     {
        
         
+        log.info( queryString );
+        
         if ( !( openId.canHandle( queryString ) ) )
         {
             returnError( queryString, response );
@@ -185,7 +187,8 @@ public class OpenIdServlet extends HttpServlet
         
         AuthenticationRequest authReq = ( AuthenticationRequest )
                 RequestFactory.parse( queryString );
-        //                String claimedId = (String) session.getAttribute(ID_CLAIMED);
+        
+        String claimedId = (String) request.getSession().getAttribute(ID_CLAIMED);
         /* Ensure that the previously claimed id is the same as the just
         passed in claimed id. */
        
@@ -198,17 +201,26 @@ public class OpenIdServlet extends HttpServlet
 //        {
 //            identity = authReq.getClaimedIdentity();
 //        }
-        if ( getUserManager().canClaim(  getLoggedIn( request ) , authReq.getClaimedIdentity() ) )
+        if ( getUserManager().canClaim(  getLoggedIn( request ) , claimedId ) )
         {
             //String returnTo = authReq.getReturnTo();
+            
+            //FIXME if returnTo includes a query string already, its query part should also be encoded!!!
             String returnTo = ( String ) request.getSession().getAttribute( AuthenticationRequest.OPENID_RETURN_TO );
+            
+            if ( returnTo.indexOf( "?" ) >= 0 )
+            {
+                
+                returnTo = returnTo.substring( 0, returnTo.indexOf( "?" ) ) + "?" + URLEncoder.encode( returnTo.substring( returnTo.indexOf( "?" ) + 1 ), "UTF-8" ); 
+            }
+            
+            
             String delim = ( returnTo.indexOf( '?' ) >= 0 ) ? "&" : "?";
+           
             String returnToUrlWithOpenIdResponse = response.encodeRedirectURL( returnTo + delim + openIdResponse );
             
-            if( log.isDebugEnabled() )
-            {
-                log.debug( "sending redirect to: " + returnToUrlWithOpenIdResponse );
-            }
+            
+            log.info( "sending redirect to: " + returnToUrlWithOpenIdResponse );
             
             //redirecting to relying party with OpenID response query
             response.sendRedirect( returnToUrlWithOpenIdResponse );

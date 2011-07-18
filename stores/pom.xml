@@ -25,7 +25,7 @@
   <artifactId>joid-stores-parent</artifactId>
   <name>JOID Stores Parent</name>
   <packaging>pom</packaging>
-
+  
   <profiles>
     <profile>
       <id>hibernate</id>
@@ -35,7 +35,10 @@
     </profile>
     <profile>
       <id>all</id>
-      <modules>
+      <activation>
+		<activeByDefault>true</activeByDefault>
+	  </activation>
+	  <modules>
         <module>hibernate</module>
         <module>ldap</module>
       </modules>

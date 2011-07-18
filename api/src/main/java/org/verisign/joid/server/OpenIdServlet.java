@@ -50,7 +50,6 @@ public class OpenIdServlet extends HttpServlet
     public static final String COOKIE_USERNAME = "username";
     private static UserManager userManager;
 
-
     public void init( ServletConfig config ) throws ServletException
     {
         super.init( config );
@@ -66,14 +65,12 @@ public class OpenIdServlet extends HttpServlet
         openId = new OpenId( new ServerInfo( endPointUrl, store, crypto ) );
     }
 
-
     public void doGet( HttpServletRequest request,
                       HttpServletResponse response )
             throws ServletException, IOException
     {
         doQuery( request.getQueryString(), request, response );
     }
-
 
     public void doPost( HttpServletRequest request,
                        HttpServletResponse response )
@@ -83,12 +80,10 @@ public class OpenIdServlet extends HttpServlet
         doQuery( populateQueryStringFromPost( request ), request, response );
     }
 
-
     public void doQuery( String queryString,
                         HttpServletRequest request, HttpServletResponse response )
             throws ServletException, IOException
     {
-       
         
         log.info( queryString );
         
@@ -106,7 +101,6 @@ public class OpenIdServlet extends HttpServlet
             
             String user = getLoggedIn( request );
             
-            
             if ( request.getParameter( AuthenticationRequest.OPENID_TRUST_ROOT ) != null )
             {
                 session.setAttribute(
@@ -119,7 +113,6 @@ public class OpenIdServlet extends HttpServlet
                     AuthenticationRequest.OPENID_RETURN_TO,
                     request.getParameter( AuthenticationRequest.OPENID_RETURN_TO ) );
             }
-            
             
             if ( isAuth )
             {
@@ -159,15 +152,11 @@ public class OpenIdServlet extends HttpServlet
                 {
                     processAuthenticationRequest( request, response, queryString );
                 }
-                
-                
-
             }
             else
             {
                 processAssocationRequest( response, queryString );
             }
-            
         }
         catch ( OpenIdException e )
         {
@@ -177,50 +166,24 @@ public class OpenIdServlet extends HttpServlet
         }
     }
 
-
     private void processAuthenticationRequest( HttpServletRequest request, HttpServletResponse response,
         String queryString ) throws UnsupportedEncodingException,
         OpenIdException, IOException
     {
-        
         String openIdResponse = openId.handleRequest( queryString );
         
         AuthenticationRequest authReq = ( AuthenticationRequest )
                 RequestFactory.parse( queryString );
         
         String claimedId = (String) request.getSession().getAttribute(ID_CLAIMED);
-        /* Ensure that the previously claimed id is the same as the just
-        passed in claimed id. */
-       
-//        String identity = null;
-//        if ( request.getParameter( AuthenticationRequest.OPENID_CLAIMED_ID ) == null )
-//        {
-//            identity = request.getParameter( AuthenticationRequest.OPENID_IDENTITY );
-//        }
-//        else
-//        {
-//            identity = authReq.getClaimedIdentity();
-//        }
+
         if ( getUserManager().canClaim(  getLoggedIn( request ) , claimedId ) )
         {
-            //String returnTo = authReq.getReturnTo();
-            
-            //FIXME if returnTo includes a query string already, its query part should also be encoded!!!
             String returnTo = ( String ) request.getSession().getAttribute( AuthenticationRequest.OPENID_RETURN_TO );
-            
-            if ( returnTo.indexOf( "?" ) >= 0 )
-            {
-                
-                returnTo = returnTo.substring( 0, returnTo.indexOf( "?" ) ) + "?" + URLEncoder.encode( returnTo.substring( returnTo.indexOf( "?" ) + 1 ), "UTF-8" ); 
-            }
-            
-            
+                        
             String delim = ( returnTo.indexOf( '?' ) >= 0 ) ? "&" : "?";
            
             String returnToUrlWithOpenIdResponse = response.encodeRedirectURL( returnTo + delim + openIdResponse );
-            
-            
-            log.info( "sending redirect to: " + returnToUrlWithOpenIdResponse );
             
             //redirecting to relying party with OpenID response query
             response.sendRedirect( returnToUrlWithOpenIdResponse );
@@ -231,7 +194,6 @@ public class OpenIdServlet extends HttpServlet
             throw new OpenIdException( "User cannot claim this id." );
         }
     }
-
 
     private void processAssocationRequest( HttpServletResponse response, String queryString ) throws IOException, OpenIdException
     {
@@ -250,9 +212,6 @@ public class OpenIdServlet extends HttpServlet
         out.flush();
         return;
     }
-    
-    
-
 
     /**
      *
@@ -281,7 +240,6 @@ public class OpenIdServlet extends HttpServlet
         }
         return o;
     }
-
     
     private String populateQueryStringFromPost( HttpServletRequest request ) throws IOException
     {
@@ -313,12 +271,10 @@ public class OpenIdServlet extends HttpServlet
         return sb.toString();
     }
 
-
     public static void setLoggedIn( HttpServletRequest request, String username )
     {
         request.getSession( true ).setAttribute( USERNAME_ATTRIBUTE, username );
     }
-
 
     private void returnError( String query, HttpServletResponse response )
             throws ServletException, IOException
@@ -359,7 +315,6 @@ public class OpenIdServlet extends HttpServlet
             out.flush();
         }
     }
-
 
     public void log( String s )
     {

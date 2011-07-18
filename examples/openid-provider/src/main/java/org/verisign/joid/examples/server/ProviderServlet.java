@@ -29,9 +29,6 @@ public class ProviderServlet extends HttpServlet
     {
         LOG.debug( "doPost()" );
 
-        String returnTo = UrlUtils.getBaseUrl( req );
-        String trustRoot = "http://localhost:8180";//@TODO make as an init param
-        
         HttpSession  session = req.getSession();
         
         try
@@ -56,7 +53,8 @@ public class ProviderServlet extends HttpServlet
                             // then we'll redirect to login servlet again to finish up
                             String baseUrl = UrlUtils.getBaseUrl(req);
                             String openIdServer = baseUrl + "/login";
-                            resp.sendRedirect(openIdServer + "?" + URLDecoder.decode(query));
+                            String redirectUrl = openIdServer + "?" + query;
+                            resp.sendRedirect( redirectUrl );
                             return;
                         } else {
                             errorMsg = "You do not own the claimed identity.";

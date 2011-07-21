@@ -40,8 +40,7 @@ This page is a sample for consumers to use, but also serves as a testing page fo
 			<b>Login with your OpenID URL:</b> 
 			<input type="text" size="30" value="<%=openIdServer + "/user/austinpowers"%>" name="openid_url" id="openid_url" /> 
       <br/>
-      <b>Trust Root:</b> 
-            <input type="text" name="trustRoot" value="http://localhost:8080" /> 
+            <input type="hidden" name="trustRoot" value="<%=returnTo %>" /> 
             <br/>
 			<input type="submit" value="Login" /><br /> 
 			<i>For example: <tt>someone.bloghost.com</tt> </i>
@@ -51,7 +50,7 @@ This page is a sample for consumers to use, but also serves as a testing page fo
 	<br />
 	<br />
 	<img src="http://l.yimg.com/us.yimg.com/i/ydn/openid-signin-yellow.png"
-		alt="Sign in with Yahoo" onclick="submitForm('http://www.yahoo.com');" />
+		alt="Sign in with Yahoo" onclick="submitForm('http://me.yahoo.com');" />
 	<br />
 	<br />
 	<img src="http://buttons.googlesyndication.com/fusion/add.gif"

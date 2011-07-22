@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapConnectionPool;
 import org.apache.directory.ldap.client.api.PoolableLdapConnectionFactory;
+import org.apache.directory.server.HttpDirectoryService;
 import org.apache.directory.shared.ldap.model.entry.Attribute;
 import org.apache.directory.shared.ldap.model.entry.DefaultModification;
 import org.apache.directory.shared.ldap.model.entry.Entry;
@@ -38,7 +39,6 @@ import org.apache.directory.shared.ldap.model.entry.ModificationOperation;
 import org.apache.directory.shared.ldap.model.exception.LdapException;
 import org.apache.directory.shared.ldap.model.name.Dn;
 import org.apache.directory.shared.ldap.model.schema.AttributeType;
-
 import org.verisign.joid.AssociationRequest;
 import org.verisign.joid.Crypto;
 import org.verisign.joid.IAssociation;
@@ -73,12 +73,35 @@ public class LdapStore implements IStore
     private LdapConnectionPool connPool;
     
     
+    private Boolean useEmbeddedApacheDs = false;
+    
     public void initialize()
     {
-        connPool = new LdapConnectionPool( new PoolableLdapConnectionFactory( getConnConfig() ) );
+        if( useEmbeddedApacheDs )
+        {
+            throw new IllegalArgumentException( "should call initialize(HttpDirectoryService) when embedded ApacheDs is used " );
+        }
+        else
+        {
+            connPool = new LdapConnectionPool( new PoolableLdapConnectionFactory( getConnConfig() ) );
+            
+            associationDao = new AssociationDao( new LdapNetworkConnectionManager( connPool ), associationBaseDn );
+            nonceDao = new NonceDao( new LdapNetworkConnectionManager( connPool ), associationBaseDn );
+        }
         
-        associationDao = new AssociationDao( new LdapNetworkConnectionManager( connPool ), associationBaseDn );
-        nonceDao = new NonceDao( new LdapNetworkConnectionManager( connPool ), associationBaseDn );
+        
+    }
+    
+    public void initialize( HttpDirectoryService directoryService ) throws IllegalStateException
+    {
+        if( directoryService == null )
+        {
+            throw new IllegalStateException( "directory service is null" );
+        }
+        
+       associationDao = new AssociationDao( new LdapSessionConnectionManager( directoryService ), associationBaseDn );
+       nonceDao = new NonceDao( new LdapSessionConnectionManager( directoryService ), nonceBaseDn  );
+       
     }
     
 

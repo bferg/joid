@@ -52,6 +52,12 @@
       <groupId>org.apache.directory.shared</groupId>
       <artifactId>shared-ldap-client-api</artifactId>
     </dependency>
+    
+    <dependency>
+      <groupId>org.apache.directory.server</groupId>
+      <artifactId>apacheds-http-directory-bridge</artifactId>
+      <version>2.0.0-M2-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.directory.server</groupId>

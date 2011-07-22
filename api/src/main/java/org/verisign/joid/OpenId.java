@@ -16,9 +16,11 @@ package org.verisign.joid;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Map;
-import org.apache.commons.logging.LogFactory;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.logging.Log;
-import org.verisign.joid.Crypto;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -94,7 +96,7 @@ public class OpenId
     /**
      * Call this method if the data is posted by way of HTTP POST
      */
-    public String handleRequest( Map<String,String> map ) throws OpenIdException
+    public String handleRequest( Map<String, String> map ) throws OpenIdException
     {
         throw new RuntimeException( "nyi" );
     }
@@ -106,10 +108,39 @@ public class OpenId
      * @param query the request to check.
      * @return true if the incoming request is an Association Request; false
      * otherwise.
+     * @throws InvalidOpenIdQueryException 
      */
-    public boolean isAssociationRequest( String query )
+    public boolean isAssociationRequest( String query ) throws InvalidOpenIdQueryException
     {
+        
+        if ( query == null || query.equals( "" ) )
+        {
+            throw new InvalidOpenIdQueryException( "empty query" );
+        }
+
         try
+        {
+            Pattern openIdModePattern = Pattern.compile( ".*" + RequestFactory.OPENID_MODE + "=(.+?)&.*" );
+
+            Matcher matcher = openIdModePattern.matcher( query );
+
+            if ( matcher.find() )
+            {
+                return Mode.parse( matcher.group( 1 ) ).equals( Mode.ASSOCIATE );
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( e, e );
+            throw new InvalidOpenIdQueryException( "cannot parse query: " + query );
+
+        }
+        
+       /* try
         {
             Request req = RequestFactory.parse( query );
             return ( req instanceof AssociationRequest );
@@ -123,7 +154,7 @@ public class OpenId
         {
             log.info( e, e );
             return false;
-        }
+        }*/
     }
 
 
@@ -133,9 +164,40 @@ public class OpenId
      * @param query the request to check.
      * @return true if the incoming request is an Authentication Request; false
      * otherwise.
+     * @throws InvalidOpenIdQueryException 
      */
-    public boolean isAuthenticationRequest( String query )
+    public boolean isAuthenticationRequest( String query ) throws InvalidOpenIdQueryException
     {
+
+        if ( query == null || query.equals( "" ) )
+        {
+            throw new InvalidOpenIdQueryException( "empty query" );
+        }
+
+        try
+        {
+            Pattern openIdModePattern = Pattern.compile( ".*" + RequestFactory.OPENID_MODE + "=(.+?)&.*" );
+
+            Matcher matcher = openIdModePattern.matcher( query );
+
+            if ( matcher.find() )
+            {
+                return Mode.parse( matcher.group( 1 ) ).equals( Mode.CHECKID_SETUP )
+                    || Mode.parse( matcher.group( 1 ) ).equals( Mode.CHECKID_IMMEDIATE );
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch ( Exception e )
+        {
+            log.error( e, e );
+            throw new InvalidOpenIdQueryException( "cannot parse query: " + query );
+
+        }
+
+        /*
         try
         {
             Request req = RequestFactory.parse( query );
@@ -151,6 +213,7 @@ public class OpenId
             log.info( e, e );
             return false;
         }
+        */
     }
 
 
@@ -160,23 +223,35 @@ public class OpenId
      * @param query the request to check.
      * @return true if the incoming request is a Check Authentication 
      * Request; false otherwise.
+     * @throws InvalidOpenIdQueryException 
      */
-    public boolean isCheckAuthenticationRequest( String query )
+    public boolean isCheckAuthenticationRequest( String query ) throws InvalidOpenIdQueryException
     {
+
+        if ( query == null || query.equals( "" ) )
+        {
+            throw new InvalidOpenIdQueryException( "empty query" );
+        }
+
         try
         {
-            Request req = RequestFactory.parse( query );
-            return ( req instanceof CheckAuthenticationRequest );
+            Pattern openIdModePattern = Pattern.compile( ".*" + RequestFactory.OPENID_MODE + "=(.+?)&.*" );
+
+            Matcher matcher = openIdModePattern.matcher( query );
+
+            if ( matcher.find() )
+            {
+                return Mode.parse( matcher.group( 1 ) ).equals( Mode.CHECK_AUTHENTICATION );
+            }
+            else
+            {
+                return false;
+            }
         }
-        catch ( OpenIdException e )
+        catch ( Exception e )
         {
-            log.info( e, e );
-            return false;
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            log.info( e, e );
-            return false;
+            log.error( e, e );
+            throw new InvalidOpenIdQueryException( "cannot parse query: " + query );
         }
     }
 
@@ -188,8 +263,9 @@ public class OpenId
      * on the request: if the request is an authentication request, the
      * response will be suitable for redirecting via URL; otherwise the
      * response will be name/value pair encoded as per specification.
+     * @throws InvalidOpenIdQueryException 
      */
-    public String handleRequest( String query ) throws OpenIdException
+    public String handleRequest( String query ) throws OpenIdException, InvalidOpenIdQueryException
     {
         Request req = null;
         try
@@ -201,7 +277,7 @@ public class OpenId
             log.warn( "exception=" + e );
             throw new OpenIdException( e );
         }
-        
+
         Response resp = req.processUsing( serverInfo );
         if ( req instanceof AuthenticationRequest )
         {

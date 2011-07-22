@@ -32,9 +32,10 @@ public class RequestFactory
      * @return the parsed request.
      * @throws OpenIdException if the query cannot be parsed into a known
      *  request.
+     * @throws InvalidOpenIdQueryException 
      */
     public static Request parse( String query )
-        throws UnsupportedEncodingException, OpenIdException
+        throws UnsupportedEncodingException, OpenIdException, InvalidOpenIdQueryException
     {
         Map<String,String> map;
         
@@ -63,7 +64,7 @@ public class RequestFactory
         }
         else
         {
-            throw new OpenIdException( "Cannot parse request from " + query );
+            throw new InvalidOpenIdQueryException( new StringBuilder( "Cannot parse request from " ).append( query ).toString() );
         }
     }
 

@@ -167,6 +167,7 @@ public class JoidConsumer
         ServerAndDelegate idserver = null;
         try
         {
+            //FIX ME is it required to do each authentication? maybe we can cache the idServer with association ! see the spec!!!
             idserver = discoverer.findIdServer( identity );
         }
         catch ( Exception e )

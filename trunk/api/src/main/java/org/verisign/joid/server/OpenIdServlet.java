@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
 import org.verisign.joid.AuthenticationRequest;
 import org.verisign.joid.Crypto;
+import org.verisign.joid.InvalidOpenIdQueryException;
 import org.verisign.joid.OpenId;
 import org.verisign.joid.OpenIdException;
 import org.verisign.joid.RequestFactory;
@@ -87,11 +88,11 @@ public class OpenIdServlet extends HttpServlet
         
         log.info( queryString );
         
-        if ( !( openId.canHandle( queryString ) ) )
-        {
-            returnError( queryString, response );
-            return;
-        }
+//        if ( !( openId.canHandle( queryString ) ) )
+//        {
+//            returnError( queryString, response );
+//            return;
+//        }
         
         try
         {
@@ -158,6 +159,10 @@ public class OpenIdServlet extends HttpServlet
                 processAssocationRequest( response, queryString );
             }
         }
+        catch (InvalidOpenIdQueryException e) {
+            returnError( queryString, response );
+        }
+        
         catch ( OpenIdException e )
         {
             e.printStackTrace();
@@ -168,12 +173,12 @@ public class OpenIdServlet extends HttpServlet
 
     private void processAuthenticationRequest( HttpServletRequest request, HttpServletResponse response,
         String queryString ) throws UnsupportedEncodingException,
-        OpenIdException, IOException
+        OpenIdException, IOException, InvalidOpenIdQueryException
     {
         String openIdResponse = openId.handleRequest( queryString );
         
-        AuthenticationRequest authReq = ( AuthenticationRequest )
-                RequestFactory.parse( queryString );
+//        AuthenticationRequest authReq = ( AuthenticationRequest )
+//                RequestFactory.parse( queryString );
         
         String claimedId = (String) request.getSession().getAttribute(ID_CLAIMED);
 
@@ -195,7 +200,7 @@ public class OpenIdServlet extends HttpServlet
         }
     }
 
-    private void processAssocationRequest( HttpServletResponse response, String queryString ) throws IOException, OpenIdException
+    private void processAssocationRequest( HttpServletResponse response, String queryString ) throws IOException, OpenIdException, InvalidOpenIdQueryException
     {
         // Association request
         String openIdResponse = openId.handleRequest( queryString );

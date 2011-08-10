@@ -26,7 +26,7 @@ package org.verisign.joid;
  *
  * @author <a href="mailto:birkan.duman@gmail.com">Birkan Duman</a>
  */
-public class InvalidOpenIdQueryException extends Exception
+public class InvalidOpenIdQueryException extends OpenIdException
 {
     public InvalidOpenIdQueryException( String s )
     {

@@ -107,7 +107,7 @@ public class NonceDao implements LdapDao<INonce, String>
      */
     public void create( INonce entity ) throws OpenIdException
     {
-        LdapConnection conn = connMan.acquireConnection();
+        final LdapConnection conn = connMan.acquireConnection();
         Entry entry = toEntry( entity );
 
         try

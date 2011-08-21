@@ -74,4 +74,88 @@ objectclass ( 1.3.6.1.4.1.18060.123.10
     STRUCTURAL
     MUST ( opHandleAt $ opSecretAt $ 
            opIssuedDateAt $ opLifetimeAt $ opAssociationTypeAt ) )
+           
+           
+#configuration related objectClasses and attributeTypes
 
+
+attributetype ( 1.3.6.1.4.1.18060.123.11 
+    NAME 'opStoreTypeAt' 
+    DESC 'OpenID Store Type' 
+    EQUALITY caseExactMatch 
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+    SINGLE-VALUE 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.12 
+    NAME 'opAssocLifeTimeAt' 
+    DESC 'OpenID Association Lifetime' 
+    EQUALITY integerMatch 
+    ORDERING integerOrderingMatch 
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 
+    SINGLE-VALUE 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.13 
+    NAME 'opUserManagerClassName' 
+    DESC 'OpenID UserManager Class Name' 
+    EQUALITY caseExactMatch 
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+    SINGLE-VALUE 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.14 
+    NAME 'opLoginPageAt' 
+    DESC 'OpenID Login Page' 
+    EQUALITY caseExactMatch 
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+    SINGLE-VALUE 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.15 
+    NAME 'opEndPointUrlAt' 
+    DESC 'OpenID EndPoint URL' 
+    EQUALITY caseExactMatch 
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+    SINGLE-VALUE 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.16 
+    NAME 'opAccessControlStrategyAt' 
+    DESC 'OpenID Relying Party Access Control Strategy' 
+    EQUALITY caseExactMatch 
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+    SINGLE-VALUE 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.17 
+    NAME 'opWhiteListAt' 
+    DESC 'OpenID White Listed Relying Parties' 
+    EQUALITY caseIgnoreMatch 
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.18 
+    NAME 'opBlackListAt' 
+    DESC 'OpenID Black Listed Relying Parties' 
+    EQUALITY caseExactMatch 
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+ )
+
+
+objectclass ( 1.3.6.1.4.1.18060.123.19 
+    NAME 'opConfigurationOc' 
+    DESC 'OpenID Provider Configuration objectclass' 
+    SUP top 
+    STRUCTURAL 
+    MUST ( opAssocLifeTimeAt $ opEndPointUrlAt $ opLoginPageAt $ opStoreTypeAt $ opUserManagerClassName ) 
+ )
+
+objectclass ( 1.3.6.1.4.1.18060.123.20 
+    NAME 'opRpConfigurationOc' 
+    DESC 'OpenID Relying Party Access Control Strategy Configuration objectclass' 
+    SUP top 
+    STRUCTURAL 
+    MUST opAccessControlStrategyAt 
+    MAY ( opBlackListAt $ opWhiteListAt ) 
+ )           

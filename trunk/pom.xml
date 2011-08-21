@@ -232,6 +232,11 @@
         <version>${org.apache.directory.server.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.directory.server</groupId>
+        <artifactId>apacheds-http-directory-bridge</artifactId>
+        <version>${org.apache.directory.server.version}</version>
+      </dependency>
       <!-- Web Dependencies -->
 
       <dependency>

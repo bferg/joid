@@ -1,161 +1,187 @@
-#
-# Nonce related attributeTypes and objectClasses
-#
+attributetype ( 1.3.6.1.4.1.18060.123.1 
+	NAME 'opNonceAt' 
+	DESC 'OpenID Nonce attribute' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
+ )
 
-attributetype ( 1.3.6.1.4.1.18060.123.1
-    NAME 'opNonceAt'
-    DESC 'OpenID Nonce attribute'
-    EQUALITY caseExactMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
-    SINGLE-VALUE )
+attributetype ( 1.3.6.1.4.1.18060.123.2 
+	NAME 'opCheckedDateAt' 
+	DESC 'OpenID Nonce checkedDate attribute' 
+	EQUALITY generalizedTimeMatch 
+	ORDERING generalizedTimeOrderingMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 
+	SINGLE-VALUE 
+ )
 
-attributetype ( 1.3.6.1.4.1.18060.123.2
-    NAME 'opCheckedDateAt'
-    DESC 'OpenID Nonce checkedDate attribute'
-    EQUALITY generalizedTimeMatch
-    ORDERING generalizedTimeOrderingMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
-    SINGLE-VALUE )
+attributetype ( 1.3.6.1.4.1.18060.123.5 
+	NAME 'opHandleAt' 
+	DESC 'OpenID Association handle attribute' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
+ )
 
-objectclass ( 1.3.6.1.4.1.18060.123.3
-    NAME 'opNonceOc'
-    DESC 'Nonce objectClass for JOID OpenID implementation'
-    SUP top
-    STRUCTURAL
-    MUST ( opNonceAt $ opCheckedDateAt ) )
+attributetype ( 1.3.6.1.4.1.18060.123.6 
+	NAME 'opSecretAt' 
+	DESC 'OpenID Association secret attribute' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
+ )
 
+attributetype ( 1.3.6.1.4.1.18060.123.7 
+	NAME 'opAssociationTypeAt' 
+	DESC 'OpenID Association type attribute' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
+ )
 
-#
-# Association related attributeTypes and objectClasses
-#
+attributetype ( 1.3.6.1.4.1.18060.123.8 
+	NAME 'opIssuedDateAt' 
+	DESC 'OpenID Association issuedDate attribute' 
+	EQUALITY generalizedTimeMatch 
+	ORDERING generalizedTimeOrderingMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.24 
+	SINGLE-VALUE 
+ )
 
-
-attributetype ( 1.3.6.1.4.1.18060.123.5
-    NAME 'opHandleAt'
-    DESC 'OpenID Association handle attribute'
-    EQUALITY caseExactMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
-    SINGLE-VALUE )
-
-attributetype ( 1.3.6.1.4.1.18060.123.6
-    NAME 'opSecretAt'
-    DESC 'OpenID Association secret attribute'
-    EQUALITY caseExactMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
-    SINGLE-VALUE )
-
-attributetype ( 1.3.6.1.4.1.18060.123.7
-    NAME 'opAssociationTypeAt'
-    DESC 'OpenID Association type attribute'
-    EQUALITY caseExactMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15
-    SINGLE-VALUE )
-
-attributetype ( 1.3.6.1.4.1.18060.123.8
-    NAME 'opIssuedDateAt'
-    DESC 'OpenID Association issuedDate attribute'
-    EQUALITY generalizedTimeMatch
-    ORDERING generalizedTimeOrderingMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.24
-    SINGLE-VALUE )
-
-attributetype ( 1.3.6.1.4.1.18060.123.9
-    NAME 'opLifetimeAt'
-    DESC 'OpenID Association lifetime attribute'
-    EQUALITY integerMatch
-    ORDERING integerOrderingMatch
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.27
-    SINGLE-VALUE )
-
-objectclass ( 1.3.6.1.4.1.18060.123.10
-    NAME 'opAssociationOc'
-    DESC 'OpenID Association objectclass'
-    SUP top
-    STRUCTURAL
-    MUST ( opHandleAt $ opSecretAt $ 
-           opIssuedDateAt $ opLifetimeAt $ opAssociationTypeAt ) )
-           
-           
-#configuration related objectClasses and attributeTypes
-
+attributetype ( 1.3.6.1.4.1.18060.123.9 
+	NAME 'opLifetimeAt' 
+	DESC 'OpenID Association lifetime attribute' 
+	EQUALITY integerMatch 
+	ORDERING integerOrderingMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 
+	SINGLE-VALUE 
+ )
 
 attributetype ( 1.3.6.1.4.1.18060.123.11 
-    NAME 'opStoreTypeAt' 
-    DESC 'OpenID Store Type' 
-    EQUALITY caseExactMatch 
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
-    SINGLE-VALUE 
+	NAME 'opStoreTypeAt' 
+	DESC 'OpenID Store Type' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
  )
 
 attributetype ( 1.3.6.1.4.1.18060.123.12 
-    NAME 'opAssocLifeTimeAt' 
-    DESC 'OpenID Association Lifetime' 
-    EQUALITY integerMatch 
-    ORDERING integerOrderingMatch 
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 
-    SINGLE-VALUE 
+	NAME 'opAssocLifeTimeAt' 
+	DESC 'OpenID Association Lifetime' 
+	EQUALITY integerMatch 
+	ORDERING integerOrderingMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.27 
+	SINGLE-VALUE 
  )
 
 attributetype ( 1.3.6.1.4.1.18060.123.13 
-    NAME 'opUserManagerClassName' 
-    DESC 'OpenID UserManager Class Name' 
-    EQUALITY caseExactMatch 
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
-    SINGLE-VALUE 
+	NAME 'opUserManagerClassNameAt' 
+	DESC 'OpenID UserManager Class Name' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
  )
 
 attributetype ( 1.3.6.1.4.1.18060.123.14 
-    NAME 'opLoginPageAt' 
-    DESC 'OpenID Login Page' 
-    EQUALITY caseExactMatch 
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
-    SINGLE-VALUE 
+	NAME 'opLoginPageAt' 
+	DESC 'OpenID Login Page' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
  )
 
 attributetype ( 1.3.6.1.4.1.18060.123.15 
-    NAME 'opEndPointUrlAt' 
-    DESC 'OpenID EndPoint URL' 
-    EQUALITY caseExactMatch 
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
-    SINGLE-VALUE 
+	NAME 'opEndPointUrlAt' 
+	DESC 'OpenID EndPoint URL' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
  )
 
 attributetype ( 1.3.6.1.4.1.18060.123.16 
-    NAME 'opAccessControlStrategyAt' 
-    DESC 'OpenID Relying Party Access Control Strategy' 
-    EQUALITY caseExactMatch 
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
-    SINGLE-VALUE 
+	NAME 'opAccessControlStrategyAt' 
+	DESC 'OpenID Relying Party Access Control Strategy' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
  )
 
 attributetype ( 1.3.6.1.4.1.18060.123.17 
-    NAME 'opWhiteListAt' 
-    DESC 'OpenID White Listed Relying Parties' 
-    EQUALITY caseIgnoreMatch 
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	NAME 'opWhiteListAt' 
+	DESC 'OpenID White Listed Relying Parties' 
+	EQUALITY caseIgnoreMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
  )
 
 attributetype ( 1.3.6.1.4.1.18060.123.18 
-    NAME 'opBlackListAt' 
-    DESC 'OpenID Black Listed Relying Parties' 
-    EQUALITY caseExactMatch 
-    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	NAME 'opBlackListAt' 
+	DESC 'OpenID Black Listed Relying Parties' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
  )
 
+attributetype ( 1.3.6.1.4.1.18060.123.21 
+	NAME 'OpConfigurationIdAt' 
+	DESC 'The ID of the provider the configuration belongs' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.22 
+	NAME 'opRpConfigurationIdAt' 
+	DESC 'Id of Relying Party Configuration' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.23 
+	NAME 'opNonceBaseDnAt' 
+	DESC 'Base DN to save Nonces' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
+ )
+
+attributetype ( 1.3.6.1.4.1.18060.123.24 
+	NAME 'opAssociationBaseDnAt' 
+	DESC 'Base Dn to save OpenIdAsscoations' 
+	EQUALITY caseExactMatch 
+	SYNTAX 1.3.6.1.4.1.1466.115.121.1.15 
+	SINGLE-VALUE 
+ )
+
+objectclass ( 1.3.6.1.4.1.18060.123.3 
+	NAME 'opNonceOc' 
+	DESC 'Nonce objectClass for JOID OpenID implementation' 
+	SUP top 
+	STRUCTURAL 
+	MUST ( opNonceAt $ opCheckedDateAt ) 
+ )
+
+objectclass ( 1.3.6.1.4.1.18060.123.10 
+	NAME 'opAssociationOc' 
+	DESC 'OpenID Association objectclass' 
+	SUP top 
+	STRUCTURAL 
+	MUST ( opHandleAt $ opSecretAt $ opIssuedDateAt $ opLifetimeAt $ opAssociationTypeAt ) 
+ )
 
 objectclass ( 1.3.6.1.4.1.18060.123.19 
-    NAME 'opConfigurationOc' 
-    DESC 'OpenID Provider Configuration objectclass' 
-    SUP top 
-    STRUCTURAL 
-    MUST ( opAssocLifeTimeAt $ opEndPointUrlAt $ opLoginPageAt $ opStoreTypeAt $ opUserManagerClassName ) 
+	NAME 'opConfigurationOc' 
+	DESC 'OpenID Provider Configuration objectclass' 
+	SUP top 
+	STRUCTURAL 
+	MUST ( opAssocLifeTimeAt $ opEndPointUrlAt $ opLoginPageAt $ opStoreTypeAt $ OpConfigurationIdAt $ opUserManagerClassNameAt $ opAssociationBaseDnAt $ opNonceBaseDnAt ) 
  )
 
 objectclass ( 1.3.6.1.4.1.18060.123.20 
-    NAME 'opRpConfigurationOc' 
-    DESC 'OpenID Relying Party Access Control Strategy Configuration objectclass' 
-    SUP top 
-    STRUCTURAL 
-    MUST opAccessControlStrategyAt 
-    MAY ( opBlackListAt $ opWhiteListAt ) 
- )           
+	NAME 'opRpConfigurationOc' 
+	DESC 'OpenID Relying Party Access Control Strategy Configuration objectclass' 
+	SUP top 
+	STRUCTURAL 
+	MUST ( opAccessControlStrategyAt $ opRpConfigurationIdAt ) 
+	MAY ( opBlackListAt $ opWhiteListAt ) 
+ )
+

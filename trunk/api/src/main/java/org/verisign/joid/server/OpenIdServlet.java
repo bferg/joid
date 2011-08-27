@@ -177,12 +177,26 @@ public class OpenIdServlet extends HttpServlet
     {
         String openIdResponse = openId.handleRequest( queryString );
         
-//        AuthenticationRequest authReq = ( AuthenticationRequest )
-//                RequestFactory.parse( queryString );
+        
+        
+        AuthenticationRequest authReq = ( AuthenticationRequest )
+                RequestFactory.parse( queryString );
         
         String claimedId = (String) request.getSession().getAttribute(ID_CLAIMED);
 
-        if ( getUserManager().canClaim(  getLoggedIn( request ) , claimedId ) )
+        /* Ensure that the previously claimed id is the same as the just
+        passed in claimed id. */
+        String identity;
+        if ( request.getParameter( AuthenticationRequest.OPENID_CLAIMED_ID ) == null )
+        {
+            identity = request.getParameter( AuthenticationRequest.OPENID_IDENTITY );
+        }
+        else
+        {
+            identity = authReq.getClaimedIdentity();
+        }
+        
+        if ( getUserManager().canClaim(  getLoggedIn( request ) , identity ) )
         {
             String returnTo = ( String ) request.getSession().getAttribute( AuthenticationRequest.OPENID_RETURN_TO );
                         

@@ -120,18 +120,7 @@ public class OpenId
 
         try
         {
-            Pattern openIdModePattern = Pattern.compile( ".*" + RequestFactory.OPENID_MODE + "=(.+?)&.*" );
-
-            Matcher matcher = openIdModePattern.matcher( query );
-
-            if ( matcher.find() )
-            {
-                return Mode.parse( matcher.group( 1 ) ).equals( Mode.ASSOCIATE );
-            }
-            else
-            {
-                return false;
-            }
+            return ( query.indexOf( new StringBuilder(RequestFactory.OPENID_MODE).append("=" ).append( Mode.ASSOCIATE ).toString() ) >= 0 ); 
         }
         catch ( Exception e )
         {
@@ -176,19 +165,8 @@ public class OpenId
 
         try
         {
-            Pattern openIdModePattern = Pattern.compile( ".*" + RequestFactory.OPENID_MODE + "=(.+?)&.*" );
-
-            Matcher matcher = openIdModePattern.matcher( query );
-
-            if ( matcher.find() )
-            {
-                return Mode.parse( matcher.group( 1 ) ).equals( Mode.CHECKID_SETUP )
-                    || Mode.parse( matcher.group( 1 ) ).equals( Mode.CHECKID_IMMEDIATE );
-            }
-            else
-            {
-                return false;
-            }
+            return ( query.indexOf( new StringBuilder(RequestFactory.OPENID_MODE).append("=" ).append( Mode.CHECKID_SETUP ).toString() ) >= 0
+                ||  query.indexOf( new StringBuilder(RequestFactory.OPENID_MODE).append("=" ).append( Mode.CHECKID_IMMEDIATE ).toString() ) >= 0 ); 
         }
         catch ( Exception e )
         {

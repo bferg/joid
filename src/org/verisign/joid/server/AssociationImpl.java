@@ -25,6 +25,7 @@ public class AssociationImpl implements org.verisign.joid.Association {
     private Date issuedDate;
     private Long lifetime;
     private String associationType;
+    private boolean shared;
 
     // Not in db
     private String error;
@@ -106,7 +107,7 @@ public class AssociationImpl implements org.verisign.joid.Association {
 	if (publicKey != null) {
 	    s += ", public key="+Crypto.convertToString(publicKey);
 	}
-	s+=", type="+associationType+", issuedDate="+issuedDate+"]";
+	s+=", type="+associationType+", issuedDate="+issuedDate+", shared="+(shared ? "true":"false")+"]";
 	return s;
     }
 
@@ -160,4 +161,7 @@ public class AssociationImpl implements org.verisign.joid.Association {
 	log.debug("now.after(expired): "+now.after(expired));
 	return now.after(expired);
     }
-		    }
+
+    public boolean getShared() { return shared; }
+    public void setShared(boolean isShared) { shared = isShared; }
+}

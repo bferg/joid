@@ -79,7 +79,10 @@ public class CheckAuthenticationRequest extends Request
             }
         }
 	Association assoc = store.findAssociation(handle);
-	if ((assoc == null) || (assoc.hasExpired())){
+        if ((assoc != null) && assoc.getShared()) {
+            assoc = null;
+        }
+	if ((assoc == null) || assoc.hasExpired()){
 	    invalidate = handle;
 	}
 	Crypto crypto = si.getCrypto();
@@ -94,6 +97,10 @@ public class CheckAuthenticationRequest extends Request
             +", handle="+handle
 	    +", authentication response="+ar
 	    +"]";
+    }
+
+    public String getHandle() {
+        return handle;
     }
 
     Map toMap()

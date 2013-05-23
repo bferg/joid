@@ -146,6 +146,19 @@ public class AllTests extends TestCase
 	return ar;
     }
 
+    private Association getAssociation(String handle) throws Exception {
+        Store store = serverInfo.getStore();
+        Association assoc = store.findAssociation(handle);
+        return assoc;
+    }
+
+    private void setAssociationSharing(String handle, boolean shared) throws Exception {
+        Association assoc = getAssociation(handle);
+        store.deleteAssociation(assoc);
+        assoc.setShared(shared);
+        store.saveAssociation(assoc);
+    }
+
     
     public void testUrlToMap() throws Exception
     {
@@ -391,12 +404,13 @@ public class AllTests extends TestCase
 	CheckAuthenticationRequest carq
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 	assertFalse(carq.isVersion2());
-
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(carq.getHandle(), false);
 	resp = carq.processUsing(serverInfo);
 	assertFalse(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
-	assertTrue(carp.isValid());
+	assertTrue("Check auth response valid", carp.isValid());
     }
 
     public void test3_badsig() throws Exception
@@ -455,6 +469,8 @@ public class AllTests extends TestCase
 	map.put("openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=");
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(carq.getHandle(), false);
 
 	resp = carq.processUsing(serverInfo);
 	assertFalse(resp.isVersion2());
@@ -530,15 +546,17 @@ public class AllTests extends TestCase
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 
-    // Check for sreg namespace
-    if (resp.isVersion2()) {
-        assertEquals((String)map.get("openid.ns.sreg"), 
-                     SimpleRegistration.OPENID_SREG_NAMESPACE_11);
-        // make sure that ns.sreg is signed
-        String[] signed = sigList.split(",");
-        assertTrue(Arrays.asList(signed).contains("ns.sreg"));
-    }
+        // Check for sreg namespace
+        if (resp.isVersion2()) {
+            assertEquals((String)map.get("openid.ns.sreg"), 
+                         SimpleRegistration.OPENID_SREG_NAMESPACE_11);
+            // make sure that ns.sreg is signed
+            String[] signed = sigList.split(",");
+            assertTrue(Arrays.asList(signed).contains("ns.sreg"));
+        }
 
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(carq.getHandle(), false);
 	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
@@ -640,6 +658,8 @@ public class AllTests extends TestCase
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(carq.getHandle(), false);
 	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
@@ -783,6 +803,8 @@ public class AllTests extends TestCase
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(carq.getHandle(), false);
 	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
@@ -1840,5 +1862,108 @@ public class AllTests extends TestCase
         objOutStream.writeObject(papeReq);
         objOutStream.close();
         
+    }
+
+    // Tests whether shared association handle can be used in a
+    // private association context.
+    //
+    // From http://openid.net/specs/openid-authentication-2_0.html#rfc.section.11.4.2.1 :
+    // "For verifying signatures an OP MUST only use private
+    //  associations and MUST NOT use associations that have shared
+    //  keys. If the verification request contains a handle for a
+    //  shared association, it means the Relying Party no longer knows
+    //  the shared secret, or an entity other than the RP (e.g. an
+    //  attacker) has established this association with the OP."
+    //
+    public void testAssociationBug () throws Exception {
+        // get association
+        // generate assertion using key from association
+        // check assertion with server using (shared) association (should fail)
+        
+	DiffieHellman dh = new DiffieHellman(p, g);
+	AssociationResponse ar = associate(dh);
+	BigInteger privateKey = dh.getPrivateKey();
+	BigInteger publicKey = dh.getPublicKey();
+
+	assertTrue(ar.getSessionType(),"DH-SHA1".equals(ar.getSessionType()));
+	assertTrue("HMAC-SHA1".equals(ar.getAssociationType()));
+	assertTrue(defaultLifespan == ar.getExpiresIn());
+	assertTrue(null == ar.getErrorCode());
+	assertTrue(null == ar.getMacKey());
+
+	byte[] encKey = ar.getEncryptedMacKey();
+	assertTrue(null != encKey);
+
+	BigInteger serverPublic = ar.getDhServerPublic();
+	assertTrue(null != serverPublic);
+
+	byte[] clearKey = dh.xorSecret(serverPublic, encKey);
+
+
+	// authenticate
+	String s = Utils.readFileAsString("3b.txt");
+
+        // openid.ns=http://specs.openid.net/auth/2.0
+        // openid.mode=checkid_setup
+        // openid.identity=http://hans.pip.verisignlabs.com
+        // openid.return_to=http://granqvist.com
+        // openid.trust_root=http://granqvist.com
+        
+	s += "&openid.ns="+v2
+	    + "&openid.assoc_handle="
+	    + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
+
+        Association assoc = store.findAssociation(ar.getAssociationHandle());
+        System.out.println(assoc);
+
+	Request req = RequestFactory.parse(s);
+
+	assertTrue(req instanceof AuthenticationRequest);
+	assertTrue(req.isVersion2());
+	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() == null);
+	Response resp = req.processUsing(serverInfo);
+
+	assertTrue(resp instanceof AuthenticationResponse);
+	assertTrue(resp.isVersion2());
+
+	s = resp.toUrlString();
+
+	Response resp2 = ResponseFactory.parse(s);
+	assertTrue(resp2 instanceof AuthenticationResponse);
+	assertTrue(resp2.isVersion2());
+	AuthenticationResponse authr = (AuthenticationResponse) resp;
+
+	String sigList = authr.getSignedList();
+	assertTrue(sigList != null);
+	assertTrue(sigList.indexOf("claimed_id") == -1);
+	String signature = authr.getSignature();
+	assertTrue(signature != null);
+	String namespace = authr.getNamespace();
+	assertTrue(v2.equals(namespace));
+
+	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
+	assertEquals(reSigned, signature);
+
+	// check that we can authenticate the signaure
+	// THIS SHOULD NOT BE POSSIBLE: check_authentication should not use shared associations
+	Map map = authr.toMap();
+	CheckAuthenticationRequest carq 
+	    = new CheckAuthenticationRequest(map, "check_authentication");
+
+	resp = carq.processUsing(serverInfo);
+	assertTrue(resp.isVersion2());
+	assertTrue(resp instanceof CheckAuthenticationResponse);
+	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
+	assertFalse(carp.isValid());
+
+        // Now reverify after resetting the association to shared
+        assertTrue(getAssociation(carq.getHandle()).getShared());
+        setAssociationSharing(carq.getHandle(), false);
+
+	resp = carq.processUsing(serverInfo);
+	assertTrue(resp.isVersion2());
+	assertTrue(resp instanceof CheckAuthenticationResponse);
+	carp = (CheckAuthenticationResponse) resp;
+	assertTrue(carp.isValid());
     }
 }

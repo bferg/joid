@@ -340,7 +340,9 @@ public class AuthenticationRequest extends Request {
 		if (handle == null || assoc == null) {
 			log.info("Invalidating association handle: " + handle);
 			invalidate = handle;
+            // private association
 			assoc = store.generateAssociation(statelessAr, crypto);
+            assoc.setShared(false);
 			store.saveAssociation(assoc);
 		}
 		return new AuthenticationResponse(si, this, assoc, crypto, invalidate);

@@ -45,8 +45,8 @@ public class MemoryStore extends Store
 	a.setMacKey(secret);
 	a.setIssuedDate(new Date());
 	a.setLifetime(new Long(associationLifetime));
-
 	a.setAssociationType(req.getAssociationType());
+        a.setShared(true);
 	return a;
     }
 
@@ -62,8 +62,9 @@ public class MemoryStore extends Store
 
     public void deleteAssociation(Association a)
     {
-	throw new RuntimeException("not yet implemented");
+	//throw new RuntimeException("not yet implemented");
 	// "associationList.delete(a)"
+        associationList.remove(a);
     }
 
     public Association findAssociation(String handle) throws OpenIdException

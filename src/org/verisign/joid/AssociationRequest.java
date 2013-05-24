@@ -229,7 +229,8 @@ public class AssociationRequest extends Request
     {
 	Store store = si.getStore();
 	Crypto crypto = si.getCrypto();
-	Association a = store.generateAssociation(this, crypto);
+	Association a = store.generateAssociation(this, crypto); 
+	a.setShared(true);
 	store.saveAssociation(a);
 	return new AssociationResponse(this, a, crypto);
     }

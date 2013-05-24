@@ -377,6 +377,10 @@ public class AllTests extends TestCase
 	Request req = RequestFactory.parse(s);
 	assertTrue(req instanceof AuthenticationRequest);
 	assertFalse(req.isVersion2());
+
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(ar.getAssociationHandle(), false);
+        
 	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertFalse(resp.isVersion2());
@@ -397,15 +401,12 @@ public class AllTests extends TestCase
 	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
 
-
 	// check that we can authenticate the signature
 	//
 	Map map = authr.toMap();
 	CheckAuthenticationRequest carq
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 	assertFalse(carq.isVersion2());
-        // set sharing off so we can verify; checkauth is never used for shared associations
-        setAssociationSharing(carq.getHandle(), false);
 	resp = carq.processUsing(serverInfo);
 	assertFalse(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
@@ -443,6 +444,10 @@ public class AllTests extends TestCase
 	Request req = RequestFactory.parse(s);
 	assertTrue(req instanceof AuthenticationRequest);
 	assertFalse(req.isVersion2());
+
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(ar.getAssociationHandle(), false);
+
 	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertFalse(resp.isVersion2());
@@ -462,16 +467,12 @@ public class AllTests extends TestCase
 	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
 
-
 	// check that the wrong signature doesn't authenticate
 	//
 	Map map = authr.toMap();
 	map.put("openid.sig", "pO+52CAFEBABEuu0lVRivEeu2Zw=");
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
-        // set sharing off so we can verify; checkauth is never used for shared associations
-        setAssociationSharing(carq.getHandle(), false);
-
 	resp = carq.processUsing(serverInfo);
 	assertFalse(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
@@ -521,6 +522,9 @@ public class AllTests extends TestCase
 	sreg = new SimpleRegistration(set, Collections.EMPTY_SET, supplied, "");
 	((AuthenticationRequest) req).setSimpleRegistration(sreg);
 
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(ar.getAssociationHandle(), false);
+
 	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
@@ -554,9 +558,6 @@ public class AllTests extends TestCase
             String[] signed = sigList.split(",");
             assertTrue(Arrays.asList(signed).contains("ns.sreg"));
         }
-
-        // set sharing off so we can verify; checkauth is never used for shared associations
-        setAssociationSharing(carq.getHandle(), false);
 	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
@@ -628,11 +629,13 @@ public class AllTests extends TestCase
 	assertTrue(req instanceof AuthenticationRequest);
 	assertTrue(req.isVersion2());
 	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() == null);
-	Response resp = req.processUsing(serverInfo);
 
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(ar.getAssociationHandle(), false);
+
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
-
 	s = resp.toUrlString();
 
 	Response resp2 = ResponseFactory.parse(s);
@@ -657,9 +660,6 @@ public class AllTests extends TestCase
 	Map map = authr.toMap();
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
-
-        // set sharing off so we can verify; checkauth is never used for shared associations
-        setAssociationSharing(carq.getHandle(), false);
 	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
@@ -700,11 +700,13 @@ public class AllTests extends TestCase
 	assertTrue(req instanceof AuthenticationRequest);
 	assertTrue(req.isVersion2());
 	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() == null);
-	Response resp = req.processUsing(serverInfo);
 
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(ar.getAssociationHandle(), false);
+
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
-
 	s = resp.toUrlString();
 
 	Response resp2 = ResponseFactory.parse(s);
@@ -723,7 +725,6 @@ public class AllTests extends TestCase
 
 	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
 	assertEquals(reSigned, signature);
-
 
 	// Check that the wrong signature doesn't authenticate
 	//
@@ -773,11 +774,13 @@ public class AllTests extends TestCase
 	assertTrue(req instanceof AuthenticationRequest);
 	assertTrue(req.isVersion2());
 	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() !=null);
-	Response resp = req.processUsing(serverInfo);
 
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing(ar.getAssociationHandle(), false);
+
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
-
 	s = resp.toUrlString();
 
 	Response resp2 = ResponseFactory.parse(s);
@@ -802,9 +805,6 @@ public class AllTests extends TestCase
 	Map map = authr.toMap();
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
-
-        // set sharing off so we can verify; checkauth is never used for shared associations
-        setAssociationSharing(carq.getHandle(), false);
 	resp = carq.processUsing(serverInfo);
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
@@ -1917,21 +1917,20 @@ public class AllTests extends TestCase
         System.out.println(assoc);
 
 	Request req = RequestFactory.parse(s);
-
 	assertTrue(req instanceof AuthenticationRequest);
 	assertTrue(req.isVersion2());
 	assertTrue(((AuthenticationRequest) req).getClaimedIdentity() == null);
-	Response resp = req.processUsing(serverInfo);
 
+	Response resp = req.processUsing(serverInfo);
 	assertTrue(resp instanceof AuthenticationResponse);
 	assertTrue(resp.isVersion2());
-
-	s = resp.toUrlString();
-
-	Response resp2 = ResponseFactory.parse(s);
-	assertTrue(resp2 instanceof AuthenticationResponse);
-	assertTrue(resp2.isVersion2());
 	AuthenticationResponse authr = (AuthenticationResponse) resp;
+
+        // auth response should be a new asociation handle
+        Map map = authr.toMap();
+        System.out.println(authr);
+        // old handle should be invalidated
+        assertEquals("Handle invalidated", ar.getAssociationHandle(), (String) map.get(AuthenticationResponse.OPENID_INVALIDATE_HANDLE));
 
 	String sigList = authr.getSignedList();
 	assertTrue(sigList != null);
@@ -1942,11 +1941,10 @@ public class AllTests extends TestCase
 	assertTrue(v2.equals(namespace));
 
 	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
-	assertEquals(reSigned, signature);
+	assertFalse("Signatures should NOT match as old handle invalidated", reSigned.equals(signature));
 
 	// check that we can authenticate the signaure
-	// THIS SHOULD NOT BE POSSIBLE: check_authentication should not use shared associations
-	Map map = authr.toMap();
+        // this is possible because our original was invalidated
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 
@@ -1954,16 +1952,6 @@ public class AllTests extends TestCase
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
-	assertFalse(carp.isValid());
-
-        // Now reverify after resetting the association to shared
-        assertTrue(getAssociation(carq.getHandle()).getShared());
-        setAssociationSharing(carq.getHandle(), false);
-
-	resp = carq.processUsing(serverInfo);
-	assertTrue(resp.isVersion2());
-	assertTrue(resp instanceof CheckAuthenticationResponse);
-	carp = (CheckAuthenticationResponse) resp;
 	assertTrue(carp.isValid());
     }
 }

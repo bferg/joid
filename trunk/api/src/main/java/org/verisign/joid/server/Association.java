@@ -26,6 +26,7 @@ public class Association implements org.verisign.joid.IAssociation
     private Date issuedDate;
     private Long lifetime;
     private AssociationType at = AssociationType.HMAC_SHA1;
+    private boolean shared;
 
     // Not in db
     private String error;
@@ -151,7 +152,7 @@ public class Association implements org.verisign.joid.IAssociation
         {
             s += ", public key=" + Crypto.convertToString( publicKey );
         }
-        s += ", type=" + at + ", issuedDate=" + issuedDate + "]";
+        s += ", type=" + at + ", issuedDate=" + issuedDate + ", shared=" + (shared ? "true":"false") + "]";
         return s;
     }
 
@@ -229,5 +230,17 @@ public class Association implements org.verisign.joid.IAssociation
         log.debug( "expired: " + expired.toString() );
         log.debug( "now.after(expired): " + now.after( expired ) );
         return now.after( expired );
+    }
+
+
+    public boolean getShared() 
+    { 
+        return shared; 
+    }
+
+
+    public void setShared( boolean isShared ) 
+    { 
+        shared = isShared; 
     }
 }

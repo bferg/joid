@@ -80,6 +80,10 @@ public class CheckAuthenticationRequest extends Request
             }
         }
         IAssociation assoc = store.findAssociation( handle );
+        if ( ( assoc != null ) && ( assoc.getShared() ) ) 
+        {
+            assoc = null;
+        }
         if ( ( assoc == null ) || ( assoc.hasExpired() ) )
         {
             invalidate = handle;
@@ -97,6 +101,11 @@ public class CheckAuthenticationRequest extends Request
             + ", handle=" + handle
             + ", authentication response=" + ar
             + "]";
+    }
+
+
+    public String getHandle() {
+        return handle;
     }
 
 

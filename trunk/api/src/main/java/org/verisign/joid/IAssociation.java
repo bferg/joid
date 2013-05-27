@@ -130,5 +130,23 @@ public interface IAssociation
     boolean hasExpired();
 
 
+    /** 
+     * Return flag indicating that this association is shared, i.e. it
+     * can not be used for direct verification requests to the server.
+     *
+     * @return whether this association is shared
+     */
+    public boolean getShared();
+
+
+    /** 
+     * Set flag indicating that this association is shared, i.e. it
+     * can not be used for direct verification requests to the server.
+     *
+     * @param isShared true if this association is shared
+     */
+    public void setShared(boolean isShared);
+
+
     Date getIssuedDate();
 }

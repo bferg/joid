@@ -391,6 +391,11 @@ public class AuthenticationRequest extends Request
         if ( handle != null )
         {
             assoc = store.findAssociation( handle );
+            if ( ( assoc != null ) && ( assoc.getShared() ) ) 
+            {
+                log.info("Association handle is shared (invalid): " + handle);
+                assoc = null;
+            }
             if ( assoc != null && assoc.hasExpired() )
             {
                 log.info( "Association handle has expired: " + handle );
@@ -401,7 +406,9 @@ public class AuthenticationRequest extends Request
         {
             log.info( "Invalidating association handle: " + handle );
             invalidate = handle;
+            // private association
             assoc = store.generateAssociation( statelessAr, crypto );
+            assoc.setShared( false );
             store.saveAssociation( assoc );
         }
         return new AuthenticationResponse( si, this, assoc, crypto, invalidate );

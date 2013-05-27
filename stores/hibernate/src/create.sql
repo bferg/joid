@@ -12,6 +12,7 @@ CREATE TABLE Association (
     issuedDate datetime default NULL,
     lifetime int(11) default NULL,
     associationType varchar(255) default NULL,
+    shared tinyint(1) default 1,
     PRIMARY KEY  (id)
 );
 

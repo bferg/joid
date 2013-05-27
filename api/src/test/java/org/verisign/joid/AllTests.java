@@ -122,6 +122,21 @@ public class AllTests extends TestCase
     }
 
 
+    private IAssociation getAssociation( String handle ) throws Exception {
+        IStore store = serverInfo.getStore();
+        IAssociation assoc = store.findAssociation(handle);
+        return assoc;
+    }
+
+
+    private void setAssociationSharing( String handle, boolean shared ) throws Exception {
+        IAssociation assoc = getAssociation(handle);
+        store.deleteAssociation(assoc);
+        assoc.setShared(shared);
+        store.saveAssociation(assoc);
+    }
+
+
     @org.junit.Test
     public void testUrlToMap() throws Exception
     {
@@ -359,6 +374,10 @@ public class AllTests extends TestCase
         Request req = RequestFactory.parse( s );
         assertTrue( req instanceof AuthenticationRequest );
         assertFalse( req.isVersion2() );
+
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing( ar.getAssociationHandle(), false );
+        
         Response resp = req.processUsing( serverInfo );
         assertTrue( resp instanceof AuthenticationResponse );
         assertFalse( resp.isVersion2() );
@@ -421,6 +440,10 @@ public class AllTests extends TestCase
         Request req = RequestFactory.parse( s );
         assertTrue( req instanceof AuthenticationRequest );
         assertFalse( req.isVersion2() );
+
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing( ar.getAssociationHandle(), false );
+        
         Response resp = req.processUsing( serverInfo );
         assertTrue( resp instanceof AuthenticationResponse );
         assertFalse( resp.isVersion2() );
@@ -493,6 +516,9 @@ public class AllTests extends TestCase
         sreg = new SimpleRegistration( set, Collections.<String>emptySet(), supplied, "" );
         ( ( AuthenticationRequest ) req ).setSimpleRegistration( sreg );
 
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing( ar.getAssociationHandle(), false );
+        
         Response resp = req.processUsing( serverInfo );
         assertTrue( resp instanceof AuthenticationResponse );
         assertTrue( resp.isVersion2() );
@@ -596,6 +622,10 @@ public class AllTests extends TestCase
         assertTrue( req instanceof AuthenticationRequest );
         assertTrue( req.isVersion2() );
         assertTrue( ( ( AuthenticationRequest ) req ).getClaimedIdentity() == null );
+
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing( ar.getAssociationHandle(), false );
+        
         Response resp = req.processUsing( serverInfo );
 
         assertTrue( resp instanceof AuthenticationResponse );
@@ -662,6 +692,10 @@ public class AllTests extends TestCase
         assertTrue( req instanceof AuthenticationRequest );
         assertTrue( req.isVersion2() );
         assertTrue( ( ( AuthenticationRequest ) req ).getClaimedIdentity() == null );
+
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing( ar.getAssociationHandle(), false );
+        
         Response resp = req.processUsing( serverInfo );
 
         assertTrue( resp instanceof AuthenticationResponse );
@@ -730,6 +764,10 @@ public class AllTests extends TestCase
         assertTrue( req instanceof AuthenticationRequest );
         assertTrue( req.isVersion2() );
         assertTrue( ( ( AuthenticationRequest ) req ).getClaimedIdentity() != null );
+
+        // set sharing off so we can verify; checkauth is never used for shared associations
+        setAssociationSharing( ar.getAssociationHandle(), false );
+        
         Response resp = req.processUsing( serverInfo );
 
         assertTrue( resp instanceof AuthenticationResponse );
@@ -1925,4 +1963,94 @@ public class AllTests extends TestCase
         objOutStream.close();
 
     }
+
+    // Tests whether shared association handle can be used in a
+    // private association context.
+    //
+    // From http://openid.net/specs/openid-authentication-2_0.html#rfc.section.11.4.2.1 :
+    // "For verifying signatures an OP MUST only use private
+    //  associations and MUST NOT use associations that have shared
+    //  keys. If the verification request contains a handle for a
+    //  shared association, it means the Relying Party no longer knows
+    //  the shared secret, or an entity other than the RP (e.g. an
+    //  attacker) has established this association with the OP."
+    //
+    public void testAssociationBug () throws Exception {
+        // get association
+        // generate assertion using key from association
+        // check assertion with server using (shared) association (should fail)
+        
+        DiffieHellman dh = new DiffieHellman(p, g);
+        AssociationResponse ar = associate(dh);
+        BigInteger privateKey = dh.getPrivateKey();
+        BigInteger publicKey = dh.getPublicKey();
+
+        assertTrue( ar.getSessionType().toString(), SessionType.DH_SHA1 == ar.getSessionType() );
+        assertTrue( AssociationType.HMAC_SHA1.equals( ar.getAssociationType() ) );
+        assertTrue(defaultLifespan == ar.getExpiresIn());
+        assertTrue(null == ar.getErrorCode());
+        assertTrue(null == ar.getMacKey());
+
+        byte[] encKey = ar.getEncryptedMacKey();
+        assertTrue(null != encKey);
+
+        BigInteger serverPublic = ar.getDhServerPublic();
+        assertTrue(null != serverPublic);
+
+        byte[] clearKey = dh.xorSecret(serverPublic, encKey);
+
+        // authenticate
+        String s = Utils.readFileAsString("3b.txt");
+
+        // openid.ns=http://specs.openid.net/auth/2.0
+        // openid.mode=checkid_setup
+        // openid.identity=http://hans.pip.verisignlabs.com
+        // openid.return_to=http://granqvist.com
+        // openid.trust_root=http://granqvist.com
+        
+        s += "&openid.ns="+v2
+            + "&openid.assoc_handle="
+            + URLEncoder.encode(ar.getAssociationHandle(), "UTF-8");
+
+        IAssociation assoc = store.findAssociation(ar.getAssociationHandle());
+        System.out.println(assoc);
+
+        Request req = RequestFactory.parse(s);
+        assertTrue(req instanceof AuthenticationRequest);
+        assertTrue(req.isVersion2());
+        assertTrue(((AuthenticationRequest) req).getClaimedIdentity() == null);
+
+        Response resp = req.processUsing(serverInfo);
+        assertTrue(resp instanceof AuthenticationResponse);
+        assertTrue(resp.isVersion2());
+        AuthenticationResponse authr = (AuthenticationResponse) resp;
+
+        // auth response should be a new asociation handle
+        Map map = authr.toMap();
+        System.out.println(authr);
+        // old handle should be invalidated
+        assertEquals("Handle invalidated", ar.getAssociationHandle(), (String) map.get(AuthenticationResponse.OPENID_INVALIDATE_HANDLE));
+
+        String sigList = authr.getSignedList();
+        assertTrue(sigList != null);
+        assertTrue(sigList.indexOf("claimed_id") == -1);
+        String signature = authr.getSignature();
+        assertTrue(signature != null);
+        String namespace = authr.getNamespace();
+        assertTrue(v2.equals(namespace));
+
+        String reSigned = authr.sign( AssociationType.HMAC_SHA1, clearKey, sigList );
+        assertFalse("Signatures should NOT match as old handle invalidated", reSigned.equals(signature));
+
+        // check that we can authenticate the signaure
+        // this is possible because our original was invalidated
+        CheckAuthenticationRequest carq = new CheckAuthenticationRequest( map, Mode.CHECK_AUTHENTICATION );
+
+        resp = carq.processUsing(serverInfo);
+        assertTrue(resp.isVersion2());
+        assertTrue(resp instanceof CheckAuthenticationResponse);
+        CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
+        assertTrue(carp.isValid());
+    }
+
 }

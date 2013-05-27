@@ -48,6 +48,7 @@ public class MemoryStore implements IStore
         a.setLifetime( new Long( associationLifetime ) );
 
         a.setAssociationType( req.getAssociationType() );
+        a.setShared( true );
         return a;
     }
 
@@ -66,8 +67,7 @@ public class MemoryStore implements IStore
 
     public void deleteAssociation( IAssociation a )
     {
-        throw new RuntimeException( "not yet implemented" );
-        // "associationList.delete(a)"
+        associationList.remove(a);
     }
 
 

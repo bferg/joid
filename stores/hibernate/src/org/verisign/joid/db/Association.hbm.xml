@@ -14,5 +14,6 @@
     <property name="issuedDate" type="timestamp"/>
     <property name="lifetime" type="long"/>
     <property name="associationType" type="string"/>
+    <property name="shared" type="boolean"/>
   </class>
 </hibernate-mapping>

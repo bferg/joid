@@ -80,9 +80,11 @@ public class CheckAuthenticationRequest extends Request
         }
 	Association assoc = store.findAssociation(handle);
         if ((assoc != null) && assoc.getShared()) {
+            log.info("Association handle is shared (invalid): " + handle);
             assoc = null;
         }
 	if ((assoc == null) || assoc.hasExpired()){
+            log.info("Association handle has expired: " + handle);
 	    invalidate = handle;
 	}
 	Crypto crypto = si.getCrypto();

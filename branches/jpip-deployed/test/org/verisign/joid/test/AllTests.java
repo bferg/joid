@@ -1929,8 +1929,8 @@ public class AllTests extends TestCase
         // auth response should be a new asociation handle
         Map map = authr.toMap();
         System.out.println(authr);
-        // old handle should be invalidated
-        assertEquals("Handle invalidated", ar.getAssociationHandle(), (String) map.get(AuthenticationResponse.OPENID_INVALIDATE_HANDLE));
+        // old handle should not be invalidated for checkid_setup
+        assertNull("Handle not invalidated", (String) map.get(AuthenticationResponse.OPENID_INVALIDATE_HANDLE));
 
 	String sigList = authr.getSignedList();
 	assertTrue(sigList != null);
@@ -1941,10 +1941,10 @@ public class AllTests extends TestCase
 	assertTrue(v2.equals(namespace));
 
 	String reSigned = authr.sign("HMAC-SHA1", clearKey, sigList);
-	assertFalse("Signatures should NOT match as old handle invalidated", reSigned.equals(signature));
+	assertTrue("Signatures should match as old handle is valid", reSigned.equals(signature));
 
-	// check that we can authenticate the signaure
-        // this is possible because our original was invalidated
+	// check that we can not authenticate the signaure
+        // this is not possible because check_authentication needs a private handle
 	CheckAuthenticationRequest carq 
 	    = new CheckAuthenticationRequest(map, "check_authentication");
 
@@ -1952,6 +1952,6 @@ public class AllTests extends TestCase
 	assertTrue(resp.isVersion2());
 	assertTrue(resp instanceof CheckAuthenticationResponse);
 	CheckAuthenticationResponse carp = (CheckAuthenticationResponse) resp;
-	assertTrue(carp.isValid());
+	assertTrue(!carp.isValid());
     }
 }

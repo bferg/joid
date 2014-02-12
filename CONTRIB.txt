@@ -1,0 +1,20 @@
+Thanks to the following contributors:
+
+Barry Ferg, VeriSign/Symantec
+Hans Granqvist, VeriSign
+
+Committers:
+
+Travis Reeder
+Michael Wechner
+Birkan Duman
+Alex Karasulu, Apache
+
+Patches:
+
+Christian Mainka, Horst Görtz Institute for IT-Security, Ruhr-Universität Bochum
+Vladislav Mladenov, Horst Görtz Institute for IT-Security, Ruhr-Universität Bochum
+
+  Many thanks to Christian and Vladislav for the OpenID consumer
+  patches against the return_to and identifier parameter checking
+  vulnerabilities they discovered.

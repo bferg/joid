@@ -4,6 +4,7 @@ package org.verisign.joid.consumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.verisign.joid.OpenIdRuntimeException;
+import org.verisign.joid.util.UrlUtils;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -101,8 +102,8 @@ public class OpenIdFilter implements Filter
             try
             {
                 @SuppressWarnings("unchecked")
-                AuthenticationResult result = joid.authenticate( convertToStringValueMap( servletRequest
-                    .getParameterMap() ) );
+                AuthenticationResult result = joid.authenticate(convertToStringValueMap(servletRequest.getParameterMap()), 
+                                                                UrlUtils.getBaseUrl((HttpServletRequest)servletRequest));
                 String identity = result.getIdentity();
                 if ( identity != null )
                 {

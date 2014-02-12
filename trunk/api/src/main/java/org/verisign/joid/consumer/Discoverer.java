@@ -7,8 +7,9 @@ import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -116,11 +117,17 @@ public class Discoverer
     {
         List<XRDSService> services = xrdsDocument.getServiceList();
         Iterator<XRDSService> it = services.iterator();
+        int lastPriority = -1;
         while ( it.hasNext() )
         {
             XRDSService service = it.next();
-            System.out.println( "service=" + service.getUri() );
-            serverAndDelegate.setServer( service.getUri() );
+            //ServerAndDelegate stores the endpoint of the XRDS service with the lowest priority
+            //Is needed for the op_endpoint verification of the received token
+            if (lastPriority < 0 || lastPriority > service.getPriority()) {
+                System.out.println( "service=" + service.getUri() );
+                serverAndDelegate.setServer( service.getUri() );
+                lastPriority = service.getPriority();
+            }
             //  @TODO: also set delegate after we get it
         }
     }
@@ -180,10 +187,11 @@ public class Discoverer
         NodeList list = document.getElementsByTagName( "Service" );
         for ( int i = 0; i < list.getLength(); i++ )
         {
-            Node node = list.item( i );
-            System.out.println( "servicenode=" + node );
-            NodeList childNodes = node.getChildNodes();
+            Element serviceElement = (Element) list.item(i);
+            System.out.println("servicenode=" + serviceElement);
+            NodeList childNodes = serviceElement.getChildNodes();
             XRDSService service = new XRDSService();
+            parseServicePriority(serviceElement, service);
             for ( int j = 0; j < childNodes.getLength(); j++ )
             {
                 // todo: ensure <Type> is http://openid.net/signon/1.0 - http://yadis.org/wiki/Yadis_1.0_(HTML)#7._The_Yadis_document
@@ -200,6 +208,18 @@ public class Discoverer
         return doc;
     }
 
+    //needed for parsing the 'priority'-attribute of the received XRDS-file
+    private void parseServicePriority(Element serviceElement, XRDSService service) {
+        String priority = serviceElement.getAttribute("priority");
+        if (!priority.isEmpty()) {
+            try {
+                int parsedPriority = Integer.parseInt(priority);
+                service.setPriority(parsedPriority);
+            } catch (NumberFormatException e) {
+                service.setPriority(0);
+            }
+        }
+    }
 
     private String findLinkTag( String str, String rel, BufferedReader in )
             throws IOException

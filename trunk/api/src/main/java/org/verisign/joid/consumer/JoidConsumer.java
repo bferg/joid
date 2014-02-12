@@ -195,12 +195,12 @@ public class JoidConsumer
      * This method will attempt to authenticate against the OpenID server.
      *
      * @param map
-     * @return openid.identity if authentication was successful, null if unsuccessful
+     * @return openid.claimed_id if authentication was successful, null if unsuccessful
      * @throws IOException
      * @throws OpenIdException
      * @throws NoSuchAlgorithmException
      */
-    public AuthenticationResult authenticate( Map<String,String> map )
+    public AuthenticationResult authenticate( Map<String,String> map, String serverEndpointURL )
             throws IOException, OpenIdException, NoSuchAlgorithmException
     {
 
@@ -208,34 +208,33 @@ public class JoidConsumer
         AuthenticationResponse response =
                 new AuthenticationResponse( map );
         // @TODO: store nonce's to ensure we never accept the same value again - see sec 11.3 of spec 2.0
+        //verify the return_to URL according to the OpenID specification (11.1.  Verifying the Return URL)
+        if (!serverEndpointURL.equals(response.getReturnTo()))
+        {
+            throw new OpenIdException("Return_to verification failed.");
+        }
+        
+        //Start discovery on the contained claimed_id and return the discovered endpoint
+        String serverURL = verifyServerEndpointURL(response);
         Properties props;
+        //verify if 'op_endpoint' in the token is equals the fresh discovered serverURL
+        if (!serverURL.equals(response.getUrlEndPoint())) {
+            throw new OpenIdException("Endpoint verification failed.");
+        }
         if ( response.getInvalidateHandle() != null )
         {
             // then we have to send a authentication_request (dumb mode) to verify the signature
-            CheckAuthenticationRequest checkReq =
-                    new CheckAuthenticationRequest( response.toMap(), Mode.CHECK_AUTHENTICATION );
-            props = getPropsByHandle( response.getInvalidateHandle() );
-            CheckAuthenticationResponse response2 = ( CheckAuthenticationResponse )
-                    Util.send( checkReq, props.getProperty( "idServer" ) );
-            // @TODO: verify the invalidate_handle in response2 is the same as in response
-            removeInvalidHandle( response.getInvalidateHandle() );
-            if ( response2.isValid() )
-            {
-                // then this is a valid request, lets send it back
-                return new AuthenticationResult( response.getIdentity(), response );
-            }
-            else
-            {
-                throw new AuthenticationException( "Signature invalid, identity denied." );
-            }
-        }
-        else
-        {
+            props = getPropsByHandle(response.getInvalidateHandle());
+            return useCheckAuthentication(response, serverURL); //use for the verificiation the keys associated to serverURL
+        } else {
             // normal properties
-            props = getPropsByHandle( response.getAssociationHandle() );
+            props = getProps(serverURL);
 
+            if (!props.getProperty("handle").equals(response.getAssociationHandle()))
+            {
+                return useCheckAuthentication(response, serverURL); //use for the verificiation the keys associated to serverURL
+            }
             // todo: before returning a valid response, ensure return_to is a suburl of trust_root
-
             BigInteger privKey = Crypto.convertToBigIntegerFromString( props.getProperty( "privateKey" ) );
             BigInteger modulus = Crypto.convertToBigIntegerFromString( props.getProperty( "modulus" ) );
             BigInteger serverPublic = Crypto.convertToBigIntegerFromString( props.getProperty( "publicKey" ) );
@@ -256,18 +255,51 @@ public class JoidConsumer
             String sigList = response.getSignedList();
             String reSigned = response.sign( clearKey, sigList );
             log.info( "Our signature:      " + reSigned );
-            String identity = response.getIdentity();
+            String claimedId = response.getClaimedId();
             if ( !signature.equals( reSigned ) )
             {
                 throw new AuthenticationException( "OpenID signatures do not match! " +
-                        "claimed identity: " + identity );
+                        "claimed identity: " + claimedId );
             }
-            log.info( "Signatures match, identity is ok: " + identity );
-            return new AuthenticationResult( identity, response );
+            log.info( "Signatures match, identity is ok: " + claimedId );
+            return new AuthenticationResult( claimedId, response );
         }
 
     }
 
+    private AuthenticationResult useCheckAuthentication(AuthenticationResponse response, String serverURL) 
+        throws OpenIdException, AuthenticationException, IOException 
+    {
+        CheckAuthenticationRequest checkReq
+            = new CheckAuthenticationRequest(response.toMap(), Mode.CHECK_AUTHENTICATION);
+        
+        CheckAuthenticationResponse response2 = (CheckAuthenticationResponse) Util.send(checkReq, serverURL);
+        // @TODO: verify the invalidate_handle in response2 is the same as in response
+        removeInvalidHandle(response.getInvalidateHandle());
+        if (!response2.isValid()) {
+            throw new AuthenticationException("Signature invalid, identity denied.");
+        }
+        // then this is a valid request, lets send it back
+        return new AuthenticationResult(response.getClaimedId(), response);
+    }
+
+    private String verifyServerEndpointURL(AuthenticationResponse response) throws OpenIdException {
+        ServerAndDelegate idserver = null;
+        final String claimedId = response.getClaimedId();
+        final String opEndpoint = response.getUrlEndPoint();
+        
+        //start discovery on the contained claimed_id and 
+        //compare the discovered enpoint with the 'op_endpoint' in the token
+        try {
+            idserver = discoverer.findIdServer(claimedId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new OpenIdException("Could not get OpenId server from "
+                    + "identifier.", e);
+        }
+        final String serverURL = idserver.getServer(); //uses the discovered URL instead of the URL within the token for security reasons
+        return serverURL;
+    }
 
     /**
      * If openid.invalidate_handle was received, this will remove it from our
